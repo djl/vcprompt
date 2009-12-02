@@ -7,9 +7,11 @@ from subprocess import Popen, PIPE
 UNKNOWN = "(unknown)"
 SYSTEMS = []
 
+
 def vcs(function):
     SYSTEMS.append(function)
     return function
+
 
 @vcs
 def bzr(path):
@@ -20,6 +22,7 @@ def bzr(path):
         line = f.read().split(' ', 1)[0]
         return 'bzr:r' + (line or UNKNOWN)
 
+
 @vcs
 def hg(path):
     file = '.hg/branch'
@@ -28,6 +31,7 @@ def hg(path):
     with open(file, 'r') as f:
         line = f.read()
         return 'hg:' + (line or UNKNOWN)
+
 
 @vcs
 def git(path):
@@ -42,7 +46,7 @@ def git(path):
         if re.match('^ref: refs/heads/', line.strip()):
             branch = (line.split('/')[-1] or UNKNOWN)
     return prompt + branch
-            
+
 
 @vcs
 def svn(path):
@@ -73,6 +77,7 @@ def vcprompt(path=None):
             if prompt:
                 return prompt
         count += 1
+
 
 if __name__ == '__main__':
     sys.stdout.write(vcprompt())
