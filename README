@@ -47,5 +47,5 @@ The function should take a single argument, the path to be checked for.
 TODO
 ----
 
-- Add support for CVS, Darcs and Fossil
+- More complete support for CVS, Darcs and Fossil
 - Add option to show state of repository

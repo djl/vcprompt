@@ -4,6 +4,12 @@ import re
 import sys
 from subprocess import Popen, PIPE
 
+SQLITE3 = True
+try:
+    import sqlite3
+except:
+    SQLITE3 = False
+
 UNKNOWN = "(unknown)"
 SYSTEMS = []
 
@@ -21,6 +27,22 @@ def bzr(path):
     with open(file, 'r') as f:
         line = f.read().split(' ', 1)[0]
         return 'bzr:r' + (line or UNKNOWN)
+
+
+@vcs
+def fossil(path):
+    # In my five minutes of playing with Fossil this looks OK
+    file = os.path.join(path, '_FOSSIL_')
+    if not os.path.exists(file) or  not SQLITE3:
+        return None
+
+    conn = sqlite3.connect(file)
+    c = conn.cursor()
+    repo = c.execute("""SELECT * from vvar WHERE name = 'repository' """)
+    c.close()
+
+    repo = repo.fetchone()[1].split('/')[-1]
+    return "fossil:" + repo
 
 
 @vcs
