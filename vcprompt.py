@@ -15,7 +15,7 @@ def vcs(function):
 
 @vcs
 def bzr(path):
-    file = '.bzr/branch/last-revision'
+    file = os.path.join(path, '.bzr/branch/last-revision')
     if not os.path.exists(os.path.join(path, file)):
         return None
     with open(file, 'r') as f:
@@ -25,7 +25,7 @@ def bzr(path):
 
 @vcs
 def hg(path):
-    file = '.hg/branch'
+    file = os.path.join(path, '.hg/branch')
     if not os.path.exists(os.path.join(path, file)):
         return None
     with open(file, 'r') as f:
