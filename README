@@ -23,6 +23,12 @@ For zsh you need to enable PROMPT_SUBST first::
     PS1='[%n@%m] [%~] $(vcprompt.py)'
 
 
+Requirements
+------------
+
+* Python 2.5+
+
+
 Adding systems
 --------------
 
@@ -49,3 +55,4 @@ TODO
 
 - More complete support for CVS, Darcs and Fossil
 - Add option to show state of repository
+- Formatting for prompt string
