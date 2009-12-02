@@ -1,0 +1,51 @@
+===========
+vcprompt.py
+===========
+
+A pure-Python implementation of vcprompt_
+
+.. _vcprompt: http://vc.gerg.ca/hg/vcprompt/
+
+
+Installing
+----------
+
+Place ``vcprompt.py`` somewhere in your ``$PATH``, then add it to your prompt.
+
+For bash::
+
+    PS1='\u@\h:\w $(vcprompt.py)\$'
+
+
+For zsh you need to enable PROMPT_SUBST first::
+
+    setopt prompt_subst
+    PS1='[%n@%m] [%~] $(vcprompt.py)'
+
+
+Adding systems
+--------------
+
+To add a new VCS define a function which uses the 'vcs' decorator.
+The function should take a single argument, the path to be checked for.
+
+::
+
+    @vcs
+    def git(path):
+        file = os.path.join(path, '.git/HEAD')
+        if not os.path.exists(file):
+            return None
+
+        with open(file, 'r') as f:
+            line = f.read()
+            if re.match('^ref: refs/heads/', line):
+                return 'git:' + line.split('/')[-1]
+
+
+
+TODO
+----
+
+- Add support for CVS, Darcs and Fossil
+- Add option to show state of repository
