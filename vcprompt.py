@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 import os
 import re
+import sqlite3
 import sys
 from subprocess import Popen, PIPE
-
-SQLITE3 = True
-try:
-    import sqlite3
-except:
-    SQLITE3 = False
 
 UNKNOWN = "(unknown)"
 SYSTEMS = []
@@ -33,14 +28,15 @@ def bzr(path):
 def fossil(path):
     # In my five minutes of playing with Fossil this looks OK
     file = os.path.join(path, '_FOSSIL_')
-    if not os.path.exists(file) or  not SQLITE3:
+    if not os.path.exists(file):
         return None
 
+    repo = UNKNOWN
     conn = sqlite3.connect(file)
     c = conn.cursor()
-    repo = c.execute("""SELECT * from vvar WHERE name = 'repository' """)
-    c.close()
-
+    repo = c.execute("""SELECT * FROM
+                        vvar WHERE
+                        name = 'repository' """)
     repo = repo.fetchone()[1].split('/')[-1]
     return "fossil:" + repo
 
@@ -74,23 +70,29 @@ def git(path):
 def svn(path):
     # I'm not too keen on calling an external script
     # TODO find a way to do this in pure Python without the svn bindings
+    revision = UNKNOWN
     if not os.path.exists(os.path.join(path, '.svn')):
         return None
     _p = Popen(['svnversion', path], stdout=PIPE)
     revision = _p.communicate()[0]
-    if not revision:
-        revision = UNKNOWN
     return 'svn:r' + revision
 
 
 def vcprompt(path=None):
     path = path or os.getcwd()
-    count = 0
-    while path:
-        if count > 0:
+    looped = end = False
+
+    while True:
+        if looped:
             path = path.rsplit('/', 1)[0]
+        else:
+            looped = True
         if not path:
-            path = '/'
+            if not end:
+                end = True
+                path = '/'
+            else:
+                return ""
 
         # get vcs
         prompt = ''
@@ -98,7 +100,6 @@ def vcprompt(path=None):
             prompt = vcs(path)
             if prompt:
                 return prompt
-        count += 1
 
 
 if __name__ == '__main__':
