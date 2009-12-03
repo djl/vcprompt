@@ -17,27 +17,18 @@ def vcs(function):
 
 
 def vcprompt(path=None):
-    path = path or os.getcwd()
+    paths = (path or os.getcwd()).split('/')
     looped = end = False
 
-    while True:
-        if looped:
-            path = path.rsplit('/', 1)[0]
-        else:
-            looped = True
-        if not path:
-            if not end:
-                end = True
-                path = '/'
-            else:
-                return ""
-
-        # get vcs
+    while paths:
+        path = "/".join(paths)
         prompt = ''
         for vcs in SYSTEMS:
             prompt = vcs(path)
             if prompt:
                 return prompt
+        paths.pop()
+    return ""
 
 
 @vcs
