@@ -15,6 +15,30 @@ def vcs(function):
     return function
 
 
+def vcprompt(path=None):
+    path = path or os.getcwd()
+    looped = end = False
+
+    while True:
+        if looped:
+            path = path.rsplit('/', 1)[0]
+        else:
+            looped = True
+        if not path:
+            if not end:
+                end = True
+                path = '/'
+            else:
+                return ""
+
+        # get vcs
+        prompt = ''
+        for vcs in SYSTEMS:
+            prompt = vcs(path)
+            if prompt:
+                return prompt
+
+
 @vcs
 def bzr(path):
     file = os.path.join(path, '.bzr/branch/last-revision')
@@ -83,30 +107,6 @@ def svn(path):
                 else:
                     looped = True
     return 'svn:r' + revision
-
-
-def vcprompt(path=None):
-    path = path or os.getcwd()
-    looped = end = False
-
-    while True:
-        if looped:
-            path = path.rsplit('/', 1)[0]
-        else:
-            looped = True
-        if not path:
-            if not end:
-                end = True
-                path = '/'
-            else:
-                return ""
-
-        # get vcs
-        prompt = ''
-        for vcs in SYSTEMS:
-            prompt = vcs(path)
-            if prompt:
-                return prompt
 
 
 if __name__ == '__main__':
