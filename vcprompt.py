@@ -69,13 +69,19 @@ def git(path):
 
 @vcs
 def svn(path):
-    # I'm not too keen on calling an external script
-    # TODO find a way to do this in pure Python without the svn bindings
     revision = UNKNOWN
-    if not os.path.exists(os.path.join(path, '.svn')):
+    file = os.path.join(path, '.svn/entries')
+    if not os.path.exists(file):
         return None
-    _p = Popen(['svnversion', path], stdout=PIPE)
-    revision = _p.communicate()[0]
+    with open(file, 'r') as f:
+        looped = False
+        for line in f:
+            if re.match('^\d+$', line.strip()):
+                if looped:
+                    revision = line
+                    break
+                else:
+                    looped = True
     return 'svn:r' + revision
 
 
