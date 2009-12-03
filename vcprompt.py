@@ -63,6 +63,7 @@ def fossil(path):
     repo = c.execute("""SELECT * FROM
                         vvar WHERE
                         name = 'repository' """)
+    conn.close()
     repo = repo.fetchone()[1].split('/')[-1]
     return "fossil:" + repo
 
