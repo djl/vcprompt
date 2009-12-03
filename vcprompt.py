@@ -18,7 +18,6 @@ def vcs(function):
 
 def vcprompt(path=None):
     paths = (path or os.getcwd()).split('/')
-    looped = end = False
 
     while paths:
         path = "/".join(paths)
