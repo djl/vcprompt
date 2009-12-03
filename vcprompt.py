@@ -98,15 +98,17 @@ def svn(path):
     if not os.path.exists(file):
         return None
     with open(file, 'r') as f:
-        looped = False
+        previous_line = ""
         for line in f:
-            if re.match('^\d+$', line.strip()):
-                if looped:
-                    revision = line
+            line = line.strip()
+            # In SVN's entries file, the first set of digits is
+            # the version number. The second is the revision.
+            if re.match('(\d+)', line):
+                if re.match('dir', previous_line):
+                    revision = "r%s" % line
                     break
-                else:
-                    looped = True
-    return 'svn:r' + revision
+            previous_line = line
+    return 'svn:%s' % revision
 
 
 if __name__ == '__main__':
