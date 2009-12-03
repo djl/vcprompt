@@ -11,6 +11,7 @@ SYSTEMS = []
 
 
 def vcs(function):
+    """Simple decorator which adds the wrapped function to SYSTEMS variable"""
     SYSTEMS.append(function)
     return function
 
