@@ -41,6 +41,16 @@ def bzr(path):
 
 
 @vcs
+def cvs(path):
+    # Stabbing in the dark here
+    # TODO make this not suck
+    file = os.path.join(path, 'CVS/')
+    if not os.path.exists(file):
+        return None
+    return "cvs:%s" % UNKNOWN
+
+
+@vcs
 def fossil(path):
     # In my five minutes of playing with Fossil this looks OK
     file = os.path.join(path, '_FOSSIL_')
