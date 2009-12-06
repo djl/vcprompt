@@ -6,8 +6,9 @@ import sqlite3
 import sys
 from subprocess import Popen, PIPE
 
-UNKNOWN = "(unknown)"
+FORMAT = "%s:%b"
 SYSTEMS = []
+UNKNOWN = "(unknown)"
 
 
 def vcs(function):
@@ -16,14 +17,14 @@ def vcs(function):
     return function
 
 
-def vcprompt(path=None):
-    paths = (path or os.getcwd()).split('/')
+def vcprompt(string):
+    paths = os.getcwd().split('/')
 
     while paths:
         path = "/".join(paths)
         prompt = ''
         for vcs in SYSTEMS:
-            prompt = vcs(path)
+            prompt = vcs(path, string)
             if prompt:
                 return prompt
         paths.pop()
@@ -31,7 +32,7 @@ def vcprompt(path=None):
 
 
 @vcs
-def bzr(path):
+def bzr(path, string):
     file = os.path.join(path, '.bzr/branch/last-revision')
     if not os.path.exists(file):
         return None
@@ -51,7 +52,7 @@ def cvs(path):
 
 
 @vcs
-def fossil(path):
+def fossil(path, string):
     # In my five minutes of playing with Fossil this looks OK
     file = os.path.join(path, '_FOSSIL_')
     if not os.path.exists(file):
@@ -69,7 +70,7 @@ def fossil(path):
 
 
 @vcs
-def hg(path):
+def hg(path, string):
     file = os.path.join(path, '.hg/branch')
     if not os.path.exists(os.path.join(path, file)):
         return None
@@ -79,7 +80,7 @@ def hg(path):
 
 
 @vcs
-def git(path):
+def git(path, string):
     prompt = "git:"
     branch = UNKNOWN
     file = os.path.join(path, '.git/HEAD')
@@ -94,7 +95,7 @@ def git(path):
 
 
 @vcs
-def svn(path):
+def svn(path, string):
     revision = UNKNOWN
     file = os.path.join(path, '.svn/entries')
     if not os.path.exists(file):
@@ -114,4 +115,7 @@ def svn(path):
 
 
 if __name__ == '__main__':
-    sys.stdout.write(vcprompt())
+    string = FORMAT
+    if len(sys.argv) > 1:
+        string = sys.argv[1]
+    sys.stdout.write(vcprompt(string))
