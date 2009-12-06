@@ -33,7 +33,7 @@ def vcprompt(path=None):
 @vcs
 def bzr(path):
     file = os.path.join(path, '.bzr/branch/last-revision')
-    if not os.path.exists(os.path.join(path, file)):
+    if not os.path.exists(file):
         return None
     with open(file, 'r') as f:
         line = f.read().split(' ', 1)[0]
