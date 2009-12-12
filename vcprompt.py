@@ -89,7 +89,7 @@ def git(path):
     with open(file, 'r') as f:
         line = f.read()
         if re.match('^ref: refs/heads/', line.strip()):
-            branch = (line.split('/')[-1] or UNKNOWN)
+            branch = (line.split('/')[-1] or UNKNOWN).strip()
     return prompt + branch
 
 
