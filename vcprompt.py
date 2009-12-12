@@ -42,7 +42,7 @@ def bzr(path, string):
 
 
 @vcs
-def cvs(path):
+def cvs(path, string):
     # Stabbing in the dark here
     # TODO make this not suck
     file = os.path.join(path, 'CVS/')
