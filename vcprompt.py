@@ -26,7 +26,7 @@ def vcprompt(string):
         for vcs in SYSTEMS:
             prompt = vcs(path, string)
             if prompt:
-                return prompt
+                return '[%s]' % prompt
         paths.pop()
     return ""
 
