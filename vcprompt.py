@@ -37,7 +37,7 @@ def bzr(path, string):
     if not os.path.exists(file):
         return None
     with open(file, 'r') as f:
-        line = f.read().split(' ', 1)[0]
+        line = f.read().strip().split(' ', 1)[0]
         return 'bzr:r' + (line or UNKNOWN)
 
 
@@ -75,7 +75,7 @@ def hg(path, string):
     if not os.path.exists(os.path.join(path, file)):
         return None
     with open(file, 'r') as f:
-        line = f.read()
+        line = f.read().strip()
         return 'hg:' + (line or UNKNOWN)
 
 
