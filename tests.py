@@ -2,12 +2,16 @@ import os
 import unittest
 import vcprompt
 
-def repo(vcs):
-    return './tests/repositories/%s' % vcs
+class Base(unittest.TestCase):
+    def repo(self, vcs):
+        return './tests/repositories/%s' % vcs
 
-class TestGit(unittest.TestCase):
+class TestGit(Base):
+    def setUp(self):
+        self.repository = self.repo('git')
+
     def test_format_branch(self):
-        string = vcprompt.vcprompt(path=repo('git'), string="%b")
+        string = vcprompt.vcprompt(self.repository, string="%b")
         self.assertEquals(string, 'master')
 
     def test_format_revision(self):
@@ -15,47 +19,50 @@ class TestGit(unittest.TestCase):
         return self.test_format_hash()
 
     def test_format_hash(self):
-        string = vcprompt.vcprompt(path=repo('git'), string='%r')
+        string = vcprompt.vcprompt(self.repository, string='%r')
         self.assertEquals(string, 'eae51cf')
 
     def test_format_system(self):
-        string = vcprompt.vcprompt(path=repo('git'), string='%s')
+        string = vcprompt.vcprompt(self.repository, string='%s')
         self.assertEquals(string, 'git')
 
     def test_format_all(self):
         format = "%s:%b(%r)"
-        string = vcprompt.vcprompt(path=repo('git'), string=format)
+        string = vcprompt.vcprompt(self.repository, string=format)
         self.assertEquals(string, 'git:master(eae51cf)')
 
 
-class TestMecurial(unittest.TestCase):
+class TestMecurial(Base):
+    def setUp(self):
+        self.repository = self.repo('hg')
+
     def test_format_branch(self):
-        pass
+        self.fail()
 
     def test_format_revision(self):
-        pass
+        self.fail()
 
     def test_format_hash(self):
-        pass
+        self.fail()
 
 
-class TestBazaar(unittest.TestCase):
+class TestBazaar(Base):
     def test_format_branch(self):
-        pass
+        self.fail()
 
     def test_format_revision(self):
-        pass
+        self.fail()
 
     def test_format_hash(self):
-        pass
+        self.fail()
 
 
-class TestSubversion(unittest.TestCase):
+class TestSubversion(Base):
     def test_format_branch(self):
-        pass
+        self.fail()
 
     def test_format_revision(self):
-        pass
+        self.fail()
 
     def test_format_hash(self):
         return self.test_format_revision()
