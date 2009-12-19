@@ -18,8 +18,8 @@ def vcs(function):
     return function
 
 
-def vcprompt(string):
-    paths = os.getcwd().split('/')
+def vcprompt(path='.', string=FORMAT):
+    paths = os.path.abspath(path).split()
 
     while paths:
         path = "/".join(paths)
@@ -87,10 +87,19 @@ def hg(path, string):
 
 
 @vcs
-def git(path, string=FORMAT):
+def git(path, string):
     file = os.path.join(path, '.git/')
     if not os.path.exists(file):
         return None
+
+    # the current branch is required to get the hash
+    _branch = ""
+    if re.search("%(b|r)", string):
+        _file = os.path.join(file, 'HEAD')
+        with open(_file, 'r') as f:
+            line = f.read()
+            if re.match('^ref: refs/heads/', line.strip()):
+                _branch = (line.split('/')[-1] or UNKNOWN).strip()
 
     # vcs
     if '%s' in string:
@@ -98,18 +107,14 @@ def git(path, string=FORMAT):
 
     # branch
     if "%b" in string:
-        _file = os.path.join(file, 'HEAD')
-        with open(_file 'r') as f:
-            line = f.read()
-            if re.match('^ref: refs/heads/', line.strip()):
-                branch = (line.split('/')[-1] or UNKNOWN).strip()
-                string = string.replace("%b", branch)
-    
+        string = string.replace("%b", _branch)
+
     # hash/revision
-    # if "%r" in string:
-    #     _file = os.path.join(file, '')
-    #     with open(_file)
-        
+    if "%r" in string:
+        _file = os.path.join(file, 'refs/heads/%s' % _branch)
+        with open(_file, 'r') as f:
+            hash = f.read().strip()[0:7]
+            string = string.replace("%r", hash)
 
     return string
 
