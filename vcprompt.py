@@ -9,6 +9,7 @@ from subprocess import Popen, PIPE
 FORMAT = "%s:%b"
 SYSTEMS = []
 UNKNOWN = "(unknown)"
+REGEX = "/%(b|s|r)/"
 
 
 def vcs(function):
@@ -26,7 +27,7 @@ def vcprompt(string):
         for vcs in SYSTEMS:
             prompt = vcs(path, string)
             if prompt:
-                return '[%s]' % prompt
+                return '%s' % prompt
         paths.pop()
     return ""
 
@@ -71,8 +72,14 @@ def fossil(path, string):
 
 @vcs
 def hg(path, string):
-    file = os.path.join(path, '.hg/branch')
-    if not os.path.exists(os.path.join(path, file)):
+    files = ['.hg/branch', '.hg/undo.branch']
+    file = None
+    for f in files:
+        f = os.path.join(path, f)
+        if os.path.exists(f):
+            file = f
+            break
+    if not file:
         return None
     with open(file, 'r') as f:
         line = f.read().strip()
@@ -80,18 +87,31 @@ def hg(path, string):
 
 
 @vcs
-def git(path, string):
-    prompt = "git:"
-    branch = UNKNOWN
-    file = os.path.join(path, '.git/HEAD')
+def git(path, string=FORMAT):
+    file = os.path.join(path, '.git/')
     if not os.path.exists(file):
         return None
 
-    with open(file, 'r') as f:
-        line = f.read()
-        if re.match('^ref: refs/heads/', line.strip()):
-            branch = (line.split('/')[-1] or UNKNOWN).strip()
-    return prompt + branch
+    # vcs
+    if '%s' in string:
+        string = string.replace("%s", 'git')
+
+    # branch
+    if "%b" in string:
+        _file = os.path.join(file, 'HEAD')
+        with open(_file 'r') as f:
+            line = f.read()
+            if re.match('^ref: refs/heads/', line.strip()):
+                branch = (line.split('/')[-1] or UNKNOWN).strip()
+                string = string.replace("%b", branch)
+    
+    # hash/revision
+    # if "%r" in string:
+    #     _file = os.path.join(file, '')
+    #     with open(_file)
+        
+
+    return string
 
 
 @vcs
