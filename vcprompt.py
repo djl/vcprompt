@@ -38,9 +38,16 @@ def bzr(path, string):
     file = os.path.join(path, '.bzr/branch/last-revision')
     if not os.path.exists(file):
         return None
-    with open(file, 'r') as f:
-        line = f.read().strip().split(' ', 1)[0]
-        return 'bzr:r' + (line or UNKNOWN)
+
+    # system
+    string = string.replace('%s', 'bzr')
+
+    # local revision number
+    if '%r' in string:
+        with open(file, 'r') as f:
+            line = f.read().strip().split(' ', 1)[0]
+            string = string.replace('%r', line)
+    return string
 
 
 @vcs

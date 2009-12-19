@@ -68,7 +68,8 @@ class TestBazaar(Base):
         self.fail()
 
     def test_format_revision(self):
-        self.fail()
+        string = vcprompt.vcprompt(self.repository, string='%r')
+        self.assertEquals(string, '1')
 
     def test_format_hash(self):
         self.fail()
