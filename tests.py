@@ -22,6 +22,11 @@ class TestGit(unittest.TestCase):
         string = vcprompt.vcprompt(path=repo('git'), string='%s')
         self.assertEquals(string, 'git')
 
+    def test_format_all(self):
+        format = "%s:%b(%r)"
+        string = vcprompt.vcprompt(path=repo('git'), string=format)
+        self.assertEquals(string, 'git:master(eae51cf)')
+
 
 class TestMecurial(unittest.TestCase):
     def test_format_branch(self):
@@ -58,4 +63,3 @@ class TestSubversion(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
