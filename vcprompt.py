@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import with_statement
+import binascii
 import os
 import re
 import sqlite3
@@ -81,10 +82,35 @@ def hg(path, string):
             break
     if not file:
         return None
-    with open(file, 'r') as f:
-        line = f.read().strip()
-        return 'hg:' + (line or UNKNOWN)
 
+    # local revision or global hash (revision ID)
+    if re.search('%(r|h)', string):
+        # we have dive into the Mercurial 'API' here
+        try:
+            from mercurial import ui, hg
+        except ImportError:
+            string = UNKNOWN
+        repo = hg.repository(ui.ui(), path)
+        change = repo.changectx('.')
+
+        # revision
+        rev = str(change.rev())
+        string = string.replace('%r', rev)
+
+        # hash
+        hash = binascii.b2a_hex(change.node())[0:7]
+        string = string.replace('%h', hash)
+
+    if '%b' in string:
+        with open(file, 'r') as f:
+            branch = f.read().strip()
+            string = string.replace('%b', branch)
+
+    # system
+    string = string.replace('%s', 'hg')
+
+
+    return string
 
 @vcs
 def git(path, string):
@@ -143,4 +169,4 @@ if __name__ == '__main__':
     string = FORMAT
     if len(sys.argv) > 1:
         string = sys.argv[1]
-    sys.stdout.write(vcprompt(string))
+    sys.stdout.write(vcprompt('.', string))
