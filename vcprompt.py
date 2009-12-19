@@ -69,7 +69,7 @@ def fossil(path):
 
 
 @vcs
-def hg(path, string):
+def hg(path):
     files = ['.hg/branch', '.hg/undo.branch']
     file = None
     for f in files:
