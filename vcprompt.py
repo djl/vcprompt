@@ -69,14 +69,19 @@ def fossil(path):
 
 
 @vcs
-def hg(path):
-    file = os.path.join(path, '.hg/branch')
-    if not os.path.exists(os.path.join(path, file)):
+def hg(path, string):
+    files = ['.hg/branch', '.hg/undo.branch']
+    file = None
+    for f in files:
+        f = os.path.join(path, f)
+        if os.path.exists(f):
+            file = f
+            break
+    if not file:
         return None
     with open(file, 'r') as f:
-        line = f.read()
+        line = f.read().strip()
         return 'hg:' + (line or UNKNOWN)
-
 
 @vcs
 def git(path):
