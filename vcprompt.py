@@ -179,10 +179,10 @@ def svn(path, string):
     # branch
     # this is so incredibly god damn slow
     if '%b' in string:
-        command = "svn info %s |
-                   grep '^URL:' |
-                   egrep -o '(tags|branches)/[^/]+|trunk' |
-                   egrep -o '[^/]+$'" % path
+        command = """svn info %s |
+                     grep '^URL:' |
+                     egrep -o '(tags|branches)/[^/]+|trunk' |
+                     egrep -o '[^/]+$'""" % path
         _branch = commands.getoutput(command)
         if not _branch:
             _branch = UNKNOWN
