@@ -160,7 +160,7 @@ def svn(path, string):
         return None
 
     # revision/hash
-    if re.match('%(r|h)', string):
+    if re.search('%(r|h)', string):
         _revision = UNKNOWN
         with open(file, 'r') as f:
             previous_line = ""
