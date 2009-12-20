@@ -29,9 +29,9 @@ class TestGit(Base):
         self.assertEquals(string, 'git')
 
     def test_format_all(self):
-        format = "%s:%b(%r)"
+        format = "%s:%b:%r"
         string = vcprompt.vcprompt(self.repository, string=format)
-        self.assertEquals(string, 'git:master(eae51cf)')
+        self.assertEquals(string, 'git:master:eae51cf')
 
 
 class TestMecurial(Base):
@@ -77,6 +77,10 @@ class TestBazaar(Base):
         string = vcprompt.vcprompt(self.repository, string='%s')
         self.assertEquals(string, 'bzr')
 
+    def test_format_all(self):
+        string = vcprompt.vcprompt(self.repository, string="%s:%r")
+        self.assertEquals(string, 'bzr:1')
+
 
 
 class TestSubversion(Base):
@@ -95,9 +99,12 @@ class TestSubversion(Base):
         return self.test_format_revision('%h')
 
     def test_format_system(self):
-        string = vcprompt.vcprompt(self.repository, string='%s')
+        string = vcprompt.vcprompt(self.repository, '%s')
         self.assertEquals(string, 'svn')
 
+    def test_format_all(self):
+        string = vcprompt.vcprompt(self.repository, "%s:%b:%h")
+        self.assertEquals(string, "svn:%s:0" % vcprompt.UNKNOWN)
 
 
 if __name__ == '__main__':
