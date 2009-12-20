@@ -134,20 +134,20 @@ def git(path, string):
             if re.match('^ref: refs/heads/', line.strip()):
                 _branch = (line.split('/')[-1] or UNKNOWN).strip()
 
-    # vcs
-    if '%s' in string:
-        string = string.replace("%s", 'git')
-
-    # branch
-    if "%b" in string:
+        # branch
         string = string.replace("%b", _branch)
 
-    # hash/revision
-    if "%r" in string:
-        _file = os.path.join(file, 'refs/heads/%s' % _branch)
-        with open(_file, 'r') as f:
-            hash = f.read().strip()[0:7]
-            string = string.replace("%r", hash)
+        # hash/revision
+        if "%r" in string:
+            _file = os.path.join(file, 'refs/heads/%s' % _branch)
+            with open(_file, 'r') as f:
+                hash = f.read().strip()[0:7]
+                string = string.replace("%r", hash)
+
+
+    # system
+    if '%s' in string:
+        string = string.replace("%s", 'git')
 
     return string
 
