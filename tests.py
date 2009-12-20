@@ -84,13 +84,15 @@ class TestSubversion(Base):
         self.repository = self.repo('svn')
 
     def test_format_branch(self):
-        self.fail()
+        string = vcprompt.vcprompt(self.repository, "%b")
+        self.assertEquals(string, vcprompt.UNKNOWN)
 
-    def test_format_revision(self):
-        self.fail()
+    def test_format_revision(self, string='%r'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, '0')
 
     def test_format_hash(self):
-        return self.test_format_revision()
+        return self.test_format_revision('%h')
 
     def test_format_system(self):
         string = vcprompt.vcprompt(self.repository, string='%s')

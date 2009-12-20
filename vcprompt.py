@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 from __future__ import with_statement
 import binascii
+import commands
 import os
 import re
 import sqlite3
 import sys
-from subprocess import Popen, PIPE
 
 FORMAT = "%s:%b"
 SYSTEMS = []
@@ -158,18 +158,36 @@ def svn(path, string):
     file = os.path.join(path, '.svn/entries')
     if not os.path.exists(file):
         return None
-    with open(file, 'r') as f:
-        previous_line = ""
-        for line in f:
-            line = line.strip()
-            # In SVN's entries file, the first set of digits is
-            # the version number. The second is the revision.
-            if re.match('(\d+)', line):
-                if re.match('dir', previous_line):
-                    revision = "r%s" % line
-                    break
-            previous_line = line
-    return 'svn:%s' % revision
+
+    # revision/hash
+    if re.match('%(r|h)', string):
+        _revision = UNKNOWN
+        with open(file, 'r') as f:
+            previous_line = ""
+            for line in f:
+                line = line.strip()
+                # In SVN's entries file, the first set of digits is
+                # the version number. The second is the revision.
+                if re.match('(\d+)', line):
+                    if re.match('dir', previous_line):
+                        _revision = "%s" % line
+                        break
+                previous_line = line
+        string = string.replace('%r', _revision)
+        string = string.replace('%h', _revision)
+
+    # branch
+    # this is so incredibly god damn slow
+    if '%b' in string:
+        command = "svn info %s | grep '^URL:' | egrep -o '(tags|branches)/[^/]+|trunk' | egrep -o '[^/]+$'" % path
+        _branch = commands.getoutput(command)
+        if not _branch:
+            _branch = UNKNOWN
+        string = string.replace('%b', _branch)
+
+    # system
+    string = string.replace("%s", "svn")
+    return string
 
 
 if __name__ == '__main__':
