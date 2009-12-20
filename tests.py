@@ -64,15 +64,14 @@ class TestBazaar(Base):
     def setUp(self):
         self.repository = self.repo('bzr')
 
-    def test_format_branch(self):
-        self.fail()
-
     def test_format_revision(self):
         string = vcprompt.vcprompt(self.repository, string='%r')
         self.assertEquals(string, '1')
 
     def test_format_hash(self):
-        self.fail()
+        # bzr doesn't seem to have a concept of 'global' hash/identifier
+        # just return ``test_format_revision`` for now
+        self.test_format_revision()
 
     def test_format_system(self):
         string = vcprompt.vcprompt(self.repository, string='%s')
