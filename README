@@ -21,7 +21,7 @@ For zsh you need to enable PROMPT_SUBST first::
 
     setopt prompt_subst
     PS1='[%n@%m] [%~] $(vcprompt.py)'
-    
+
 
 Prompt formatting
 -----------------
@@ -30,9 +30,10 @@ Prompt formatting
 
 The arguments are:
 
-``%s`` - the VCS system in use
-``%r`` - the current revision or hash
-``%b`` - the current branch (if applicable)
+* ``%s`` - the VCS system in use
+* ``%r`` - the current revision or hash if no revision number is present (e.g. Git)
+* ``%h`` - the current hash or revision number if no hash is present (i.e. Subversion, CVS, Bazaar)
+* ``%b`` - the current branch (if applicable)
 
 
 
