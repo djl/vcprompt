@@ -204,4 +204,8 @@ if __name__ == '__main__':
     string = FORMAT
     if len(sys.argv) > 1:
         string = sys.argv[1]
+    else:
+        if 'VCPROMPT_FORMAT' in os.environ.keys():
+            if os.environ['VCPROMPT_FORMAT']:
+                string = os.environ['VCPROMPT_FORMAT']
     sys.stdout.write(vcprompt('.', string))
