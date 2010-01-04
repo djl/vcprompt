@@ -28,7 +28,7 @@ def vcprompt(path='.', string=FORMAT):
         for vcs in SYSTEMS:
             prompt = vcs(path, string)
             if prompt:
-                return '%s' % prompt
+                return prompt
         paths.pop()
     return ""
 
@@ -68,13 +68,16 @@ def fossil(path, string):
         return None
 
     repo = UNKNOWN
-    conn = sqlite3.connect(file)
-    c = conn.cursor()
-    repo = c.execute("""SELECT * FROM
-                        vvar WHERE
-                        name = 'repository' """)
-    conn.close()
-    repo = repo.fetchone()[1].split('/')[-1]
+    try:
+        conn = sqlite3.connect(file)
+        c = conn.cursor()
+        repo = c.execute("""SELECT * FROM
+                            vvar WHERE
+                            name = 'repository' """)
+        conn.close()
+        repo = repo.fetchone()[1].split('/')[-1]
+    except:
+        pass
     return "fossil:" + repo
 
 
@@ -115,7 +118,6 @@ def hg(path, string):
 
     # system
     string = string.replace('%s', 'hg')
-
 
     return string
 
