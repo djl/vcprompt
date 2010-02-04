@@ -14,7 +14,7 @@ REGEX = "/%(b|s|r)/"
 UNKNOWN = "(unknown)"
 if 'VCPROMPT_UNKNOWN' in os.environ.keys():
     if os.environ['VCPROMPT_UNKNOWN']:
-            UNKNOWN = os.environ['VCPROMPT_UNKNOWN']
+        UNKNOWN = os.environ['VCPROMPT_UNKNOWN']
 
 
 
