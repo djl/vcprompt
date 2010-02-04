@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 from __future__ import with_statement
 import binascii
-import commands
 import os
 import re
 import sqlite3
 import sys
+from subprocess import Popen, PIPE
 
 FORMAT = "%s:%b"
 SYSTEMS = []
@@ -168,20 +168,17 @@ def svn(path, string):
 
     # revision/hash
     if re.search('%(r|h)', string):
-        _revision = UNKNOWN
-        with open(file, 'r') as f:
-            previous_line = ""
-            for line in f:
-                line = line.strip()
-                # In SVN's entries file, the first set of digits is
-                # the version number. The second is the revision.
-                if re.match('(\d+)', line):
-                    if re.match('dir', previous_line):
-                        _revision = "%s" % line
-                        break
-                previous_line = line
-        string = string.replace('%r', _revision)
-        string = string.replace('%h', _revision)
+        revision = UNKNOWN
+        pattern = "^Revision:"
+        command = """svn info %s""" % path
+        pipe = Popen(command, shell=True, stdout=PIPE)
+        for line in pipe.stdout:
+            match = re.match('^Revision: (?P<revision>\d+)', line)
+            if match:
+                revision = match.group('revision')
+
+        string = string.replace('%r', revision)
+        string = string.replace('%h', revision)
 
     # branch
     # this is so incredibly god damn slow
@@ -190,7 +187,7 @@ def svn(path, string):
                      grep '^URL:' |
                      egrep -o '(tags|branches)/[^/]+|trunk' |
                      egrep -o '[^/]+$'""" % path
-        _branch = commands.getoutput(command)
+        _branch = Popen(command, shell=True, stdout=PIPE).stdout.read()
         if not _branch:
             _branch = UNKNOWN
         string = string.replace('%b', _branch)
