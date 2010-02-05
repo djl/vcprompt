@@ -27,7 +27,7 @@ def vcs(function):
 
 
 def vcprompt(path='.', string=FORMAT):
-    paths = os.path.abspath(path).split()
+    paths = os.path.abspath(path).split('/')
 
     while paths:
         path = "/".join(paths)
