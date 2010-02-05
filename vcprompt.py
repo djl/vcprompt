@@ -74,24 +74,34 @@ def fossil(path, string):
     if not os.path.exists(file):
         return None
 
-    repo = UNKNOWN
-    try:
-        conn = sqlite3.connect(file)
-        c = conn.cursor()
-        repo = c.execute("""SELECT * FROM
-                            vvar WHERE
-                            name = 'repository' """)
-        conn.close()
-        repo = repo.fetchone()[1].split('/')[-1]
-    except:
-        pass
+    branch = revision = UNKNOWN
+    command = 'fossil info'
+    pipe = Popen(command, shell=True, stdout=PIPE)
+    for line in pipe.stdout:
+        line = line.strip()
 
-    # system
-    string = string.replace("%s", "fossil")
+        # branch/tag
+        if branch == UNKNOWN:
+            match = re.match('^tags:(\s+)(?P<branch>\w+)', line)
+            if match:
+                branch = match.group('branch')
+
+        # hash
+        if revision == UNKNOWN:
+            match = re.match('^checkout:(\s+)(?P<revision>\w+)', line)
+            if match:
+                revision = match.group('revision')[0:7]
 
     # branch
-    # I'm pretty sure is wrong
-    string = string.replace("%b", repo)
+    string = string.replace('%b', branch)
+
+    # hash/revision
+    string = string.replace('%h', revision)
+    string = string.replace('%r', revision)
+
+    # system
+    string = string.replace('%s', 'fossil')
+
     return string
 
 
