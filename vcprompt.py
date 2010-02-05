@@ -156,7 +156,7 @@ def git(path, string):
 
     # the current branch is required to get the hash
     _branch = ""
-    if re.search("%(b|r)", string):
+    if re.search("%(b|r|h)", string):
         _file = os.path.join(file, 'HEAD')
         with open(_file, 'r') as f:
             line = f.read()
@@ -167,11 +167,12 @@ def git(path, string):
         string = string.replace("%b", _branch)
 
         # hash/revision
-        if "%r" in string:
+        if re.search("%(r|h)", string):
             _file = os.path.join(file, 'refs/heads/%s' % _branch)
             with open(_file, 'r') as f:
                 hash = f.read().strip()[0:7]
                 string = string.replace("%r", hash)
+                string = string.replace("%h", hash)
 
 
     # system
