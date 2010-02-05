@@ -161,7 +161,6 @@ def git(path, string):
 
 @vcs
 def svn(path, string):
-    revision = UNKNOWN
     file = os.path.join(path, '.svn/entries')
     if not os.path.exists(file):
         return None
