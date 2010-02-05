@@ -47,36 +47,9 @@ Requirements
 * Python 2.5+
 
 
-Adding systems
---------------
-
-To add a new VCS define a function which uses the 'vcs' decorator.
-The function should take a single argument, the path to be checked for.
-
-::
-
-    @vcs
-    def git(path):
-        file = os.path.join(path, '.git/HEAD')
-        if not os.path.exists(file):
-            return None
-
-        with open(file, 'r') as f:
-            line = f.read()
-            if re.match('^ref: refs/heads/', line):
-                return 'git:' + line.split('/')[-1]
-
-
-
 TODO
 ----
 
 - More complete support and tests for CVS and Fossil
 - Basic support for Darcs
 - Add option to show state of repository
-
-
-NOTES
------
-
-Do **not use this branch yet**. I'm super cereal.
