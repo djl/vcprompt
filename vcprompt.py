@@ -181,7 +181,6 @@ def svn(path, string):
         string = string.replace('%h', revision)
 
     # branch
-    # this is so incredibly god damn slow
     if '%b' in string:
         command = """svn info %s |
                      grep '^URL:' |
