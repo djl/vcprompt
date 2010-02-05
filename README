@@ -71,7 +71,8 @@ The function should take a single argument, the path to be checked for.
 TODO
 ----
 
-- Support for CVS, Darcs and Fossil
+- More complete support and tests for CVS and Fossil
+- Basic support for Darcs
 - Add option to show state of repository
 
 
