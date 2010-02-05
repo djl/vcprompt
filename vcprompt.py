@@ -62,7 +62,9 @@ def cvs(path, string):
     file = os.path.join(path, 'CVS/')
     if not os.path.exists(file):
         return None
-    return "cvs:%s" % UNKNOWN
+    string = string.replace('%s', 'cvs')
+    string = string.replace('%b', UNKNOWN)
+    return string
 
 
 @vcs
