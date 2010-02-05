@@ -50,10 +50,11 @@ def bzr(path, string):
     string = string.replace('%s', 'bzr')
 
     # local revision number
-    if '%r' in string:
+    if re.search('%(r|h)', string):
         with open(file, 'r') as f:
             line = f.read().strip().split(' ', 1)[0]
             string = string.replace('%r', line)
+            string = string.replace('%h', line)
     return string
 
 
