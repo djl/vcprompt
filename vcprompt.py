@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 from __future__ import with_statement
+
+__version__ = (0, 1)
+
 import binascii
 import os
 import re
@@ -15,7 +18,6 @@ UNKNOWN = "(unknown)"
 if 'VCPROMPT_UNKNOWN' in os.environ.keys():
     if os.environ['VCPROMPT_UNKNOWN']:
         UNKNOWN = os.environ['VCPROMPT_UNKNOWN']
-
 
 
 def vcs(function):
