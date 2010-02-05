@@ -85,7 +85,14 @@ def fossil(path, string):
         repo = repo.fetchone()[1].split('/')[-1]
     except:
         pass
-    return "fossil:" + repo
+
+    # system
+    string = string.replace("%s", "fossil")
+
+    # branch
+    # I'm pretty sure is wrong
+    string = string.replace("%b", repo)
+    return string
 
 
 @vcs
