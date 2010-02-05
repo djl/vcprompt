@@ -187,10 +187,10 @@ def svn(path, string):
                      grep '^URL:' |
                      egrep -o '(tags|branches)/[^/]+|trunk' |
                      egrep -o '[^/]+$'""" % path
-        _branch = Popen(command, shell=True, stdout=PIPE).stdout.read()
-        if not _branch:
-            _branch = UNKNOWN
-        string = string.replace('%b', _branch)
+        branch = Popen(command, shell=True, stdout=PIPE).stdout.read().strip()
+        if not branch:
+            branch = UNKNOWN
+        string = string.replace('%b', branch)
 
     # system
     string = string.replace("%s", "svn")
