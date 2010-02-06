@@ -47,10 +47,23 @@ Requirements
 * Python 2.5+
 
 
+Testing
+-------
+
+To run the tests, you have to initialize the submodule::
+
+    # clone repo
+    $ git clone git://github.com/xvzf/vcprompt.git
+    $ cd vcprompt
+
+    # init submodules
+    $ git submodule update --init
+    $ nosetests || python tests.py
+
+
 TODO
 ----
 
-- Tests currently fail for Git due to submodules having no branch
 - More complete support and tests for CVS and Fossil
 - Basic support for Darcs
 - Add option to show state of repository
