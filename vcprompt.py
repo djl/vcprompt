@@ -165,8 +165,15 @@ def git(path, string):
         branch_file = os.path.join(file, 'HEAD')
         with open(branch_file, 'r') as f:
             line = f.read()
+
+            # check if we're currently running on a branch
             if re.match('^ref: refs/heads/', line.strip()):
                 branch = (line.split('/')[-1] or UNKNOWN).strip()
+            # we're running with a detached head (submodule?)
+            else:
+                branch = os.listdir(os.path.join(file, 'refs/heads'))[0]
+
+
 
         # branch
         string = string.replace("%b", branch)
