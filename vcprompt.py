@@ -160,7 +160,7 @@ def git(path, string):
         return None
 
     # the current branch is required to get the hash
-    _branch = ""
+    _branch = UNKNOWN
     if re.search("%(b|r|h)", string):
         _file = os.path.join(file, 'HEAD')
         with open(_file, 'r') as f:
