@@ -61,6 +61,10 @@ class TestBazaar(Base):
     def setUp(self):
         self.repository = self.repo('bzr')
 
+    def test_format_branch(self, string='%b'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'bzr')
+
     def test_format_revision(self, string='%r'):
         string = vcprompt.vcprompt(self.repository, string)
         self.assertEquals(string, '1')
