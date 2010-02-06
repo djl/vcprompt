@@ -160,24 +160,26 @@ def git(path, string):
         return None
 
     # the current branch is required to get the hash
-    _branch = UNKNOWN
+    branch = UNKNOWN
     if re.search("%(b|r|h)", string):
-        _file = os.path.join(file, 'HEAD')
-        with open(_file, 'r') as f:
+        branch_file = os.path.join(file, 'HEAD')
+        with open(branch_file, 'r') as f:
             line = f.read()
             if re.match('^ref: refs/heads/', line.strip()):
-                _branch = (line.split('/')[-1] or UNKNOWN).strip()
+                branch = (line.split('/')[-1] or UNKNOWN).strip()
 
         # branch
-        string = string.replace("%b", _branch)
+        string = string.replace("%b", branch)
 
         # hash/revision
+        hash = UNKNOWN
         if re.search("%(r|h)", string):
-            _file = os.path.join(file, 'refs/heads/%s' % _branch)
-            with open(_file, 'r') as f:
+            hash_file = os.path.join(file, 'refs/heads/%s' % branch)
+            with open(hash_file, 'r') as f:
                 hash = f.read().strip()[0:7]
-                string = string.replace("%r", hash)
-                string = string.replace("%h", hash)
+
+        string = string.replace("%r", hash)
+        string = string.replace("%h", hash)
 
 
     # system
