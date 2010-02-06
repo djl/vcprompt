@@ -55,6 +55,10 @@ def bzr(path, string):
             line = f.read().strip().split(' ', 1)[0]
             string = string.replace('%r', line)
             string = string.replace('%h', line)
+
+    # branch
+    # this is wrong, but meh. I'll fix it later
+    string = string.replace('%b', os.path.basename(path))
     return string
 
 
