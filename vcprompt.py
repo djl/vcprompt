@@ -15,7 +15,7 @@ SYSTEMS = []
 REGEX = "/%(b|s|r)/"
 
 UNKNOWN = "(unknown)"
-if 'VCPROMPT_UNKNOWN' in os.environ.keys():
+if 'VCPROMPT_UNKNOWN' in list(os.environ.keys()):
     if os.environ['VCPROMPT_UNKNOWN']:
         UNKNOWN = os.environ['VCPROMPT_UNKNOWN']
 
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         string = sys.argv[1]
     else:
-        if 'VCPROMPT_FORMAT' in os.environ.keys():
+        if 'VCPROMPT_FORMAT' in list(os.environ.keys()):
             if os.environ['VCPROMPT_FORMAT']:
                 string = os.environ['VCPROMPT_FORMAT']
     sys.stdout.write(vcprompt('.', string))
