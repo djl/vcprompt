@@ -81,34 +81,95 @@ def fossil(path, string):
     if not os.path.exists(file):
         return None
 
-    branch = revision = UNKNOWN
-    command = 'fossil info'
-    pipe = Popen(command, shell=True, stdout=PIPE)
-    for line in pipe.stdout:
-        line = line.strip()
+    branch = hash = UNKNOWN
 
-        # branch/tag
-        if branch == UNKNOWN:
-            match = re.match('^tags:(\s+)(?P<branch>\w+)', line)
-            if match:
-                branch = match.group('branch')
+    # all this just to get the repository file :(
+    repository = None
+    try:
+        query = "SELECT value FROM vvar where name = 'repository'"
+        conn = sqlite3.connect(file)
+        c = conn.cursor()
+        c.execute(query)
+        repository = c.fetchone()[0]
+    # TODO add the right exception here
+    except Exception:
+        pass
+    finally:
+        conn.close()
 
-        # hash
-        if revision == UNKNOWN:
-            match = re.match('^checkout:(\s+)(?P<revision>\w+)', line)
-            if match:
-                revision = match.group('revision')[0:7]
+    if repository:
+        # get the hash. we need this to get the current trunk
+        _rid = None
+        if re.search('%(b|h|r)', string):
+            try:
+                query = """SELECT uuid, rid FROM blob ORDER BY rid DESC LIMIT 1"""
+                conn = sqlite3.connect(repository)
+                c = conn.cursor()
+                c.execute(query)
+                hash, _rid = c.fetchone()
+                hash = hash[:7]
+            # TODO add the right exception here
+            except Exception:
+                pass
+            finally:
+                conn.close()
 
-    # branch
+           # now we grab the branch
+            try:
+                query = """SELECT value FROM tagxref WHERE rid = %d and value is not NULL LIMIT 1 """ % _rid
+                conn = sqlite3.connect(repository)
+                c = conn.cursor()
+                c.execute(query)
+                branch = c.fetchone()[0]
+            # TODO add the right exception here
+            except Exception:
+                pass
+            finally:
+                conn.close()
+
+
+    # parse out formatting string
     string = string.replace('%b', branch)
-
-    # hash/revision
-    string = string.replace('%h', revision)
-    string = string.replace('%r', revision)
-
-    # system
+    string = string.replace('%h', hash)
+    string = string.replace('%r', hash)
     string = string.replace('%s', 'fossil')
+    return string
 
+
+@vcs
+def git(path, string):
+    file = os.path.join(path, '.git/')
+    if not os.path.exists(file):
+        return None
+
+    branch = hash = UNKNOWN
+    # the current branch is required to get the hash
+    if re.search("%(b|r|h)", string):
+        branch_file = os.path.join(file, 'HEAD')
+        with open(branch_file, 'r') as f:
+            line = f.read()
+
+            # check if we're currently running on a branch
+            if re.match('^ref: refs/heads/', line.strip()):
+                branch = (line.split('/')[-1] or UNKNOWN).strip()
+            # we're running with a detached head (submodule?)
+            else:
+                branch = os.listdir(os.path.join(file, 'refs/heads'))[0]
+
+
+        # hash/revision
+        hash = UNKNOWN
+        if re.search("%(r|h)", string):
+            hash_file = os.path.join(file, 'refs/heads/%s' % branch)
+            with open(hash_file, 'r') as f:
+                hash = f.read().strip()[0:7]
+
+
+    # formatting
+    string = string.replace("%b", branch)
+    string = string.replace("%h", hash)
+    string = string.replace("%r", hash)
+    string = string.replace("%s", 'git')
     return string
 
 
@@ -124,6 +185,8 @@ def hg(path, string):
     if not file:
         return None
 
+    branch = revision = hash = UNKNOWN
+
     # local revision or global hash (revision ID)
     if re.search('%(r|h)', string):
         # we have dive into the Mercurial 'API' here
@@ -135,64 +198,20 @@ def hg(path, string):
         change = repo.changectx('.')
 
         # revision
-        rev = str(change.rev())
-        string = string.replace('%r', rev)
+        revision = str(change.rev())
 
         # hash
         hash = binascii.b2a_hex(change.node())[0:7]
-        string = string.replace('%h', hash)
 
     if '%b' in string:
         with open(file, 'r') as f:
             branch = f.read().strip()
-            string = string.replace('%b', branch)
 
-    # system
+    # formatting
+    string = string.replace('%b', branch)
+    string = string.replace('%h', hash)
+    string = string.replace('%r', revision)
     string = string.replace('%s', 'hg')
-
-    return string
-
-
-@vcs
-def git(path, string):
-    file = os.path.join(path, '.git/')
-    if not os.path.exists(file):
-        return None
-
-    # the current branch is required to get the hash
-    branch = UNKNOWN
-    if re.search("%(b|r|h)", string):
-        branch_file = os.path.join(file, 'HEAD')
-        with open(branch_file, 'r') as f:
-            line = f.read()
-
-            # check if we're currently running on a branch
-            if re.match('^ref: refs/heads/', line.strip()):
-                branch = (line.split('/')[-1] or UNKNOWN).strip()
-            # we're running with a detached head (submodule?)
-            else:
-                branch = os.listdir(os.path.join(file, 'refs/heads'))[0]
-
-
-
-        # branch
-        string = string.replace("%b", branch)
-
-        # hash/revision
-        hash = UNKNOWN
-        if re.search("%(r|h)", string):
-            hash_file = os.path.join(file, 'refs/heads/%s' % branch)
-            with open(hash_file, 'r') as f:
-                hash = f.read().strip()[0:7]
-
-        string = string.replace("%r", hash)
-        string = string.replace("%h", hash)
-
-
-    # system
-    if '%s' in string:
-        string = string.replace("%s", 'git')
-
     return string
 
 
@@ -202,19 +221,19 @@ def svn(path, string):
     if not os.path.exists(file):
         return None
 
+    branch = revision = UNKNOWN
+
     # revision/hash
     if re.search('%(r|h)', string):
         revision = UNKNOWN
         pattern = "^Revision:"
-        command = """svn info %s""" % path
-        pipe = Popen(command, shell=True, stdout=PIPE)
-        for line in pipe.stdout:
+        command = "svn info %s" % path
+        pipe = Popen(command, shell=True, stdout=PIPE,
+                     stderr=open('/dev/null', 'w'))
+        for line in pipe.communicate()[0].split('\n'):
             match = re.match('^Revision: (?P<revision>\d+)', line)
             if match:
                 revision = match.group('revision')
-
-        string = string.replace('%r', revision)
-        string = string.replace('%h', revision)
 
     # branch
     if '%b' in string:
@@ -222,12 +241,16 @@ def svn(path, string):
                      grep '^URL:' |
                      egrep -o '(tags|branches)/[^/]+|trunk' |
                      egrep -o '[^/]+$'""" % path
-        branch = Popen(command, shell=True, stdout=PIPE).stdout.read().strip()
+        branch = Popen(command, shell=True, stdout=PIPE,
+                       stderr=open('/dev/null', 'w')).communicate()[0]
         if not branch:
             branch = UNKNOWN
-        string = string.replace('%b', branch)
 
-    # system
+
+    # formatting
+    string = string.replace('%r', revision)
+    string = string.replace('%h', revision)
+    string = string.replace('%b', branch)
     string = string.replace("%s", "svn")
     return string
 
