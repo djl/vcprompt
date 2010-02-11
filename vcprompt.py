@@ -105,7 +105,8 @@ def fossil(path, string):
         _rid = None
         if re.search('%(b|h|r)', string):
             try:
-                query = """SELECT uuid, rid FROM blob ORDER BY rid DESC LIMIT 1"""
+                query = """SELECT uuid, rid FROM blob
+                           ORDER BY rid DESC LIMIT 1"""
                 conn = sqlite3.connect(repository)
                 c = conn.cursor()
                 c.execute(query)
@@ -118,7 +119,8 @@ def fossil(path, string):
 
            # now we grab the branch
             try:
-                query = """SELECT value FROM tagxref WHERE rid = %d and value is not NULL LIMIT 1 """ % _rid
+                query = """SELECT value FROM tagxref WHERE rid = %d and
+                           value is not NULL LIMIT 1 """ % _rid
                 conn = sqlite3.connect(repository)
                 c = conn.cursor()
                 c.execute(query)
