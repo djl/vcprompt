@@ -192,16 +192,12 @@ def hg(path, string):
         # we have dive into the Mercurial 'API' here
         try:
             from mercurial import ui, hg
+            repo = hg.repository(ui.ui(), path)
+            change = repo.changectx('.')
+            revision = str(change.rev())
+            hash = binascii.b2a_hex(change.node())[0:7]
         except ImportError:
-            string = UNKNOWN
-        repo = hg.repository(ui.ui(), path)
-        change = repo.changectx('.')
-
-        # revision
-        revision = str(change.rev())
-
-        # hash
-        hash = binascii.b2a_hex(change.node())[0:7]
+            pass
 
     if '%b' in string:
         with open(file, 'r') as f:
