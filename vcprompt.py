@@ -159,7 +159,6 @@ def git(path, string):
 
 
         # hash/revision
-        hash = UNKNOWN
         if re.search("%(r|h)", string):
             hash_file = os.path.join(file, 'refs/heads/%s' % branch)
             with open(hash_file, 'r') as f:
