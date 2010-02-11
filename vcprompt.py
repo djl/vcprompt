@@ -46,19 +46,19 @@ def bzr(path, string):
     if not os.path.exists(file):
         return None
 
-    # system
-    string = string.replace('%s', 'bzr')
+    branch = hash = UNKNOWN
 
     # local revision number
     if re.search('%(r|h)', string):
         with open(file, 'r') as f:
-            line = f.read().strip().split(' ', 1)[0]
-            string = string.replace('%r', line)
-            string = string.replace('%h', line)
+            hash = f.read().strip().split(' ', 1)[0]
 
     # branch
-    # this is wrong, but meh. I'll fix it later
+    # TODO figure out something more correct
     string = string.replace('%b', os.path.basename(path))
+    string = string.replace('%h', hash)
+    string = string.replace('%r', hash)
+    string = string.replace('%s', 'bzr')
     return string
 
 
@@ -69,8 +69,12 @@ def cvs(path, string):
     file = os.path.join(path, 'CVS/')
     if not os.path.exists(file):
         return None
+
+    branch = revision = UNKNOWN
+
     string = string.replace('%s', 'cvs')
-    string = string.replace('%b', UNKNOWN)
+    string = string.replace('%b', branch)
+    string = string.replace('%r', revision)
     return string
 
 
