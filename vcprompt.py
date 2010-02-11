@@ -3,7 +3,6 @@ from __future__ import with_statement
 
 __version__ = (0, 1, 0)
 
-import binascii
 import os
 import re
 import sqlite3
@@ -12,7 +11,6 @@ from subprocess import Popen, PIPE
 
 FORMAT = "%s:%b"
 SYSTEMS = []
-REGEX = "/%(b|s|r)/"
 
 UNKNOWN = "(unknown)"
 if 'VCPROMPT_UNKNOWN' in list(os.environ.keys()):
