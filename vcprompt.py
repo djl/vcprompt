@@ -95,8 +95,7 @@ def fossil(path, string):
         c = conn.cursor()
         c.execute(query)
         repository = c.fetchone()[0]
-    # TODO add the right exception here
-    except Exception:
+    except sqlite3.OperationalError:
         pass
     finally:
         conn.close()
@@ -112,8 +111,7 @@ def fossil(path, string):
                 c.execute(query)
                 hash, _rid = c.fetchone()
                 hash = hash[:7]
-            # TODO add the right exception here
-            except Exception:
+            except sqlite3.OperationalError:
                 pass
             finally:
                 conn.close()
@@ -125,8 +123,7 @@ def fossil(path, string):
                 c = conn.cursor()
                 c.execute(query)
                 branch = c.fetchone()[0]
-            # TODO add the right exception here
-            except Exception:
+            except sqlite3.OperationalError:
                 pass
             finally:
                 conn.close()
