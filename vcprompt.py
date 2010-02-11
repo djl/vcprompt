@@ -25,7 +25,6 @@ else:
             FORMAT = os.environ['VCPROMPT_FORMAT']
 
 
-
 def vcs(function):
     """Simple decorator which adds the wrapped function to SYSTEMS variable"""
     SYSTEMS.append(function)
@@ -165,13 +164,11 @@ def git(path, string):
             else:
                 branch = os.listdir(os.path.join(file, 'refs/heads'))[0]
 
-
         # hash/revision
         if re.search("%(r|h)", string):
             hash_file = os.path.join(file, 'refs/heads/%s' % branch)
             with open(hash_file, 'r') as f:
                 hash = f.read().strip()[0:7]
-
 
     # formatting
     string = string.replace("%b", branch)

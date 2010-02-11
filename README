@@ -7,6 +7,7 @@ A pure-Python implementation of vcprompt_
 .. _vcprompt: http://vc.gerg.ca/hg/vcprompt/
 
 
+
 Installing
 ----------
 
@@ -21,6 +22,7 @@ For zsh you need to enable PROMPT_SUBST first::
 
     setopt prompt_subst
     PS1='[%n@%m] [%~] $(vcprompt.py)'
+
 
 
 Prompt formatting
@@ -47,6 +49,7 @@ Requirements
 * Python 2.5+
 
 
+
 Testing
 -------
 
@@ -59,6 +62,7 @@ To run the tests, you have to initialize the submodule::
     # init submodules
     $ git submodule update --init
     $ nosetests || python tests.py
+
 
 
 TODO
