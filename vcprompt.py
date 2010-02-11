@@ -9,9 +9,9 @@ import sqlite3
 import sys
 from subprocess import Popen, PIPE
 
-FORMAT = "%s:%b"
+FORMAT = '%s:%b'
 SYSTEMS = []
-UNKNOWN = "(unknown)"
+UNKNOWN = '(unknown)'
 
 if 'VCPROMPT_UNKNOWN' in list(os.environ.keys()):
     if os.environ['VCPROMPT_UNKNOWN']:
@@ -35,14 +35,14 @@ def vcprompt(path='.', string=FORMAT):
     paths = os.path.abspath(path).split('/')
 
     while paths:
-        path = "/".join(paths)
+        path = '/'.join(paths)
         prompt = ''
         for vcs in SYSTEMS:
             prompt = vcs(path, string)
             if prompt:
                 return prompt
         paths.pop()
-    return ""
+    return ''
 
 
 @vcs
@@ -152,7 +152,7 @@ def git(path, string):
 
     branch = hash = UNKNOWN
     # the current branch is required to get the hash
-    if re.search("%(b|r|h)", string):
+    if re.search('%(b|r|h)', string):
         branch_file = os.path.join(file, 'HEAD')
         with open(branch_file, 'r') as f:
             line = f.read()
@@ -165,16 +165,16 @@ def git(path, string):
                 branch = os.listdir(os.path.join(file, 'refs/heads'))[0]
 
         # hash/revision
-        if re.search("%(r|h)", string):
+        if re.search('%(r|h)', string):
             hash_file = os.path.join(file, 'refs/heads/%s' % branch)
             with open(hash_file, 'r') as f:
                 hash = f.read().strip()[0:7]
 
     # formatting
-    string = string.replace("%b", branch)
-    string = string.replace("%h", hash)
-    string = string.replace("%r", hash)
-    string = string.replace("%s", 'git')
+    string = string.replace('%b', branch)
+    string = string.replace('%h', hash)
+    string = string.replace('%r', hash)
+    string = string.replace('%s', 'git')
     return string
 
 
@@ -221,35 +221,35 @@ def svn(path, string):
 
     branch = revision = UNKNOWN
 
-    # revision/hash
-    if re.search('%(r|h)', string):
-        revision = UNKNOWN
-        pattern = "^Revision:"
-        command = "svn info %s" % path
-        pipe = Popen(command, shell=True, stdout=PIPE,
-                     stderr=open('/dev/null', 'w'))
-        for line in pipe.communicate()[0].split('\n'):
-            match = re.match('^Revision: (?P<revision>\d+)', line)
-            if match:
-                revision = match.group('revision')
-
     # branch
-    if '%b' in string:
-        command = """svn info %s |
-                     grep '^URL:' |
-                     egrep -o '(tags|branches)/[^/]+|trunk' |
-                     egrep -o '[^/]+$'""" % path
-        branch = Popen(command, shell=True, stdout=PIPE,
-                       stderr=open('/dev/null', 'w')).communicate()[0]
-        if not branch:
-            branch = UNKNOWN
+    command = 'svn info %s' % path
+    output = Popen(command, shell=True, stdout=PIPE,
+                   stderr=open('/dev/null', 'w')).communicate()[0]
 
+    # compile some regexes
+    branch_regex = re.compile('((tags|branches)|trunk)')
+    revision_regex = re.compile('^Revision: (?P<revision>\d+)')
+
+    for line in output.split('\n'):
+        # branch
+        if '%b' in string:
+            if re.match('URL:', line):
+                matches = re.search(branch_regex, line)
+                if matches:
+                    branch = matches.groups(0)[0]
+
+        # revision/hash
+        if re.search('%(r|h)', string):
+            if re.match('Revision:', line):
+                matches = re.search(revision_regex, line)
+                if matches.groupdict().has_key('revision'):
+                    revision = matches.group('revision')
 
     # formatting
     string = string.replace('%r', revision)
     string = string.replace('%h', revision)
     string = string.replace('%b', branch)
-    string = string.replace("%s", "svn")
+    string = string.replace('%s', 'svn')
     return string
 
 
