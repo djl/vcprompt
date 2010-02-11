@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import os
 import sys
 import subprocess
@@ -130,16 +131,17 @@ class TestFossil(Base):
         return os.path.exists(self.repository_db)
 
     def open(self):
-        devnull = open('/dev/null', 'w')
-        command = "cd %s && fossil open %s" % (self.repository,
-                                               self.repository_file)
-        subprocess.Popen(command, shell=True, stdout=devnull,
-                         stderr=devnull)
+        with open('/dev/null', 'w') as devnull:
+            command = "cd %s && fossil open %s" % (self.repository,
+                                                   self.repository_file)
+            subprocess.Popen(command, shell=True, stdout=devnull,
+                             stderr=devnull)
 
     def close(self):
-        command = "cd %s && fossil close" % self.repository
-        subprocess.Popen(command, shell=True, stdout=devnull,
-                         stderr=devnull)
+        with open('/dev/null', 'w') as devnull:
+            command = "cd %s && fossil close" % self.repository
+            subprocess.Popen(command, shell=True, stdout=devnull,
+                             stderr=devnull)
 
     def test_format_system(self, string='%s'):
         string = vcprompt.vcprompt(self.repository, string)
