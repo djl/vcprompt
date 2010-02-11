@@ -242,7 +242,7 @@ def svn(path, string):
         if re.search('%(r|h)', string):
             if re.match('Revision:', line):
                 matches = re.search(revision_regex, line)
-                if matches.groupdict().has_key('revision'):
+                if 'revision' in matches.groupdict():
                     revision = matches.group('revision')
 
     # formatting
