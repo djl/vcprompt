@@ -187,18 +187,15 @@ def hg(path, string):
 
     branch = revision = hash = UNKNOWN
 
-    # local revision or global hash (revision ID)
+    # changeset ID or global hash
     if re.search('%(r|h)', string):
-        # we have dive into the Mercurial 'API' here
-        try:
-            from mercurial import ui, hg
-            repo = hg.repository(ui.ui(), path)
-            change = repo.changectx('.')
-            revision = str(change.rev())
-            hash = binascii.b2a_hex(change.node())[0:7]
-        except ImportError:
-            pass
+        cache_file = os.path.join(path, '.hg/tags.cache')
+        if os.path.exists(cache_file):
+            with open(cache_file, 'r') as f:
+                revision, hash = f.read().split()
+                hash = hash[:7]
 
+    # branch
     if '%b' in string:
         with open(file, 'r') as f:
             branch = f.read().strip()
