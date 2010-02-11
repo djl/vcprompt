@@ -11,11 +11,19 @@ from subprocess import Popen, PIPE
 
 FORMAT = "%s:%b"
 SYSTEMS = []
-
 UNKNOWN = "(unknown)"
+
 if 'VCPROMPT_UNKNOWN' in list(os.environ.keys()):
     if os.environ['VCPROMPT_UNKNOWN']:
         UNKNOWN = os.environ['VCPROMPT_UNKNOWN']
+
+if len(sys.argv) > 1:
+    FORMAT = sys.argv[1]
+else:
+    if 'VCPROMPT_FORMAT' in list(os.environ.keys()):
+        if os.environ['VCPROMPT_FORMAT']:
+            FORMAT = os.environ['VCPROMPT_FORMAT']
+
 
 
 def vcs(function):
@@ -249,11 +257,4 @@ def svn(path, string):
 
 
 if __name__ == '__main__':
-    string = FORMAT
-    if len(sys.argv) > 1:
-        string = sys.argv[1]
-    else:
-        if 'VCPROMPT_FORMAT' in list(os.environ.keys()):
-            if os.environ['VCPROMPT_FORMAT']:
-                string = os.environ['VCPROMPT_FORMAT']
-    sys.stdout.write(vcprompt('.', string))
+    sys.stdout.write(vcprompt('.', FORMAT))
