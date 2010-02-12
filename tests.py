@@ -14,7 +14,7 @@ class Base(unittest.TestCase):
         return location
 
 
-class TestGit(Base):
+class Git(Base):
     def setUp(self):
         self.repository = self.repo('git')
 
@@ -38,7 +38,7 @@ class TestGit(Base):
         self.assertEquals(string, 'git:master:eae51cf')
 
 
-class TestMecurial(Base):
+class Mercurial(Base):
     def setUp(self):
         self.repository = self.repo('hg')
 
@@ -63,7 +63,7 @@ class TestMecurial(Base):
         self.assertEquals(string, 'hg:default:r0:8ada0a9')
 
 
-class TestBazaar(Base):
+class Bazaar(Base):
     def setUp(self):
         self.repository = self.repo('bzr')
 
@@ -90,7 +90,7 @@ class TestBazaar(Base):
 
 
 
-class TestSubversion(Base):
+class Subversion(Base):
     def setUp(self):
         self.repository = self.repo('svn')
 
@@ -114,7 +114,7 @@ class TestSubversion(Base):
         self.assertEquals(string, "svn:%s:0" % vcprompt.UNKNOWN)
 
 
-class TestFossil(Base):
+class Fossil(Base):
     def setUp(self):
         self.repository = self.repo('fossil')
         self.repository_file = 'fossil'
