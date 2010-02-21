@@ -156,7 +156,6 @@ def git(path, string):
         branch_file = os.path.join(file, 'HEAD')
         with open(branch_file, 'r') as f:
             line = f.read()
-            print line
 
             # check if we're currently running on a branch
             if re.match('^ref: refs/heads/', line.strip()):
