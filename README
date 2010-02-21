@@ -36,10 +36,20 @@ The arguments are:
 * ``%r`` - the current revision or hash if no revision number is present (e.g. Git)
 * ``%h`` - the current hash or revision number if no hash is present (i.e. Subversion, CVS, Bazaar)
 * ``%b`` - the current branch (if applicable)
+* ``%i`` - the status of the repository (see below)
 
 If not given, the formatting string defaults to ``%s:%b``, that is the current system and the branch. For example::
 
     git:master
+
+
+The status indicators for the ``%i`` argument are as follows:
+
+* ``C`` - the repository is clean (unmodified)
+* ``M`` - the repository has been modified
+* ``S`` - the repository has files which have been
+  staged, but not commited (Git only)
+* ``U`` - the repository has untracked files
 
 
 

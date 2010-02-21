@@ -178,6 +178,7 @@ def git(path, string):
         branch_file = os.path.join(file, 'HEAD')
         with open(branch_file, 'r') as f:
             line = f.read()
+            print line
 
             # check if we're currently running on a branch
             if re.match('^ref: refs/heads/', line.strip()):
@@ -192,10 +193,36 @@ def git(path, string):
             with open(hash_file, 'r') as f:
                 hash = f.read().strip()[0:7]
 
+    # status
+    status = ''
+    if "%i" in string:
+        # there's no way of doing this without calling a seperate process :(
+        command = 'git status'
+        output = Popen(command.split(), stdout=PIPE)
+        for line in output.communicate()[0].split("\n"):
+            line = line.strip('#').strip()
+
+            # untracked
+            if re.search('Untracked', line):
+                status = '%sU' % status
+                continue
+
+            # modified
+            if re.search('not updated', line):
+                status = '%sM' % status
+                continue
+
+            # indexed
+            if re.search('to be committed', line):
+                status = '%sS' % status
+                continue
+
+
     # formatting
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
     string = string.replace('%r', hash)
+    string = string.replace('%i', status)
     string = string.replace('%s', 'git')
     return string
 
