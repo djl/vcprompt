@@ -263,34 +263,10 @@ def hg(path, string):
     if '%i' in string:
         command = 'hg status'
         output = Popen(command.split(), stdout=PIPE)
+
         for line in output.communicate()[0].split('\n'):
-            line = line.strip()
-
-            # untracked files
-            if line.startswith('?'):
-                status = '%sU' % status
-                continue
-
-            # modified
-            if line.startswith('M'):
-                status = '%sM' % status
-                continue
-
-            # added
-            if line.startswith('A'):
-                status = '%sA' % status
-                continue
-
-            # removed
-            if line.startswith('R'):
-                status = '%sR' % status
-                continue
-
-            # removed, but still tracked
-            if line.startswith('!'):
-                status = '%s!' % status
-                continue
-
+            code = line.strip().split(' ')[0]
+            status = '%s%s' % (status, code)
 
     # sort the string to make it all pretty like
     status = ''.join(sorted(set(status)))
