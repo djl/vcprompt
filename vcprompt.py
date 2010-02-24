@@ -260,6 +260,7 @@ def hg(path, string):
         output = Popen(command.split(), stdout=PIPE)
         for line in output.communicate()[0].split('\n'):
             line = line.strip()
+
             # untracked files
             if line.startswith('?'):
                 status = '%sU' % status
@@ -270,10 +271,21 @@ def hg(path, string):
                 status = '%sM' % status
                 continue
 
-            # modified
+            # added
             if line.startswith('A'):
                 status = '%sA' % status
                 continue
+
+            # removed
+            if line.startswith('R'):
+                status = '%sR' % status
+                continue
+
+            # removed, but still tracked
+            if line.startswith('!'):
+                status = '%s!' % status
+                continue
+
 
     # sort the string to make it all pretty like
     status = ''.join(sorted(set(status)))
