@@ -194,6 +194,7 @@ def git(path, string):
                 status = '%sS' % status
                 continue
 
+    status = ''.join(sorted(set(status)))
 
     # formatting
     string = string.replace('%b', branch)
