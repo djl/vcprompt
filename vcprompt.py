@@ -58,11 +58,37 @@ def bzr(path, string):
         with open(file, 'r') as f:
             hash = f.read().strip().split(' ', 1)[0]
 
+
+    # status
+    status = ''
+    if '%i' in string:
+        command = 'bzr status'
+        output = Popen(command.split(), stdout=PIPE)
+
+        # the list of headers in 'bzr status' output
+        headers = {'added': 'A',
+                   'modified': 'M',
+                   'removed': 'R',
+                   'renamed': 'V',
+                   'kind changed': 'K',
+                   'unknown': '?'}
+        headers_regex = '%s:' % '|'.join(headers.keys())
+
+        for line in output.communicate()[0].split('\n'):
+            line = line.strip()
+            if re.match(headers_regex, line):
+                section = ''
+                header = line.split(':')[0]
+                status = '%s%s' % (status, headers[header])
+
+    status = ''.join(sorted(set(status)))
+
     # branch
     # TODO figure out something more correct
     string = string.replace('%b', os.path.basename(path))
     string = string.replace('%h', hash)
     string = string.replace('%r', hash)
+    string = string.replace('%i', status)
     string = string.replace('%s', 'bzr')
     return string
 
