@@ -253,10 +253,35 @@ def hg(path, string):
         with open(file, 'r') as f:
             branch = f.read().strip()
 
-    # formatting
+    # status
+    status = ''
+    if '%i' in string:
+        command = 'hg status'
+        output = Popen(command.split(), stdout=PIPE)
+        for line in output.communicate()[0].split('\n'):
+            line = line.strip()
+            # untracked files
+            if line.startswith('?'):
+                status = '%sU' % status
+                continue
+
+            # modified
+            if line.startswith('M'):
+                status = '%sM' % status
+                continue
+
+            # modified
+            if line.startswith('A'):
+                status = '%sA' % status
+                continue
+
+    # sort the string to make it all pretty like
+    status = ''.join(sorted(set(status)))
+
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
     string = string.replace('%r', revision)
+    string = string.replace('%i', status)
     string = string.replace('%s', 'hg')
     return string
 
