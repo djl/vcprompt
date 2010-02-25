@@ -46,13 +46,13 @@ current system and the branch. For example::
     git:master
 
 
-The status indicators for the ``%i`` argument are as follows:
+The status indicators for the ``%i`` argument will use the underlying
+status codes from the VCS (e.g. ``git status --short``, ``hg status``).
 
-* ``C`` - the repository is clean (unmodified)
-* ``M`` - the repository has been modified
-* ``S`` - the repository has files which have been
-  staged, but not commited (Git only)
-* ``U`` - the repository has untracked files
+Consult the man pages for the VCS you are using for the full documentation.
+
+**Note:** Using ``%i`` argument with Git requires *at least* Git 1.7.0. At
+some point I may backport this to work with earlier versions.
 
 
 
