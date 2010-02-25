@@ -52,7 +52,7 @@ def bzr(path, string):
     if not os.path.exists(file):
         return None
 
-    branch = hash = UNKNOWN
+    branch = hash = status = UNKNOWN
 
     # local revision number
     if re.search('%(r|h)', string):
@@ -61,27 +61,30 @@ def bzr(path, string):
 
 
     # status
-    status = ''
     if '%i' in string:
         command = 'bzr status'
-        output = Popen(command.split(), stdout=PIPE)
+        process = Popen(command.split(), stdout=PIPE)
+        output = process.communicate()[0]
+        returncode = process.returncode
 
-        # the list of headers in 'bzr status' output
-        headers = {'added': 'A',
-                   'modified': 'M',
-                   'removed': 'R',
-                   'renamed': 'V',
-                   'kind changed': 'K',
-                   'unknown': '?'}
-        headers_regex = '%s:' % '|'.join(headers.keys())
+        if returncode == 0:
+            # the list of headers in 'bzr status' output
+            headers = {'added': 'A',
+                       'modified': 'M',
+                       'removed': 'R',
+                       'renamed': 'V',
+                       'kind changed': 'K',
+                       'unknown': '?'}
+            headers_regex = '%s:' % '|'.join(headers.keys())
 
-        for line in output.communicate()[0].split('\n'):
-            line = line.strip()
-            if re.match(headers_regex, line):
-                header = line.split(':')[0]
-                status = '%s%s' % (status, headers[header])
+            status = ''
+            for line in output.split('\n'):
+                line = line.strip()
+                if re.match(headers_regex, line):
+                    header = line.split(':')[0]
+                    status = '%s%s' % (status, headers[header])
 
-    status = ''.join(sorted(set(status)))
+            status = ''.join(sorted(set(status)))
 
     # branch
     # TODO figure out something more correct
@@ -198,7 +201,7 @@ def git(path, string):
     if not os.path.exists(file):
         return None
 
-    branch = hash = UNKNOWN
+    branch = hash = status = UNKNOWN
     # the current branch is required to get the hash
     if re.search('%(b|r|h)', string):
         branch_file = os.path.join(file, 'HEAD')
@@ -220,11 +223,12 @@ def git(path, string):
 
     # status
     status = UNKNOWN
-    if "%i" in string:
+    if '%i' in string:
         command = 'git status --short'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         output = process.communicate()[0]
         returncode = process.returncode
+
         # only process if ``git status`` has the --short option
         if returncode == 0:
             status = ''
@@ -256,7 +260,7 @@ def hg(path, string):
     if not file:
         return None
 
-    branch = revision = hash = UNKNOWN
+    branch = revision = hash = status = UNKNOWN
 
     # changeset ID or global hash
     if re.search('%(r|h)', string):
@@ -272,16 +276,20 @@ def hg(path, string):
             branch = f.read().strip()
 
     # status
-    status = ''
+    status = UNKNOWN
     if '%i' in string:
         command = 'hg status'
-        output = Popen(command.split(), stdout=PIPE)
-        for line in output.communicate()[0].split('\n'):
-            code = line.strip().split(' ')[0]
-            status = '%s%s' % (status, code)
+        process = Popen(command.split(), stdout=PIPE)
+        output = process.communicate()[0]
+        returncode = process.returncode
+        if returncode == 0:
+            status = ''
+            for line in output.split('\n'):
+                code = line.strip().split(' ')[0]
+                status = '%s%s' % (status, code)
 
-    # sort the string to make it all pretty like
-    status = ''.join(sorted(set(status)))
+            # sort the string to make it all pretty like
+            status = ''.join(sorted(set(status)))
 
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
@@ -297,42 +305,48 @@ def svn(path, string):
     if not os.path.exists(file):
         return None
 
-    branch = revision = UNKNOWN
+    branch = revision = status = UNKNOWN
 
     # branch
     command = 'svn info %s' % path
-    output = Popen(command, shell=True, stdout=PIPE,
-                   stderr=open('/dev/null', 'w')).communicate()[0]
+    process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
+    output = process.communicate()[0]
+    returncode = process.returncode
 
-    # compile some regexes
-    branch_regex = re.compile('((tags|branches)|trunk)')
-    revision_regex = re.compile('^Revision: (?P<revision>\d+)')
+    if returncode == 0:
+        # compile some regexes
+        branch_regex = re.compile('((tags|branches)|trunk)')
+        revision_regex = re.compile('^Revision: (?P<revision>\d+)')
 
-    for line in output.split('\n'):
-        # branch
-        if '%b' in string:
-            if re.match('URL:', line):
-                matches = re.search(branch_regex, line)
-                if matches:
-                    branch = matches.groups(0)[0]
+        for line in output.split('\n'):
+            # branch
+            if '%b' in string:
+                if re.match('URL:', line):
+                    matches = re.search(branch_regex, line)
+                    if matches:
+                        branch = matches.groups(0)[0]
 
-        # revision/hash
-        if re.search('%(r|h)', string):
-            if re.match('Revision:', line):
-                matches = re.search(revision_regex, line)
-                if 'revision' in matches.groupdict():
-                    revision = matches.group('revision')
+            # revision/hash
+            if re.search('%(r|h)', string):
+                if re.match('Revision:', line):
+                    matches = re.search(revision_regex, line)
+                    if 'revision' in matches.groupdict():
+                        revision = matches.group('revision')
 
     # status
-    status = ''
     if '%i' in string:
         command = 'svn status'
-        output = Popen(command, shell=True, stdout=PIPE).communicate()[0]
-        for line in output.split('\n'):
-            code = line.strip().split(' ')[0]
-            status = '%s%s' % (status, code)
+        process = Popen(command, shell=True, stdout=PIPE)
+        output = process.communicate()[0]
+        returncode = process.returncode
 
-    status = ''.join(sorted(set(status)))
+        if returncode == 0:
+            status = ''
+            for line in output.split('\n'):
+                code = line.strip().split(' ')[0]
+                status = '%s%s' % (status, code)
+
+            status = ''.join(sorted(set(status)))
 
     # formatting
     string = string.replace('%r', revision)
