@@ -197,30 +197,21 @@ def git(path, string):
                 hash = f.read().strip()[0:7]
 
     # status
-    status = ''
+    status = UNKNOWN
     if "%i" in string:
-        # there's no way of doing this without calling a seperate process :(
-        command = 'git status'
-        output = Popen(command.split(), stdout=PIPE)
-        for line in output.communicate()[0].split("\n"):
-            line = line.strip('#').strip()
+        command = 'git status --short'
+        process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
+        output = process.communicate()[0]
+        returncode = process.returncode
+        # only process if ``git status`` has the --short option
+        if returncode == 0:
+            status = ''
+            for line in output.split('\n'):
+                code = line.strip().split(' ')[0]
+                status = '%s%s' % (status, code)
 
-            # untracked
-            if re.search('Untracked', line):
-                status = '%sU' % status
-                continue
-
-            # modified
-            if re.search('not updated', line):
-                status = '%sM' % status
-                continue
-
-            # indexed
-            if re.search('to be committed', line):
-                status = '%sS' % status
-                continue
-
-    status = ''.join(sorted(set(status)))
+    if status != UNKNOWN:
+        status = ''.join(sorted(set(status)))
 
     # formatting
     string = string.replace('%b', branch)
@@ -263,7 +254,6 @@ def hg(path, string):
     if '%i' in string:
         command = 'hg status'
         output = Popen(command.split(), stdout=PIPE)
-
         for line in output.communicate()[0].split('\n'):
             code = line.strip().split(' ')[0]
             status = '%s%s' % (status, code)
