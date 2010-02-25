@@ -78,7 +78,6 @@ def bzr(path, string):
         for line in output.communicate()[0].split('\n'):
             line = line.strip()
             if re.match(headers_regex, line):
-                section = ''
                 header = line.split(':')[0]
                 status = '%s%s' % (status, headers[header])
 
