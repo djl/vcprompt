@@ -311,10 +311,22 @@ def svn(path, string):
                 if 'revision' in matches.groupdict():
                     revision = matches.group('revision')
 
+    # status
+    status = ''
+    if '%i' in string:
+        command = 'svn status'
+        output = Popen(command, shell=True, stdout=PIPE).communicate()[0]
+        for line in output.split('\n'):
+            code = line.strip().split(' ')[0]
+            status = '%s%s' % (status, code)
+
+    status = ''.join(sorted(set(status)))
+
     # formatting
     string = string.replace('%r', revision)
     string = string.replace('%h', revision)
     string = string.replace('%b', branch)
+    string = string.replace('%i', status)
     string = string.replace('%s', 'svn')
     return string
 
