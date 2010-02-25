@@ -33,15 +33,16 @@ def vcs(function):
 
 def vcprompt(path='.', string=FORMAT):
     paths = os.path.abspath(path).split('/')
-
+    prompt = None
     while paths:
         path = '/'.join(paths)
-        prompt = ''
+        paths.pop()
+        if prompt:
+            return prompt
         for vcs in SYSTEMS:
             prompt = vcs(path, string)
             if prompt:
-                return prompt
-        paths.pop()
+                break
     return ''
 
 
