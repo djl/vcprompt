@@ -62,9 +62,10 @@ Notes
   for Fossil because Fossil doesn't provide a simple interface for getting this
   information.
 
-  Currently Fossil requires at least two external calls (``changes`` and ``extra``),
-  just to get the status information of a repository. Beyond this the output still
-  has to be parsed and translated into usable (and preferably) one letter strings.
+  Currently Fossil requires at least two external calls (``changes`` and
+  ``extra``), just to get the status of a repository. Beyond this the
+  output still has to be parsed and translated into usable (and preferably)
+  one letter strings.
 
 
 
