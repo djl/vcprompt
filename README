@@ -69,8 +69,7 @@ TODO
 ----
 
 - Only test VCSes which are available on the system
-- More complete support and tests for CVS
-- Basic support for Darcs
+- More complete support and tests for CVS, Darcs
 - Add option to show state of repository
 - Build a real distutils installer
   - Use argparse/optparse

@@ -84,6 +84,28 @@ def cvs(path, string):
 
 
 @vcs
+def darcs(path, string):
+    # It's almost a given that everything in here is
+    # going to be wrong
+    file = os.path.join(path, '_darcs/hashed_inventory')
+    if not os.path.exists(file):
+        return None
+
+    hash = branch = UNKNOWN
+    # hash
+    if re.search('%(h|r)', string):
+        with open(file, 'r') as f:
+            size, hash = f.read().strip().split('\n')[0].split('-')
+            hash = hash[:7]
+
+    string = string.replace('%b', branch)
+    string = string.replace('%h', hash)
+    string = string.replace('%r', hash)
+    string = string.replace('%s', 'darcs')
+    return string
+
+
+@vcs
 def fossil(path, string):
     # In my five minutes of playing with Fossil this looks OK
     file = os.path.join(path, '_FOSSIL_')
