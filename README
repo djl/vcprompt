@@ -51,8 +51,20 @@ status codes from the VCS (e.g. ``git status --short``, ``hg status``).
 
 Consult the man pages for the VCS you are using for the full documentation.
 
-**Note:** Using ``%i`` argument with Git requires *at least* Git 1.7.0. At
-some point I may backport this to work with earlier versions.
+
+Notes
+-----
+
+* When using the ``%i`` formatting argument with Git, you must have at
+  least Git 1.7.0. Support for earlier versions may be added in the future
+
+* The ``%i`` formatting argument has not and probably will not be implemented
+  for Fossil because Fossil doesn't provide a simple interface for getting this
+  information.
+
+  Currently Fossil requires at least two external calls (``changes`` and ``extra``),
+  just to get the status information of a repository. Beyond this the output still
+  has to be parsed and translated into usable (and preferably) one letter strings.
 
 
 
