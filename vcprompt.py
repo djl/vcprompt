@@ -120,7 +120,7 @@ def darcs(path, string):
     if not os.path.exists(file):
         return None
 
-    hash = branch = UNKNOWN
+    hash = branch = status = UNKNOWN
     # hash
     if re.search('%(h|r)', string):
         with open(file, 'r') as f:
@@ -133,10 +133,25 @@ def darcs(path, string):
     # until it does, or I can think of something better, this'll have to do
     branch = os.path.basename(path)
 
+    # status
+    if '%i' in string:
+        status = ''
+        command = 'darcs whatsnew -l'
+        process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
+        output = process.communicate()[0]
+        returncode = process.returncode
+
+        if not returncode:
+            for line in output.split('\n'):
+                code = line.split(' ')[0]
+                status = '%s%s' % (status, code)
+            status = ''.join(sorted(set(status)))
+
     # formatting
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
     string = string.replace('%r', hash)
+    string = string.replace('%i', status)
     string = string.replace('%s', 'darcs')
     return string
 
