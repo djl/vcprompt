@@ -67,6 +67,10 @@ Notes
   output still has to be parsed and translated into usable (and preferably)
   one letter strings.
 
+* The ``%i`` argument is slow as molasses on darcs. On average it takes
+  just under a second. This is due to darcs taking a little while to work
+  out if new files exist, but haven't been added, to your repository.
+
 
 
 Requirements
