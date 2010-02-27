@@ -127,6 +127,13 @@ def darcs(path, string):
             size, hash = f.read().strip().split('\n')[0].split('-')
             hash = hash[:7]
 
+    # branch
+    # darcs doesn't have in-repo local branching (yet)
+    # http://bugs.darcs.net/issue555
+    # until it does, or I can think of something better, this'll have to do
+    branch = os.path.basename(path)
+
+    # formatting
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
     string = string.replace('%r', hash)
