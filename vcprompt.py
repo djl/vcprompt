@@ -287,7 +287,7 @@ def git(path, string):
 
 @vcs
 def hg(path, string):
-    files = ['.hg/branch', '.hg/undo.branch' '.hg/bookmarks.current']
+    files = ['.hg/branch', '.hg/undo.branch', '.hg/bookmarks.current']
     file = None
     for f in files:
         f = os.path.join(path, f)
