@@ -67,7 +67,7 @@ def bzr(path, string):
         output = process.communicate()[0]
         returncode = process.returncode
 
-        if returncode == 0:
+        if not returncode:
             # the list of headers in 'bzr status' output
             headers = {'added': 'A',
                        'modified': 'M',
@@ -230,7 +230,7 @@ def git(path, string):
         returncode = process.returncode
 
         # only process if ``git status`` has the --short option
-        if returncode == 0:
+        if not returncode:
             status = ''
             for line in output.split('\n'):
                 code = line.strip().split(' ')[0]
@@ -282,7 +282,7 @@ def hg(path, string):
         process = Popen(command.split(), stdout=PIPE)
         output = process.communicate()[0]
         returncode = process.returncode
-        if returncode == 0:
+        if not returncode:
             status = ''
             for line in output.split('\n'):
                 code = line.strip().split(' ')[0]
@@ -313,7 +313,7 @@ def svn(path, string):
     output = process.communicate()[0]
     returncode = process.returncode
 
-    if returncode == 0:
+    if not returncode:
         # compile some regexes
         branch_regex = re.compile('((tags|branches)|trunk)')
         revision_regex = re.compile('^Revision: (?P<revision>\d+)')
@@ -340,7 +340,7 @@ def svn(path, string):
         output = process.communicate()[0]
         returncode = process.returncode
 
-        if returncode == 0:
+        if not returncode:
             status = ''
             for line in output.split('\n'):
                 code = line.strip().split(' ')[0]
