@@ -25,6 +25,21 @@ else:
             FORMAT = os.environ['VCPROMPT_FORMAT']
 
 
+def sorted_alpha(x, y):
+    xup = x.isupper()
+    yup = y.isupper()
+    if xup and yup:
+        return cmp(x, y)
+    elif xup:
+        return 1
+    elif yup:
+        return -1
+    else:
+        return cmp(x, y)
+
+def sorted_unique(xs):
+    return ''.join(set(sorted(list(xs), cmp=sorted_alpha)))
+
 def vcs(function):
     """Simple decorator which adds the wrapped function to SYSTEMS variable"""
     SYSTEMS.append(function)
@@ -84,7 +99,7 @@ def bzr(path, string):
                     header = line.split(':')[0]
                     status = '%s%s' % (status, headers[header])
 
-            status = ''.join(sorted(set(status)))
+            status = sorted_unique(status)
 
     # branch
     # TODO figure out something more correct
@@ -145,7 +160,7 @@ def darcs(path, string):
             for line in output.split('\n'):
                 code = line.split(' ')[0]
                 status = '%s%s' % (status, code)
-            status = ''.join(sorted(set(status)))
+            status = sorted_unique(status)
 
     # formatting
     string = string.replace('%b', branch)
@@ -259,7 +274,7 @@ def git(path, string):
                 status = '%s%s' % (status, code)
 
     if status != UNKNOWN:
-        status = ''.join(sorted(set(status)))
+        status = sorted_unique(status)
 
     # formatting
     string = string.replace('%b', branch)
@@ -311,7 +326,7 @@ def hg(path, string):
                 status = '%s%s' % (status, code)
 
             # sort the string to make it all pretty like
-            status = ''.join(sorted(set(status)))
+            status = sorted_unique(status)
 
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
@@ -368,7 +383,7 @@ def svn(path, string):
                 code = line.strip().split(' ')[0]
                 status = '%s%s' % (status, code)
 
-            status = ''.join(sorted(set(status)))
+            status = sorted_unique(status)
 
     # formatting
     string = string.replace('%r', revision)
