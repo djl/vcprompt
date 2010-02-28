@@ -14,6 +14,102 @@ class Base(unittest.TestCase):
         return location
 
 
+class Bazaar(Base):
+    def setUp(self):
+        self.repository = self.repo('bzr')
+
+    def test_format_branch(self, string='%b'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'bzr')
+
+    def test_format_revision(self, string='%r'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, '1')
+
+    def test_format_hash(self, string='%h'):
+        # bzr doesn't seem to have a concept of 'global' hash/identifier
+        # just return ``test_format_revision`` for now
+        self.test_format_revision(string)
+
+    def test_format_system(self, string='%s'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'bzr')
+
+    def test_format_all(self, string='%s:%r'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'bzr:1')
+
+
+class Darcs(Base):
+    def setUp(self):
+        self.repository = self.repo('darcs')
+
+    def test_format_branch(self, string='%b'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'darcs')
+
+    def test_format_revision(self, string='%r'):
+        return self.test_format_hash(string)
+
+    def test_format_hash(self, string='%h'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, '4b13fbf')
+
+    def test_format_system(self, string='%s'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'darcs')
+
+    def test_format_all(self, string='%s:%b:%r'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'darcs:darcs:4b13fbf')
+
+
+class Fossil(Base):
+    def setUp(self):
+        self.repository = self.repo('fossil')
+        self.repository_file = 'fossil'
+        self.repository_db = os.path.join(self.repository,
+                                          '_FOSSIL')
+        if not self.is_open():
+            self.open()
+
+    def tearDown(self):
+        if self.is_open():
+            self.close()
+
+    def is_open(self):
+        return os.path.exists(self.repository_db)
+
+    def open(self):
+        with open('/dev/null', 'w') as devnull:
+            command = "cd %s && fossil open %s" % (self.repository,
+                                                   self.repository_file)
+            subprocess.Popen(command, shell=True, stdout=devnull,
+                             stderr=devnull)
+
+    def close(self):
+        with open('/dev/null', 'w') as devnull:
+            command = "cd %s && fossil close" % self.repository
+            subprocess.Popen(command, shell=True, stdout=devnull,
+                             stderr=devnull)
+
+    def test_format_system(self, string='%s'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'fossil')
+
+    def test_format_branch(self, string='%b'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'trunk')
+
+    def test_format_hash(self, string='%h'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, '4103d09')
+
+    def test_format_revision(self, string='%r'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, '4103d09')
+
+
 class Git(Base):
     def setUp(self):
         self.repository = self.repo('git')
@@ -63,33 +159,6 @@ class Mercurial(Base):
         self.assertEquals(string, 'hg:default:r0:8ada0a9')
 
 
-class Bazaar(Base):
-    def setUp(self):
-        self.repository = self.repo('bzr')
-
-    def test_format_branch(self, string='%b'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, 'bzr')
-
-    def test_format_revision(self, string='%r'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, '1')
-
-    def test_format_hash(self, string='%h'):
-        # bzr doesn't seem to have a concept of 'global' hash/identifier
-        # just return ``test_format_revision`` for now
-        self.test_format_revision(string)
-
-    def test_format_system(self, string='%s'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, 'bzr')
-
-    def test_format_all(self, string='%s:%r'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, 'bzr:1')
-
-
-
 class Subversion(Base):
     def setUp(self):
         self.repository = self.repo('svn')
@@ -112,76 +181,6 @@ class Subversion(Base):
     def test_format_all(self, string='%s:%b:%h'):
         string = vcprompt.vcprompt(self.repository, string)
         self.assertEquals(string, "svn:%s:0" % vcprompt.UNKNOWN)
-
-
-class Fossil(Base):
-    def setUp(self):
-        self.repository = self.repo('fossil')
-        self.repository_file = 'fossil'
-        self.repository_db = os.path.join(self.repository,
-                                          '_FOSSIL')
-        if not self.is_open():
-            self.open()
-
-    def tearDown(self):
-        if self.is_open():
-            self.close()
-
-    def is_open(self):
-        return os.path.exists(self.repository_db)
-
-    def open(self):
-        with open('/dev/null', 'w') as devnull:
-            command = "cd %s && fossil open %s" % (self.repository,
-                                                   self.repository_file)
-            subprocess.Popen(command, shell=True, stdout=devnull,
-                             stderr=devnull)
-
-    def close(self):
-        with open('/dev/null', 'w') as devnull:
-            command = "cd %s && fossil close" % self.repository
-            subprocess.Popen(command, shell=True, stdout=devnull,
-                             stderr=devnull)
-
-    def test_format_system(self, string='%s'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, 'fossil')
-
-    def test_format_branch(self, string='%b'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, 'trunk')
-
-    def test_format_hash(self, string='%h'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, '4103d09')
-
-    def test_format_revision(self, string='%r'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, '4103d09')
-
-
-class Darcs(Base):
-    def setUp(self):
-        self.repository = self.repo('darcs')
-
-    def test_format_branch(self, string='%b'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, 'darcs')
-
-    def test_format_revision(self, string='%r'):
-        return self.test_format_hash(string)
-
-    def test_format_hash(self, string='%h'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, '4b13fbf')
-
-    def test_format_system(self, string='%s'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, 'darcs')
-
-    def test_format_all(self, string='%s:%b:%r'):
-        string = vcprompt.vcprompt(self.repository, string)
-        self.assertEquals(string, 'darcs:darcs:4b13fbf')
 
 
 if __name__ == '__main__':
