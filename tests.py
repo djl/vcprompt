@@ -160,5 +160,29 @@ class Fossil(Base):
         self.assertEquals(string, '4103d09')
 
 
+class Darcs(Base):
+    def setUp(self):
+        self.repository = self.repo('darcs')
+
+    def test_format_branch(self, string='%b'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'darcs')
+
+    def test_format_revision(self, string='%r'):
+        return self.test_format_hash(string)
+
+    def test_format_hash(self, string='%h'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, '4b13fbf')
+
+    def test_format_system(self, string='%s'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'darcs')
+
+    def test_format_all(self, string='%s:%b:%r'):
+        string = vcprompt.vcprompt(self.repository, string)
+        self.assertEquals(string, 'darcs:darcs:4b13fbf')
+
+
 if __name__ == '__main__':
     unittest.main()

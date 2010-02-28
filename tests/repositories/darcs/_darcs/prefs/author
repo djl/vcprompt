@@ -1,0 +1,9 @@
+# Each patch is attributed to its author, usually by email address (for
+# example, `Fred Bloggs <fred@example.net>').  Darcs looks in several
+# places for this author string: the --author option, the files
+# _darcs/prefs/author (in the repository) and ~/.darcs/author (in your
+# home directory), and the environment variables $DARCS_EMAIL and
+# $EMAIL.  If none of those exist, Darcs will prompt you for an author
+# string and write it to _darcs/prefs/author.
+
+davidlogie@me.com
