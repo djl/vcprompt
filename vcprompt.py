@@ -42,6 +42,7 @@ def vcs(function):
 
 
 def vcprompt(path, string):
+    path = os.path.expanduser(path)
     paths = os.path.abspath(path).split('/')
     prompt = None
     while paths:
