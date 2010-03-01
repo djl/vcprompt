@@ -11,7 +11,13 @@ A pure-Python implementation of vcprompt_
 Installing
 ----------
 
-Place ``vcprompt.py`` somewhere in your ``$PATH``, then add it to your prompt.
+``vcprompt`` has no dependencies outside of Python stdlib, so you can simply
+use it as a standalone script::
+
+    curl -s http://github.com/xvzf/vcprompt/raw/master/vcprompt.py >> ~/bin/vcprompt && chmod 755 ~/bin/vcprompt
+
+
+Next, you'll want to add it to your prompt.
 
 For bash::
 

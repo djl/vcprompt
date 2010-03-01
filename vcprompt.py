@@ -1,52 +1,47 @@
 #!/usr/bin/env python
 from __future__ import with_statement
-
-__version__ = (0, 1, 0)
-
+from subprocess import Popen, PIPE
+import optparse
 import os
 import re
 import sqlite3
 import sys
-from subprocess import Popen, PIPE
+
+__version__ = (0, 0, 2)
 
 FORMAT = '%s:%b'
 SYSTEMS = []
 UNKNOWN = '(unknown)'
 
+
+# unknown environment variable
 if 'VCPROMPT_UNKNOWN' in list(os.environ.keys()):
     if os.environ['VCPROMPT_UNKNOWN']:
         UNKNOWN = os.environ['VCPROMPT_UNKNOWN']
 
-if len(sys.argv) > 1:
-    FORMAT = sys.argv[1]
-else:
-    if 'VCPROMPT_FORMAT' in list(os.environ.keys()):
-        if os.environ['VCPROMPT_FORMAT']:
-            FORMAT = os.environ['VCPROMPT_FORMAT']
+# foamtting environment variable
+if 'VCPROMPT_FORMAT' in list(os.environ.keys()):
+    if os.environ['VCPROMPT_FORMAT']:
+        FORMAT = os.environ['VCPROMPT_FORMAT']
 
 
-def sorted_alpha(x, y):
-    xup = x.isupper()
-    yup = y.isupper()
-    if xup and yup:
-        return cmp(x, y)
-    elif xup:
-        return 1
-    elif yup:
-        return -1
-    else:
-        return cmp(x, y)
+def sorted_alpha(sortme, unique=False):
+    upper = [x for x in sortme if x.isupper()]
+    lower = [x for x in sortme if x.islower()]
+    digit = [x for x in sortme if x.isdigit()]
+    if unique:
+        upper = list(set(upper))
+        lower = list(set(lower))
+        digit = list(set(digit))
+    return lower + upper + digit
 
-def sorted_unique(xs):
-    return ''.join(set(sorted(list(xs), cmp=sorted_alpha)))
 
 def vcs(function):
-    """Simple decorator which adds the wrapped function to SYSTEMS variable"""
     SYSTEMS.append(function)
     return function
 
 
-def vcprompt(path='.', string=FORMAT):
+def vcprompt(path, string):
     paths = os.path.abspath(path).split('/')
     prompt = None
     while paths:
@@ -59,6 +54,25 @@ def vcprompt(path='.', string=FORMAT):
             if prompt:
                 break
     return ''
+
+
+def version():
+    return '.'.join(map(str, __version__))
+
+
+def main():
+    # parser
+    parser = optparse.OptionParser("usage: %prog FORMAT [OPTIONS]",
+                                   version=version())
+    parser.add_option('-f', '--format', dest='format',
+                      default=FORMAT, help='The format string to use.')
+    parser.add_option('-p', '--path', dest='path',
+                      default='.', help='The path to run vcprompt on.')
+
+    # parse!
+    options, args = parser.parse_args()
+
+    sys.stdout.write(vcprompt(options.path, options.format))
 
 
 @vcs
@@ -99,7 +113,7 @@ def bzr(path, string):
                     header = line.split(':')[0]
                     status = '%s%s' % (status, headers[header])
 
-            status = sorted_unique(status)
+            status = sorted_alpha(status)
 
     # branch
     # TODO figure out something more correct
@@ -160,7 +174,7 @@ def darcs(path, string):
             for line in output.split('\n'):
                 code = line.split(' ')[0]
                 status = '%s%s' % (status, code)
-            status = sorted_unique(status)
+            status = sorted_alpha(status)
 
     # formatting
     string = string.replace('%b', branch)
@@ -274,7 +288,7 @@ def git(path, string):
                 status = '%s%s' % (status, code)
 
     if status != UNKNOWN:
-        status = sorted_unique(status)
+        status = sorted_alpha(status)
 
     # formatting
     string = string.replace('%b', branch)
@@ -326,7 +340,7 @@ def hg(path, string):
                 status = '%s%s' % (status, code)
 
             # sort the string to make it all pretty like
-            status = sorted_unique(status)
+            status = sorted_alpha(status)
 
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
@@ -383,7 +397,7 @@ def svn(path, string):
                 code = line.strip().split(' ')[0]
                 status = '%s%s' % (status, code)
 
-            status = sorted_unique(status)
+            status = sorted_alpha(status)
 
     # formatting
     string = string.replace('%r', revision)
@@ -395,4 +409,4 @@ def svn(path, string):
 
 
 if __name__ == '__main__':
-    sys.stdout.write(vcprompt('.', FORMAT))
+    main()
