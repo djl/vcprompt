@@ -16,7 +16,7 @@ Installing
 ``vcprompt`` has no dependencies outside of the Python stdlib, so you can simply
 use it as a standalone script::
 
-    curl -s http://github.com/xvzf/vcprompt/raw/master/vcprompt.py >> ~/bin/vcprompt && chmod 755 ~/bin/vcprompt
+    curl -s http://github.com/xvzf/vcprompt/raw/master/bin/vcprompt >> ~/bin/vcprompt && chmod 755 ~/bin/vcprompt
 
 
 Next, you'll want to add it to your prompt.
@@ -51,6 +51,9 @@ If not given, the value defaults to ``.``.
 
 formatting
 ~~~~~~~~~~
+
+The ``--path`` allows the output of ``vcprompt`` to be formatted in a
+specific way.
 
 The formatting arguments are:
 
@@ -124,5 +127,3 @@ TODO
 
 - Only test VCSes which are available on the system
 - More complete support and tests for CVS, Darcs
-- Build a real distutils installer
-  - Use argparse/optparse

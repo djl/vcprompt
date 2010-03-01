@@ -7,22 +7,15 @@ import re
 import sqlite3
 import sys
 
-__version__ = (0, 0, 2)
+__version__ = (0, 0, 3)
 
 FORMAT = '%s:%b'
 SYSTEMS = []
 UNKNOWN = '(unknown)'
 
 
-# unknown environment variable
-if 'VCPROMPT_UNKNOWN' in list(os.environ.keys()):
-    if os.environ['VCPROMPT_UNKNOWN']:
-        UNKNOWN = os.environ['VCPROMPT_UNKNOWN']
-
-# foamtting environment variable
-if 'VCPROMPT_FORMAT' in list(os.environ.keys()):
-    if os.environ['VCPROMPT_FORMAT']:
-        FORMAT = os.environ['VCPROMPT_FORMAT']
+def format():
+    return os.environ.get('VCPROMPT_FORMAT', FORMAT)
 
 
 def sorted_alpha(sortme, unique=False):
@@ -34,6 +27,14 @@ def sorted_alpha(sortme, unique=False):
         lower = list(set(lower))
         digit = list(set(digit))
     return lower + upper + digit
+
+
+def unknown(*args):
+    u = os.environ.get('VCPROMPT_UNKNOWN', UNKNOWN)
+    if '--unknown' in args:
+        print u
+        sys.exit(0)
+    return u
 
 
 def vcs(function):
@@ -65,10 +66,18 @@ def main():
     # parser
     parser = optparse.OptionParser("usage: %prog FORMAT [OPTIONS]",
                                    version=version())
+
+    # format
     parser.add_option('-f', '--format', dest='format',
-                      default=FORMAT, help='The format string to use.')
+                      default=format(), help='The format string to use.')
+
+    # path
     parser.add_option('-p', '--path', dest='path',
                       default='.', help='The path to run vcprompt on.')
+
+    # unknown
+    parser.add_option('--unknown', dest='unknown', action='callback',
+                      callback=unknown, help='Prints the "unknown" value.')
 
     # parse!
     options, args = parser.parse_args()
@@ -82,7 +91,7 @@ def bzr(path, string):
     if not os.path.exists(file):
         return None
 
-    branch = hash = status = UNKNOWN
+    branch = hash = status = unknown()
 
     # local revision number
     if re.search('%(r|h)', string):
@@ -134,7 +143,7 @@ def cvs(path, string):
     if not os.path.exists(file):
         return None
 
-    branch = revision = UNKNOWN
+    branch = revision = unknown()
 
     string = string.replace('%s', 'cvs')
     string = string.replace('%b', branch)
@@ -150,7 +159,7 @@ def darcs(path, string):
     if not os.path.exists(file):
         return None
 
-    hash = branch = status = UNKNOWN
+    hash = branch = status = unknown()
     # hash
     if re.search('%(h|r)', string):
         with open(file, 'r') as f:
@@ -193,7 +202,7 @@ def fossil(path, string):
     if not os.path.exists(file):
         return None
 
-    branch = hash = UNKNOWN
+    branch = hash = unknown()
 
     # all this just to get the repository file :(
     repository = None
@@ -253,7 +262,7 @@ def git(path, string):
     if not os.path.exists(file):
         return None
 
-    branch = hash = status = UNKNOWN
+    branch = hash = status = unknown()
     # the current branch is required to get the hash
     if re.search('%(b|r|h)', string):
         branch_file = os.path.join(file, 'HEAD')
@@ -274,7 +283,7 @@ def git(path, string):
                 hash = f.read().strip()[0:7]
 
     # status
-    status = UNKNOWN
+    status = unknown()
     if '%i' in string:
         command = 'git status --short'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
@@ -312,7 +321,7 @@ def hg(path, string):
     if not file:
         return None
 
-    branch = revision = hash = status = UNKNOWN
+    branch = revision = hash = status = unknown()
 
     # changeset ID or global hash
     if re.search('%(r|h)', string):
@@ -328,7 +337,7 @@ def hg(path, string):
             branch = f.read().strip()
 
     # status
-    status = UNKNOWN
+    status = unknown()
     if '%i' in string:
         command = 'hg status'
         process = Popen(command.split(), stdout=PIPE)
@@ -357,7 +366,7 @@ def svn(path, string):
     if not os.path.exists(file):
         return None
 
-    branch = revision = status = UNKNOWN
+    branch = revision = status = unknown()
 
     # branch
     command = 'svn info %s' % path
