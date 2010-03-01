@@ -1,8 +1,10 @@
-===========
-vcprompt.py
-===========
+========
+vcprompt
+========
 
-A pure-Python implementation of vcprompt_
+Version control information in your prompt (or anywhere!).
+
+Heavily inspired by Greg Ward's vcprompt_
 
 .. _vcprompt: http://vc.gerg.ca/hg/vcprompt/
 
