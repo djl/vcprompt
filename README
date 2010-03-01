@@ -13,7 +13,7 @@ Heavily inspired by Greg Ward's vcprompt_
 Installing
 ----------
 
-``vcprompt`` has no dependencies outside of Python stdlib, so you can simply
+``vcprompt`` has no dependencies outside of the Python stdlib, so you can simply
 use it as a standalone script::
 
     curl -s http://github.com/xvzf/vcprompt/raw/master/vcprompt.py >> ~/bin/vcprompt && chmod 755 ~/bin/vcprompt
@@ -23,22 +23,36 @@ Next, you'll want to add it to your prompt.
 
 For bash::
 
-    PS1='\u@\h:\w $(vcprompt.py)\$'
+    PS1='\u@\h:\w $(vcprompt)\$'
 
 
 For zsh you need to enable PROMPT_SUBST first::
 
     setopt prompt_subst
-    PS1='[%n@%m] [%~] $(vcprompt.py)'
+    PS1='[%n@%m] [%~] $(vcprompt)'
 
 
 
-Prompt formatting
------------------
 
-``vcprompt`` takes a single, optional argument - a formatting string.
+Usage
+-----
 
-The arguments are:
+``vcprompt`` takes two optional arguments: ``--path`` and ``--format``.
+
+
+path
+~~~~
+
+The ``--path`` argument can be used to specify a path to begin searching
+for an existing VCS repository.
+
+If not given, the value defaults to ``.``.
+
+
+formatting
+~~~~~~~~~~
+
+The formatting arguments are:
 
 * ``%s`` - the VCS system in use
 * ``%r`` - the current revision or hash if no revision number is
@@ -58,6 +72,8 @@ The status indicators for the ``%i`` argument will use the underlying
 status codes from the VCS (e.g. ``git status --short``, ``hg status``).
 
 Consult the man pages for the VCS you are using for the full documentation.
+
+
 
 
 Notes
