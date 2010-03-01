@@ -13,23 +13,40 @@ Heavily inspired by Greg Ward's vcprompt_
 Installing
 ----------
 
-``vcprompt`` has no dependencies outside of the Python stdlib, so you can simply
-use it as a standalone script::
+``vcprompt`` be install either via pypi or as a standalone script.
 
-    curl -s http://github.com/xvzf/vcprompt/raw/master/bin/vcprompt >> ~/bin/vcprompt && chmod 755 ~/bin/vcprompt
+pypi
+~~~~
+::
+
+    # pip
+    $ pip install vcprompt
+
+    # easy_install
+    $ easy_install vcprompt
 
 
+standalone
+~~~~~~~~~~
+
+    # assuming ~/bin is on your $PATH
+    $ curl -s http://github.com/xvzf/vcprompt/raw/master/bin/vcprompt >> ~/bin/vcprompt
+    $ chmod 755 ~/bin/vcprompt
+
+
+prompt
+~~~~~~
 Next, you'll want to add it to your prompt.
 
 For bash::
 
-    PS1='\u@\h:\w $(vcprompt)\$'
+    $ export PS1='\u@\h:\w $(vcprompt)\$'
 
 
 For zsh you need to enable PROMPT_SUBST first::
 
-    setopt prompt_subst
-    PS1='[%n@%m] [%~] $(vcprompt)'
+    $ setopt prompt_subst
+    $ PS1='[%n@%m] [%~] $(vcprompt)'
 
 
 
