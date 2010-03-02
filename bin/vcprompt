@@ -29,6 +29,11 @@ def sorted_alpha(sortme, unique=False):
     return lower + upper + digit
 
 
+def systems(*args, **kwargs):
+    for system in SYSTEMS:
+        print system.func_name
+    sys.exit(0)
+
 def unknown(*args):
     u = os.environ.get('VCPROMPT_UNKNOWN', UNKNOWN)
     if '--unknown' in args:
@@ -78,6 +83,11 @@ def main():
     # unknown
     parser.add_option('--unknown', dest='unknown', action='callback',
                       callback=unknown, help='Prints the "unknown" value.')
+
+    # systems
+    parser.add_option('--systems', dest='systems', action='callback',
+                      callback=systems,
+                      help='Prints the available version control systems.')
 
     # parse!
     options, args = parser.parse_args()
