@@ -34,6 +34,7 @@ def systems(*args, **kwargs):
         print system.func_name
     sys.exit(0)
 
+
 def unknown(*args):
     u = os.environ.get('VCPROMPT_UNKNOWN', UNKNOWN)
     if '--unknown' in args:
