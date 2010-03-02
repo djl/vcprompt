@@ -18,7 +18,7 @@ def format():
     return os.environ.get('VCPROMPT_FORMAT', FORMAT)
 
 
-def sorted_alpha(sortme, unique=False):
+def sorted_alpha(sortme, unique=True):
     upper = [x for x in sortme if x.isupper()]
     lower = [x for x in sortme if x.islower()]
     digit = [x for x in sortme if x.isdigit()]
