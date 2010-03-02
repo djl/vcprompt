@@ -31,7 +31,7 @@ setup(
     scripts=['bin/vcprompt'],
     license='BSD',
     description='Version control information in your prompt (or anywhere!).',
-    long_description=__doc___,
+    long_description=__doc__,
     classifiers=[
         'Development Status :: 3 - Alpha'
         'Intended Audience :: Developers',
