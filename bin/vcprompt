@@ -14,8 +14,28 @@ SYSTEMS = []
 UNKNOWN = '(unknown)'
 
 
+def description(desc):
+    """
+    Adds a 'description' attribute to the decorated function.
+    """
+    def decorator(function):
+        function.description = desc
+        return function
+    return decorator
+
+
 def format():
     return os.environ.get('VCPROMPT_FORMAT', FORMAT)
+
+
+def name(n):
+    """
+    Adds a 'name' attribute to the decorated function.
+    """
+    def decorator(function):
+        function.name = n
+        return function
+    return decorator
 
 
 def sorted_alpha(sortme, unique=True):
@@ -31,7 +51,10 @@ def sorted_alpha(sortme, unique=True):
 
 def systems(*args, **kwargs):
     for system in SYSTEMS:
-        print system.func_name
+        name = getattr(system, 'name', system.func_name)
+        desc = getattr(system, 'description', '')
+        output = "%s: %s" % (name, desc)
+        print output
     sys.exit(0)
 
 
@@ -97,6 +120,8 @@ def main():
 
 
 @vcs
+@name("Bazaar")
+@description("The Bazaar version control system")
 def bzr(path, string):
     file = os.path.join(path, '.bzr/branch/last-revision')
     if not os.path.exists(file):
@@ -147,6 +172,8 @@ def bzr(path, string):
 
 
 @vcs
+@name("CVS")
+@description("Concurrent Versions System")
 def cvs(path, string):
     # Stabbing in the dark here
     # TODO make this not suck
@@ -163,6 +190,8 @@ def cvs(path, string):
 
 
 @vcs
+@name("Darcs")
+@description("Distributed. Interactive. Smart.")
 def darcs(path, string):
     # It's almost a given that everything in here is
     # going to be wrong
@@ -207,6 +236,8 @@ def darcs(path, string):
 
 
 @vcs
+@name("Fossil")
+@description("""The Fossil version control system.""")
 def fossil(path, string):
     # In my five minutes of playing with Fossil this looks OK
     file = os.path.join(path, '_FOSSIL_')
@@ -268,6 +299,8 @@ def fossil(path, string):
 
 
 @vcs
+@name("Git")
+@description("The fast version control system")
 def git(path, string):
     file = os.path.join(path, '.git/')
     if not os.path.exists(file):
@@ -321,6 +354,8 @@ def git(path, string):
 
 
 @vcs
+@name("Mercurial")
+@description("The Mercurial version control system")
 def hg(path, string):
     files = ['.hg/branch', '.hg/undo.branch', '.hg/bookmarks.current']
     file = None
@@ -372,6 +407,8 @@ def hg(path, string):
 
 
 @vcs
+@name("Subversion")
+@description("The Subversion version control system.")
 def svn(path, string):
     file = os.path.join(path, '.svn/entries')
     if not os.path.exists(file):
