@@ -37,8 +37,6 @@ class Bazaar(Base):
         self.assertEquals(string, '1')
 
     def test_format_hash(self, string='%h'):
-        # bzr doesn't seem to have a concept of 'global' hash/identifier
-        # just return ``test_format_revision`` for now
         self.test_format_revision(string)
 
     def test_format_system(self, string='%s'):
