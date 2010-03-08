@@ -14,28 +14,8 @@ SYSTEMS = []
 UNKNOWN = '(unknown)'
 
 
-def description(desc):
-    """
-    Adds a 'description' attribute to the decorated function.
-    """
-    def decorator(function):
-        function.description = desc
-        return function
-    return decorator
-
-
 def format():
     return os.environ.get('VCPROMPT_FORMAT', FORMAT)
-
-
-def name(n):
-    """
-    Adds a 'name' attribute to the decorated function.
-    """
-    def decorator(function):
-        function.name = n
-        return function
-    return decorator
 
 
 def sorted_alpha(sortme, unique=True):
@@ -66,9 +46,13 @@ def unknown(*args):
     return u
 
 
-def vcs(function):
-    SYSTEMS.append(function)
-    return function
+def vcs(name, description):
+    def wrapped(function):
+        function.name = name
+        function.description = name
+        SYSTEMS.append(function)
+        return function
+    return wrapped
 
 
 def vcprompt(path, string):
@@ -119,9 +103,7 @@ def main():
     sys.stdout.write(vcprompt(options.path, options.format))
 
 
-@vcs
-@name("Bazaar")
-@description("The Bazaar version control system")
+@vcs('Bazaar', 'The Bazaar version control system')
 def bzr(path, string):
     file = os.path.join(path, '.bzr/branch/last-revision')
     if not os.path.exists(file):
@@ -171,9 +153,7 @@ def bzr(path, string):
     return string
 
 
-@vcs
-@name("CVS")
-@description("Concurrent Versions System")
+@vcs('CVS', 'Concurrent Versions System.')
 def cvs(path, string):
     # Stabbing in the dark here
     # TODO make this not suck
@@ -189,9 +169,7 @@ def cvs(path, string):
     return string
 
 
-@vcs
-@name("Darcs")
-@description("Distributed. Interactive. Smart.")
+@vcs('Darcs', 'Distributed. Interactive. Smart.')
 def darcs(path, string):
     # It's almost a given that everything in here is
     # going to be wrong
@@ -235,9 +213,7 @@ def darcs(path, string):
     return string
 
 
-@vcs
-@name("Fossil")
-@description("""The Fossil version control system.""")
+@vcs('Fossil', 'The Fossil version control system.')
 def fossil(path, string):
     # In my five minutes of playing with Fossil this looks OK
     file = os.path.join(path, '_FOSSIL_')
@@ -298,9 +274,7 @@ def fossil(path, string):
     return string
 
 
-@vcs
-@name("Git")
-@description("The fast version control system")
+@vcs('Git', 'The fast version control system.')
 def git(path, string):
     file = os.path.join(path, '.git/')
     if not os.path.exists(file):
@@ -353,9 +327,7 @@ def git(path, string):
     return string
 
 
-@vcs
-@name("Mercurial")
-@description("The Mercurial version control system")
+@vcs('Mercurial', 'The Mercurial version control system.')
 def hg(path, string):
     files = ['.hg/branch', '.hg/undo.branch', '.hg/bookmarks.current']
     file = None
@@ -406,9 +378,7 @@ def hg(path, string):
     return string
 
 
-@vcs
-@name("Subversion")
-@description("The Subversion version control system.")
+@vcs('Subversion', 'The Subversion version control system.')
 def svn(path, string):
     file = os.path.join(path, '.svn/entries')
     if not os.path.exists(file):
