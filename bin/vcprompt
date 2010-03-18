@@ -22,7 +22,7 @@ def sorted_alpha(sortme, unique=True):
         upper = list(set(upper))
         lower = list(set(lower))
         digit = list(set(digit))
-    return lower + upper + digit
+    return ''.join(lower + upper + digit)
 
 
 def systems(*args, **kwargs):
@@ -318,7 +318,7 @@ def git(path, string, unknown):
                 code = line.strip().split(' ')[0]
                 status = '%s%s' % (status, code)
 
-    if status != UNKNOWN:
+    if status != unknown:
         status = sorted_alpha(status)
 
     # formatting
