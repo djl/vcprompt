@@ -1,0 +1,70 @@
+vcprompt(1) -- Version control information in your prompt
+=========================================================
+
+## SYNOPSIS
+
+`vcprompt` [ <OPTIONS> ]  
+`vcprompt` --format <FORMAT>  
+`vcprompt` --path <PATH>  
+`vcprompt` --systems  
+`vcprompt` --unknown  
+
+
+## DESCRIPTION
+
+vcprompt is a small utility for displaying version control information
+in your shell's prompt.
+
+
+## INSTALL
+
+Install from the Python Package Index:
+
+    $ [sudo] easy_install vcprompt
+
+Or, clone the git repository:
+
+    $ git clone git://github.com/xvzf/vcprompt.git
+    $ cd vcprompt
+    $ [sudo] python setup.py install
+
+
+## OPTIONS
+
+`vcprompt` takes a few options:
+
+  * `-f`, `--format`:
+    The format string to use when displaying information. If not provided
+    this will fall back onto the `VCPROMPT_FORMAT` environment variable or
+    the hard-coded string inside of the `vprompt` binary.
+
+  * `-p`, `--path`:
+    The path to for vcprompt to start looking for a version control
+    repository.
+
+  * `--systems`:
+    Prints all the version control systems which vcprompt is aware off.
+
+  * `--unknown`:
+    Prints the 'unknown' value to stdout. This is used internally for
+    testing but is included here for completeness.
+
+
+## ENVIRONMENT
+
+  * `VCPROMPT_FORMAT`:
+    The format string which `vcprompt` will use when displaying any
+    information.
+
+    See vcprompt(5) for the full formatting syntax.
+    
+  * `VCPROMPT_UNKNOWN`:
+    The value to be used when `vcprompt` is unable to determine the
+    output for a formatting option.
+    
+    Defaults to "(unknown)".
+
+
+## SEE ALSO
+
+vcprompt(5)

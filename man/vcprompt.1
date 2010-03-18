@@ -1,0 +1,98 @@
+.\" generated with Ronn/v0.4.1
+.\" http://github.com/rtomayko/ronn/
+.
+.TH "VCPROMPT" "1" "March 2010" "" ""
+.
+.SH "NAME"
+\fBvcprompt\fR \-\- Version control information in your prompt
+.
+.SH "SYNOPSIS"
+\fBvcprompt\fR [ \fIOPTIONS\fR ]
+.
+.br
+\fBvcprompt\fR \-\-format \fIFORMAT\fR
+.
+.br
+\fBvcprompt\fR \-\-path \fIPATH\fR
+.
+.br
+\fBvcprompt\fR \-\-systems
+.
+.br
+\fBvcprompt\fR \-\-unknown
+.
+.br
+.
+.SH "DESCRIPTION"
+vcprompt is a small utility for displaying version control information
+in your shell's prompt.
+.
+.SH "INSTALL"
+Install from the Python Package Index:
+.
+.IP "" 4
+.
+.nf
+$ [sudo] easy_install vcprompt
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Or, clone the git repository:
+.
+.IP "" 4
+.
+.nf
+$ git clone git://github.com/xvzf/vcprompt.git
+$ cd vcprompt
+$ [sudo] python setup.py install
+.
+.fi
+.
+.IP "" 0
+.
+.SH "OPTIONS"
+\fBvcprompt\fR takes a few options:
+.
+.TP
+\fB\-f\fR, \fB\-\-format\fR
+The format string to use when displaying information. If not provided
+this will fall back onto the \fBVCPROMPT_FORMAT\fR environment variable or
+the hard\-coded string inside of the \fBvprompt\fR binary.
+.
+.TP
+\fB\-p\fR, \fB\-\-path\fR
+The path to for vcprompt to start looking for a version control
+repository.
+.
+.TP
+\fB\-\-systems\fR
+Prints all the version control systems which vcprompt is aware off.
+.
+.TP
+\fB\-\-unknown\fR
+Prints the 'unknown' value to stdout. This is used internally for
+testing but is included here for completeness.
+.
+.SH "ENVIRONMENT"
+.
+.TP
+\fBVCPROMPT_FORMAT\fR
+The format string which \fBvcprompt\fR will use when displaying any
+information.
+.
+.IP
+See vcprompt(5) for the full formatting syntax.
+.
+.TP
+\fBVCPROMPT_UNKNOWN\fR
+The value to be used when \fBvcprompt\fR is unable to determine the
+output for a formatting option.
+.
+.IP
+Defaults to "(unknown)".
+.
+.SH "SEE ALSO"
+vcprompt(5)
