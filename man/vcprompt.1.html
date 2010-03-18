@@ -70,8 +70,9 @@
 <p><code>vcprompt</code> [ <var>OPTIONS</var> ]<br />
 <code>vcprompt</code> --format <var>FORMAT</var><br />
 <code>vcprompt</code> --path <var>PATH</var><br />
+<code>vcprompt</code> --unknown <var>UNKNOWN</var><br />
+<code>vcprompt</code> --values <var>OPTIONS</var><br />
 <code>vcprompt</code> --systems<br />
-<code>vcprompt</code> --unknown<br />
 </p>
 
 <h2>DESCRIPTION</h2>
@@ -95,17 +96,45 @@ $ [sudo] python setup.py install
 
 <h2>OPTIONS</h2>
 
-<p><code>vcprompt</code> takes a few options.</p>
+<p><code>vcprompt</code> takes a few options:</p>
 
 <dl>
-<dt><code>-f</code>, <code>--format</code></dt><dd><p>The format string to use when displaying information.</p></dd>
+<dt><code>-f</code>, <code>--format</code></dt><dd><p>The format string to use when displaying information.</p>
+
+<p>If not provided this will fall back onto the <code>VCPROMPT_FORMAT</code>
+environment variable or the hard-coded string inside of
+the <code>vprompt</code> binary.</p></dd>
 <dt><code>-p</code>, <code>--path</code></dt><dd><p>The path to for vcprompt to start looking for a version control
-repository.</p></dd>
+repository.</p>
+
+<p>Defaults to '.'.</p></dd>
+<dt><code>--unknown</code></dt><dd><p>The value to use when <code>vcprompt</code> is unable to determine the
+appropriate output for a formatting option.</p>
+
+<p>If not provided will fall back onto the <code>VCPROMPT_UNKNOWN</code>
+environment variable or the hard-coded string inside of the <code>vcprompt</code>
+binary.</p></dd>
 <dt><code>--systems</code></dt><dd><p>Prints all the version control systems which vcprompt is aware off.</p></dd>
-<dt><code>--unknown</code></dt><dd><p>Prints the 'unknown' value to stdout. This is used internally for
-testing but is included here for completeness.</p></dd>
+<dt><code>--values</code></dt><dd><p>Prints the values of the given OPTIONS to stdout if they exist.
+This is used internally for testing but is included here for completeness.</p></dd>
 </dl>
 
+
+<h2>ENVIRONMENT</h2>
+
+<dl>
+<dt><code>VCPROMPT_FORMAT</code></dt><dd><p>The format string which <code>vcprompt</code> will use when displaying any
+information.</p>
+
+<p>See vcprompt(5) for the full formatting syntax.</p></dd>
+<dt><code>VCPROMPT_UNKNOWN</code></dt><dd><p>The value to be used when <code>vcprompt</code> is unable to determine the
+output for a formatting option.</p></dd>
+</dl>
+
+
+<h2>SEE ALSO</h2>
+
+<p>vcprompt(5)</p>
 
 
 <ol class='foot man'>

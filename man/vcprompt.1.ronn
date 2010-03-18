@@ -6,8 +6,9 @@ vcprompt(1) -- Version control information in your prompt
 `vcprompt` [ <OPTIONS> ]  
 `vcprompt` --format <FORMAT>  
 `vcprompt` --path <PATH>  
+`vcprompt` --unknown <UNKNOWN>  
+`vcprompt` --values <OPTIONS>  
 `vcprompt` --systems  
-`vcprompt` --unknown  
 
 
 ## DESCRIPTION
@@ -34,20 +35,33 @@ Or, clone the git repository:
 `vcprompt` takes a few options:
 
   * `-f`, `--format`:
-    The format string to use when displaying information. If not provided
-    this will fall back onto the `VCPROMPT_FORMAT` environment variable or
-    the hard-coded string inside of the `vprompt` binary.
+    The format string to use when displaying information.
+
+    If not provided this will fall back onto the `VCPROMPT_FORMAT`
+    environment variable or the hard-coded string inside of
+    the `vprompt` binary.
 
   * `-p`, `--path`:
     The path to for vcprompt to start looking for a version control
     repository.
 
+    Defaults to '.'.
+
+  * `--unknown`:
+    The value to use when `vcprompt` is unable to determine the
+    appropriate output for a formatting option.
+
+    If not provided will fall back onto the `VCPROMPT_UNKNOWN`
+    environment variable or the hard-coded string inside of the `vcprompt`
+    binary.
+
   * `--systems`:
     Prints all the version control systems which vcprompt is aware off.
 
-  * `--unknown`:
-    Prints the 'unknown' value to stdout. This is used internally for
-    testing but is included here for completeness.
+  * `--values`:
+    Prints the values of the given OPTIONS to stdout if they exist.
+    This is used internally for testing but is included here for completeness.
+
 
 
 ## ENVIRONMENT
@@ -57,12 +71,10 @@ Or, clone the git repository:
     information.
 
     See vcprompt(5) for the full formatting syntax.
-    
+
   * `VCPROMPT_UNKNOWN`:
     The value to be used when `vcprompt` is unable to determine the
     output for a formatting option.
-    
-    Defaults to "(unknown)".
 
 
 ## SEE ALSO

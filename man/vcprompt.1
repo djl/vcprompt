@@ -16,10 +16,13 @@
 \fBvcprompt\fR \-\-path \fIPATH\fR
 .
 .br
-\fBvcprompt\fR \-\-systems
+\fBvcprompt\fR \-\-unknown \fIUNKNOWN\fR
 .
 .br
-\fBvcprompt\fR \-\-unknown
+\fBvcprompt\fR \-\-values \fIOPTIONS\fR
+.
+.br
+\fBvcprompt\fR \-\-systems
 .
 .br
 .
@@ -58,23 +61,39 @@ $ [sudo] python setup.py install
 .
 .TP
 \fB\-f\fR, \fB\-\-format\fR
-The format string to use when displaying information. If not provided
-this will fall back onto the \fBVCPROMPT_FORMAT\fR environment variable or
-the hard\-coded string inside of the \fBvprompt\fR binary.
+The format string to use when displaying information.
+.
+.IP
+If not provided this will fall back onto the \fBVCPROMPT_FORMAT\fR
+environment variable or the hard\-coded string inside of
+the \fBvprompt\fR binary.
 .
 .TP
 \fB\-p\fR, \fB\-\-path\fR
 The path to for vcprompt to start looking for a version control
 repository.
 .
+.IP
+Defaults to '.'.
+.
+.TP
+\fB\-\-unknown\fR
+The value to use when \fBvcprompt\fR is unable to determine the
+appropriate output for a formatting option.
+.
+.IP
+If not provided will fall back onto the \fBVCPROMPT_UNKNOWN\fR
+environment variable or the hard\-coded string inside of the \fBvcprompt\fR
+binary.
+.
 .TP
 \fB\-\-systems\fR
 Prints all the version control systems which vcprompt is aware off.
 .
 .TP
-\fB\-\-unknown\fR
-Prints the 'unknown' value to stdout. This is used internally for
-testing but is included here for completeness.
+\fB\-\-values\fR
+Prints the values of the given OPTIONS to stdout if they exist.
+This is used internally for testing but is included here for completeness.
 .
 .SH "ENVIRONMENT"
 .
@@ -90,9 +109,6 @@ See vcprompt(5) for the full formatting syntax.
 \fBVCPROMPT_UNKNOWN\fR
 The value to be used when \fBvcprompt\fR is unable to determine the
 output for a formatting option.
-.
-.IP
-Defaults to "(unknown)".
 .
 .SH "SEE ALSO"
 vcprompt(5)
