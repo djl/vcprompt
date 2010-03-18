@@ -9,13 +9,9 @@ import sys
 
 __version__ = (0, 0, 5)
 
-FORMAT = '%s:%b'
+FORMAT = os.environ.get('VCPROMPT_FORMAT', '%s:%b')
+UNKNOWN = os.environ.get('VCPROMPT_UNKNOWN', '(unknown)')
 SYSTEMS = []
-UNKNOWN = '(unknown)'
-
-
-def format():
-    return os.environ.get('VCPROMPT_FORMAT', FORMAT)
 
 
 def sorted_alpha(sortme, unique=True):
@@ -38,12 +34,12 @@ def systems(*args, **kwargs):
     sys.exit(0)
 
 
-def unknown(*args):
-    u = os.environ.get('VCPROMPT_UNKNOWN', UNKNOWN)
-    if '--unknown' in args:
-        print u
-        sys.exit(0)
-    return u
+def values(option, opt, value, parser, *args, **kwargs):
+    for option in parser.rargs:
+        option = option.upper()
+        if option in globals().keys():
+            print globals()[option]
+    sys.exit(0)
 
 
 def vcs(name, description):
@@ -55,7 +51,7 @@ def vcs(name, description):
     return wrapped
 
 
-def vcprompt(path, string):
+def vcprompt(path, string, unknown):
     path = os.path.expanduser(path)
     paths = os.path.abspath(path).split('/')
     prompt = None
@@ -65,7 +61,7 @@ def vcprompt(path, string):
         if prompt:
             return prompt
         for vcs in SYSTEMS:
-            prompt = vcs(path, string)
+            prompt = vcs(path, string, unknown)
             if prompt:
                 break
     return ''
@@ -82,15 +78,21 @@ def main():
 
     # format
     parser.add_option('-f', '--format', dest='format',
-                      default=format(), help='The format string to use.')
+                      default=FORMAT, help='The format string to use.')
 
     # path
     parser.add_option('-p', '--path', dest='path',
                       default='.', help='The path to run vcprompt on.')
 
     # unknown
-    parser.add_option('--unknown', dest='unknown', action='callback',
-                      callback=unknown, help='Prints the "unknown" value.')
+    parser.add_option('--unknown', dest='unknown', default=UNKNOWN,
+                      help='The "unknown" value.')
+
+    # print
+    parser.add_option('--values', dest='values', action='callback',
+                      callback=values,
+                      help='Prints the values of the "format", "path"' \
+                           'and "unknown" options.')
 
     # systems
     parser.add_option('--systems', dest='systems', action='callback',
@@ -100,16 +102,17 @@ def main():
     # parse!
     options, args = parser.parse_args()
 
-    sys.stdout.write(vcprompt(options.path, options.format))
-
+    sys.stdout.write(vcprompt(options.path,
+                              options.format,
+                              options.unknown))
 
 @vcs('Bazaar', 'The Bazaar version control system')
-def bzr(path, string):
+def bzr(path, string, unknown):
     file = os.path.join(path, '.bzr/branch/last-revision')
     if not os.path.exists(file):
         return None
 
-    branch = hash = status = unknown()
+    branch = hash = status = unknown
 
     # local revision number
     if re.search('%(r|h)', string):
@@ -154,14 +157,14 @@ def bzr(path, string):
 
 
 @vcs('CVS', 'Concurrent Versions System.')
-def cvs(path, string):
+def cvs(path, string, unknown):
     # Stabbing in the dark here
     # TODO make this not suck
     file = os.path.join(path, 'CVS/')
     if not os.path.exists(file):
         return None
 
-    branch = revision = unknown()
+    branch = revision = unknown
 
     string = string.replace('%s', 'cvs')
     string = string.replace('%b', branch)
@@ -170,14 +173,14 @@ def cvs(path, string):
 
 
 @vcs('Darcs', 'Distributed. Interactive. Smart.')
-def darcs(path, string):
+def darcs(path, string, unknown):
     # It's almost a given that everything in here is
     # going to be wrong
     file = os.path.join(path, '_darcs/hashed_inventory')
     if not os.path.exists(file):
         return None
 
-    hash = branch = status = unknown()
+    hash = branch = status = unknown
     # hash
     if re.search('%(h|r)', string):
         with open(file, 'r') as f:
@@ -214,13 +217,13 @@ def darcs(path, string):
 
 
 @vcs('Fossil', 'The Fossil version control system.')
-def fossil(path, string):
+def fossil(path, string, unknown):
     # In my five minutes of playing with Fossil this looks OK
     file = os.path.join(path, '_FOSSIL_')
     if not os.path.exists(file):
         return None
 
-    branch = hash = unknown()
+    branch = hash = unknown
 
     # all this just to get the repository file :(
     repository = None
@@ -270,17 +273,18 @@ def fossil(path, string):
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
     string = string.replace('%r', hash)
+    string = string.replace('%i', unknown)
     string = string.replace('%s', 'fossil')
     return string
 
 
 @vcs('Git', 'The fast version control system.')
-def git(path, string):
+def git(path, string, unknown):
     file = os.path.join(path, '.git/')
     if not os.path.exists(file):
         return None
 
-    branch = hash = status = unknown()
+    branch = hash = status = unknown
     # the current branch is required to get the hash
     if re.search('%(b|r|h)', string):
         branch_file = os.path.join(file, 'HEAD')
@@ -289,7 +293,7 @@ def git(path, string):
 
             # check if we're currently running on a branch
             if re.match('^ref: refs/heads/', line.strip()):
-                branch = (line.split('/')[-1] or UNKNOWN).strip()
+                branch = (line.split('/')[-1] or unknown).strip()
             # we're running with a detached head (submodule?)
             else:
                 branch = os.listdir(os.path.join(file, 'refs/heads'))[0]
@@ -301,7 +305,6 @@ def git(path, string):
                 hash = f.read().strip()[0:7]
 
     # status
-    status = unknown()
     if '%i' in string:
         command = 'git status --short'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
@@ -328,7 +331,7 @@ def git(path, string):
 
 
 @vcs('Mercurial', 'The Mercurial version control system.')
-def hg(path, string):
+def hg(path, string, unknown):
     files = ['.hg/branch', '.hg/undo.branch', '.hg/bookmarks.current']
     file = None
     for f in files:
@@ -339,7 +342,7 @@ def hg(path, string):
     if not file:
         return None
 
-    branch = revision = hash = status = unknown()
+    branch = revision = hash = status = unknown
 
     # changeset ID or global hash
     if re.search('%(r|h)', string):
@@ -355,7 +358,6 @@ def hg(path, string):
             branch = f.read().strip()
 
     # status
-    status = unknown()
     if '%i' in string:
         command = 'hg status'
         process = Popen(command.split(), stdout=PIPE)
@@ -379,12 +381,12 @@ def hg(path, string):
 
 
 @vcs('Subversion', 'The Subversion version control system.')
-def svn(path, string):
+def svn(path, string, unknown):
     file = os.path.join(path, '.svn/entries')
     if not os.path.exists(file):
         return None
 
-    branch = revision = status = unknown()
+    branch = revision = status = unknown
 
     # branch
     command = 'svn info %s' % path
