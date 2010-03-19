@@ -100,7 +100,7 @@ Notes
 -----
 
 * When using the ``%i`` formatting argument with Git, you must have at
-  least Git 1.7.0. Support for earlier versions may be added in the future
+  least Git 1.7.0. Support for earlier versions may be added in the future.
 
 * The ``%i`` formatting argument has not and probably will not be implemented
   for Fossil because Fossil doesn't provide a simple interface for getting this
@@ -110,10 +110,6 @@ Notes
   ``extra``), just to get the status of a repository. Beyond this the
   output still has to be parsed and translated into usable (and preferably)
   one characters strings.
-
-* The ``%i`` argument is slow as molasses with Darcs. On average it takes
-  just under a second. This is due to darcs taking a little while to work
-  out if any new, untracked files exist in your repository.
 
 
 
