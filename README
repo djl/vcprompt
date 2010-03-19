@@ -139,4 +139,4 @@ TODO
 ----
 
 - Only test VCSes which are available on the system
-- More complete support and tests for CVS, Darcs
+- More complete support and tests for CVS
