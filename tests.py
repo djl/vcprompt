@@ -14,12 +14,15 @@ class Base(unittest.TestCase):
 
     def unknown(self):
         process = subprocess.Popen('./bin/vcprompt --values unknown'.split(),
-                                stdout=subprocess.PIPE)
+                                   stdout=subprocess.PIPE)
         output = process.communicate()[0].strip()
         return output
 
-    def vcprompt(self, path, string):
-        command = './bin/vcprompt --path %s --format %s' % (path, string)
+    def vcprompt(self, *args, **kwargs):
+        command = './bin/vcprompt --path %s ' % self.repository
+        for key, value in kwargs.items():
+            key = key.replace('_', '-')
+            command += "--%s %s " % (key, value)
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
         return process.communicate()[0]
 
@@ -29,23 +32,23 @@ class Bazaar(Base):
         self.repository = self.repo('bzr')
 
     def test_format_branch(self, string='%b'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'bzr')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'bzr')
 
     def test_format_revision(self, string='%r'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, '1')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '1')
 
     def test_format_hash(self, string='%h'):
         self.test_format_revision(string)
 
     def test_format_system(self, string='%s'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'bzr')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'bzr')
 
     def test_format_all(self, string='%s:%r'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'bzr:1')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'bzr:1')
 
 
 class Darcs(Base):
@@ -53,23 +56,23 @@ class Darcs(Base):
         self.repository = self.repo('darcs')
 
     def test_format_branch(self, string='%b'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'darcs')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'darcs')
 
     def test_format_revision(self, string='%r'):
         return self.test_format_hash(string)
 
     def test_format_hash(self, string='%h'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, '4b13fbf')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '4b13fbf')
 
     def test_format_system(self, string='%s'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'darcs')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'darcs')
 
     def test_format_all(self, string='%s:%b:%r'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'darcs:darcs:4b13fbf')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'darcs:darcs:4b13fbf')
 
 
 class Fossil(Base):
@@ -102,20 +105,20 @@ class Fossil(Base):
                              stderr=devnull)
 
     def test_format_system(self, string='%s'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'fossil')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'fossil')
 
     def test_format_branch(self, string='%b'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'trunk')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'trunk')
 
     def test_format_hash(self, string='%h'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, '4103d09')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '4103d09')
 
     def test_format_revision(self, string='%r'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, '4103d09')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '4103d09')
 
 
 class Git(Base):
@@ -123,23 +126,23 @@ class Git(Base):
         self.repository = self.repo('git')
 
     def test_format_branch(self, string='%b'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'master')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'master')
 
     def test_format_revision(self, string='%r'):
         return self.test_format_hash(string)
 
     def test_format_hash(self, string='%h'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'eae51cf')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'eae51cf')
 
     def test_format_system(self, string='%s'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'git')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'git')
 
     def test_format_all(self, string='%s:%b:%r'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'git:master:eae51cf')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'git:master:eae51cf')
 
 
 class Mercurial(Base):
@@ -147,24 +150,24 @@ class Mercurial(Base):
         self.repository = self.repo('hg')
 
     def test_format_branch(self, string="%b"):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'default')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'default')
 
     def test_format_revision(self, string="%r"):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, '0')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '0')
 
     def test_format_hash(self, string="%h"):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, '8ada0a9')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '8ada0a9')
 
     def test_format_system(self, string="%s"):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'hg')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'hg')
 
     def test_format_all(self, string='%s:%b:r%r:%h'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'hg:default:r0:8ada0a9')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'hg:default:r0:8ada0a9')
 
 
 class Subversion(Base):
@@ -172,23 +175,23 @@ class Subversion(Base):
         self.repository = self.repo('svn')
 
     def test_format_branch(self, string="%b"):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, self.unknown())
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, self.unknown())
 
     def test_format_revision(self, string='%r'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, '0')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '0')
 
     def test_format_hash(self, string='%h'):
         return self.test_format_revision(string)
 
     def test_format_system(self, string='%s'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, 'svn')
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, 'svn')
 
     def test_format_all(self, string='%s:%b:%h'):
-        string = self.vcprompt(self.repository, string)
-        self.assertEquals(string, "svn:%s:0" % self.unknown())
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, "svn:%s:0" % self.unknown())
 
 
 if __name__ == '__main__':
