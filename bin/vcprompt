@@ -8,7 +8,7 @@ import string
 import sqlite3
 import sys
 
-__version__ = (0, 0, 6)
+__version__ = (0, 1, 0)
 
 FORMAT = os.environ.get('VCPROMPT_FORMAT', '%s:%b')
 UNKNOWN = os.environ.get('VCPROMPT_UNKNOWN', '(unknown)')
