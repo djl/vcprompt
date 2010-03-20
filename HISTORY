@@ -1,0 +1,9 @@
+0.0.5 (2010-??-??)
+------------------
+
+* Added: manpages
+* Added: history file (oh my, how meta!)
+* Changed: Merged the two new decorators into the original ``vcs`` decorator
+* Changed: Renamed ``--unknown`` flag to ``--values``
+* Changed: The ``--unknown`` flag is now used for setting the 'unknown' value
+* Bugfix: The '%i' format argument no longer fails with multiple character statuses
