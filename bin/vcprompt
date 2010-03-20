@@ -54,7 +54,7 @@ def vcs(name, description):
     return wrapped
 
 
-def vcprompt(path, string, unknown):
+def vcprompt(path, formats, unknown):
     path = os.path.expanduser(path)
     paths = os.path.abspath(path).split('/')
     prompt = None
@@ -64,7 +64,10 @@ def vcprompt(path, string, unknown):
         if prompt:
             return prompt
         for vcs in SYSTEMS:
-            prompt = vcs(path, string, unknown)
+            vcs_format = "format-%s" % vcs.func_name
+            if vcs_format in formats.keys():
+                format = formats[vcs_format] or formats['format']
+            prompt = vcs(path, format, unknown)
             if prompt:
                 break
     return ''
@@ -76,12 +79,21 @@ def version():
 
 def main():
     # parser
-    parser = optparse.OptionParser("usage: %prog FORMAT [OPTIONS]",
+    parser = optparse.OptionParser("usage: %prog [OPTIONS]",
                                    version=version())
 
     # format
     parser.add_option('-f', '--format', dest='format',
                       default=FORMAT, help='The format string to use.')
+
+    # per-VCS formatting
+    group = optparse.OptionGroup(parser, "VCS-specific formatting")
+    for system in SYSTEMS:
+        dest = 'format-%s' % system.func_name
+        flag = '--%s' % dest
+        help = 'The format string to use for %s' % system.name
+        group.add_option(flag, dest=dest, default=None, help=help)
+    parser.add_option_group(group)
 
     # path
     parser.add_option('-p', '--path', dest='path',
@@ -105,9 +117,9 @@ def main():
     # parse!
     options, args = parser.parse_args()
 
-    sys.stdout.write(vcprompt(options.path,
-                              options.format,
-                              options.unknown))
+    sys.stdout.write(vcprompt(path=options.path,
+                              formats=options.__dict__,
+                              unknown=options.unknown))
 
 @vcs('Bazaar', 'The Bazaar version control system')
 def bzr(path, string, unknown):
