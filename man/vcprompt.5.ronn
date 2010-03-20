@@ -1,0 +1,33 @@
+vcprompt(5) -- Prompt formatting syntax
+=======================================
+
+## SYNTAX
+
+* `%b`:
+  The current branch of the repository.
+
+* `%h`:
+  The hash of the most recent commit in the repository.
+
+  If the version control system does not provide a hash for each commit
+  or changeset, it will fall back onto the revision number.
+
+* `%i`:
+  A brief overview of the current state of the repository.
+  
+  The output is a string of zero or more characters
+
+
+* `%r`:
+  The current revision number of the repository.
+
+  If the version control in use does not have revision numbers,
+  it will fall back to the most recent commit's SHA1 hash
+  (or equivalent).
+
+* `%s`:
+  The version control system in use.
+  
+  Uses the 'short' or executable name for each system.
+
+

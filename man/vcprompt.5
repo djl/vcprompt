@@ -1,0 +1,44 @@
+.\" generated with Ronn/v0.4.1
+.\" http://github.com/rtomayko/ronn/
+.
+.TH "VCPROMPT" "5" "March 2010" "" ""
+.
+.SH "NAME"
+\fBvcprompt\fR \-\- Prompt formatting syntax
+.
+.SH "SYNTAX"
+.
+.TP
+\fB%b\fR
+The current branch of the repository.
+.
+.TP
+\fB%h\fR
+The hash of the most recent commit in the repository.
+.
+.IP
+If the version control system does not provide a hash for each commit
+or changeset, it will fall back onto the revision number.
+.
+.TP
+\fB%i\fR
+A brief overview of the current state of the repository.
+.
+.IP
+The output is a string of zero or more characters
+.
+.TP
+\fB%r\fR
+The current revision number of the repository.
+.
+.IP
+If the version control in use does not have revision numbers,
+it will fall back to the most recent commit's SHA1 hash
+(or equivalent).
+.
+.TP
+\fB%s\fR
+The version control system in use.
+.
+.IP
+Uses the 'short' or executable name for each system.
