@@ -65,8 +65,7 @@ def vcprompt(path, formats, unknown):
             return prompt
         for vcs in SYSTEMS:
             vcs_format = "format-%s" % vcs.func_name
-            if vcs_format in formats.keys():
-                format = formats[vcs_format] or formats['format']
+            format = formats[vcs_format] or formats['format']
             prompt = vcs(path, format, unknown)
             if prompt:
                 break
