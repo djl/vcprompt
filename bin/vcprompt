@@ -89,10 +89,12 @@ def main():
     # per-VCS formatting
     group = optparse.OptionGroup(parser, "VCS-specific formatting")
     for system in SYSTEMS:
+        default = 'VCPROMPT_FORMAT_%s' % system.func_name.upper()
+        default = os.environ.get(default, None)
         dest = 'format-%s' % system.func_name
         flag = '--%s' % dest
         help = 'The format string to use for %s' % system.name
-        group.add_option(flag, dest=dest, default=None, help=help)
+        group.add_option(flag, dest=dest, default=default, help=help)
     parser.add_option_group(group)
 
     # path
