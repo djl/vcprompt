@@ -102,14 +102,6 @@ Notes
 * When using the ``%i`` formatting argument with Git, you must have at
   least Git 1.7.0. Support for earlier versions may be added in the future.
 
-* The ``%i`` formatting argument has not and probably will not be implemented
-  for Fossil because Fossil doesn't provide a simple interface for getting this
-  information.
-
-  Currently Fossil requires at least two external calls (``changes`` and
-  ``extra``), just to get the status of a repository. Beyond this the
-  output still has to be parsed and translated into usable (and preferably)
-  one characters strings.
 
 
 

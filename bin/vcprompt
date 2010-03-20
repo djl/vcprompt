@@ -4,6 +4,7 @@ from subprocess import Popen, PIPE
 import optparse
 import os
 import re
+import string
 import sqlite3
 import sys
 
@@ -18,11 +19,13 @@ def sorted_alpha(sortme, unique=True):
     upper = [x for x in sortme if x.isupper()]
     lower = [x for x in sortme if x.islower()]
     digit = [x for x in sortme if x.isdigit()]
+    punctuation = [x for x in sortme if x in string.punctuation]
     if unique:
         upper = list(set(upper))
         lower = list(set(lower))
         digit = list(set(digit))
-    return ''.join(lower + upper + digit)
+        punctuation = list(set(punctuation))
+    return ''.join(lower + upper + digit + punctuation)
 
 
 def systems(*args, **kwargs):
@@ -223,7 +226,7 @@ def fossil(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = hash = unknown
+    branch = hash = status = unknown
 
     # all this just to get the repository file :(
     repository = None
@@ -269,11 +272,42 @@ def fossil(path, string, unknown):
                 conn.close()
 
 
+    # status
+    if '%i' in string:
+        # new files
+        command = 'fossil extra'
+        process = Popen(command.split(), stdout=PIPE)
+        output = process.communicate()[0]
+        returncode = process.returncode
+
+        if not returncode and output:
+            if status == unknown:
+                status = ''
+            status = "%s?" % status
+
+        command = 'fossil changes'
+        process = Popen(command.split(), stdout=PIPE)
+        output = process.communicate()[0]
+        returncode = process.returncode
+
+        if not returncode:
+            if status == unknown:
+                status = ''
+            headers = {'EDITED': 'M',
+                       'MISSING': 'R'}
+            for line in output.split('\n'):
+                line = line.strip()
+                if line:
+                    status = "%s%s" % (status, line[0])
+
+    if status != unknown:
+        status = sorted_alpha(status)
+
     # parse out formatting string
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
     string = string.replace('%r', hash)
-    string = string.replace('%i', unknown)
+    string = string.replace('%i', status)
     string = string.replace('%s', 'fossil')
     return string
 
