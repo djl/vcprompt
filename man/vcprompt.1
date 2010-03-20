@@ -13,6 +13,9 @@
 \fBvcprompt\fR \-\-format \fIFORMAT\fR
 .
 .br
+\fBvcprompt\fR \-\-format\-\fISYSTEM\fR \fIFORMAT\fR
+.
+.br
 \fBvcprompt\fR \-\-path \fIPATH\fR
 .
 .br
@@ -69,6 +72,12 @@ environment variable or the hard\-coded string inside of
 the \fBvprompt\fR binary.
 .
 .TP
+\fB\-\-format\-<SYSTEM>\fR
+The format string to be used for a specific version control system.
+If a system's formatting is not explicitly specified, it will
+automatically fall back onto the value of the \fB\-\-format\fR flag.
+.
+.TP
 \fB\-p\fR, \fB\-\-path\fR
 The path to for vcprompt to start looking for a version control
 repository.
@@ -97,18 +106,25 @@ This is used internally for testing but is included here for completeness.
 .
 .SH "ENVIRONMENT"
 .
-.TP
-\fBVCPROMPT_FORMAT\fR
+.IP "\(bu" 4
+\fBVCPROMPT_FORMAT\fR:
 The format string which \fBvcprompt\fR will use when displaying any
 information.
 .
 .IP
 See vcprompt(5) for the full formatting syntax.
 .
-.TP
-\fBVCPROMPT_UNKNOWN\fR
+.IP "\(bu" 4
+\fBVCPROMPT_FORMAT_<SYSTEM>\fR
+Each version control system's formatting can be specified via
+it's own environment variable.
+.
+.IP "\(bu" 4
+\fBVCPROMPT_UNKNOWN\fR:
 The value to be used when \fBvcprompt\fR is unable to determine the
 output for a formatting option.
+.
+.IP "" 0
 .
 .SH "SEE ALSO"
 vcprompt(5)

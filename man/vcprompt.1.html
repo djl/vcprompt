@@ -69,6 +69,7 @@
 
 <p><code>vcprompt</code> [ <var>OPTIONS</var> ]<br />
 <code>vcprompt</code> --format <var>FORMAT</var><br />
+<code>vcprompt</code> --format-<var>SYSTEM</var> <var>FORMAT</var><br />
 <code>vcprompt</code> --path <var>PATH</var><br />
 <code>vcprompt</code> --unknown <var>UNKNOWN</var><br />
 <code>vcprompt</code> --values <var>OPTIONS</var><br />
@@ -104,6 +105,9 @@ $ [sudo] python setup.py install
 <p>If not provided this will fall back onto the <code>VCPROMPT_FORMAT</code>
 environment variable or the hard-coded string inside of
 the <code>vprompt</code> binary.</p></dd>
+<dt><code>--format-&lt;SYSTEM></code></dt><dd><p>The format string to be used for a specific version control system.
+If a system's formatting is not explicitly specified, it will
+automatically fall back onto the value of the <code>--format</code> flag.</p></dd>
 <dt><code>-p</code>, <code>--path</code></dt><dd><p>The path to for vcprompt to start looking for a version control
 repository.</p>
 
@@ -122,14 +126,19 @@ This is used internally for testing but is included here for completeness.</p></
 
 <h2>ENVIRONMENT</h2>
 
-<dl>
-<dt><code>VCPROMPT_FORMAT</code></dt><dd><p>The format string which <code>vcprompt</code> will use when displaying any
+<ul>
+<li><p><code>VCPROMPT_FORMAT</code>:
+The format string which <code>vcprompt</code> will use when displaying any
 information.</p>
 
-<p>See vcprompt(5) for the full formatting syntax.</p></dd>
-<dt><code>VCPROMPT_UNKNOWN</code></dt><dd><p>The value to be used when <code>vcprompt</code> is unable to determine the
-output for a formatting option.</p></dd>
-</dl>
+<p>See vcprompt(5) for the full formatting syntax.</p></li>
+<li><p><code>VCPROMPT_FORMAT_&lt;SYSTEM></code>
+Each version control system's formatting can be specified via
+it's own environment variable.</p></li>
+<li><p><code>VCPROMPT_UNKNOWN</code>:
+The value to be used when <code>vcprompt</code> is unable to determine the
+output for a formatting option.</p></li>
+</ul>
 
 
 <h2>SEE ALSO</h2>

@@ -5,6 +5,7 @@ vcprompt(1) -- Version control information in your prompt
 
 `vcprompt` [ <OPTIONS> ]  
 `vcprompt` --format <FORMAT>  
+`vcprompt` --format-<SYSTEM> <FORMAT>  
 `vcprompt` --path <PATH>  
 `vcprompt` --unknown <UNKNOWN>  
 `vcprompt` --values <OPTIONS>  
@@ -41,6 +42,11 @@ Or, clone the git repository:
     environment variable or the hard-coded string inside of
     the `vprompt` binary.
 
+  * `--format-<SYSTEM>`:
+    The format string to be used for a specific version control system.
+    If a system's formatting is not explicitly specified, it will
+    automatically fall back onto the value of the `--format` flag.
+
   * `-p`, `--path`:
     The path to for vcprompt to start looking for a version control
     repository.
@@ -71,6 +77,10 @@ Or, clone the git repository:
     information.
 
     See vcprompt(5) for the full formatting syntax.
+
+  * `VCPROMPT_FORMAT_<SYSTEM>`
+    Each version control system's formatting can be specified via
+    it's own environment variable.
 
   * `VCPROMPT_UNKNOWN`:
     The value to be used when `vcprompt` is unable to determine the
