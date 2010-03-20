@@ -3,7 +3,9 @@
 
 * Added: manpages
 * Added: history file (oh my, how meta!)
+* Added: Formatting support for Fossil
 * Changed: Merged the two new decorators into the original ``vcs`` decorator
 * Changed: Renamed ``--unknown`` flag to ``--values``
 * Changed: The ``--unknown`` flag is now used for setting the 'unknown' value
 * Bugfix: The '%i' format argument no longer fails with multiple character statuses
+* Bugfix: The '%i' format argument no longer ignores punctuation
