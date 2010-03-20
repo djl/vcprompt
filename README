@@ -130,12 +130,6 @@ To run the tests, you have to initialize the submodule::
 TODO
 ----
 
-* Implement per-VCS formatting strings. Possibly with '--format-$VCS'
-  flags e.g.:
-
-  --format-git "%s:%b"
-  --format-svn "%s:%r"
-
 * Only test VCSes which are available on the system
 
 * More complete support and tests for CVS
