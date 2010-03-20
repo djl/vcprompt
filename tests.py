@@ -19,11 +19,12 @@ class Base(unittest.TestCase):
         return output
 
     def vcprompt(self, *args, **kwargs):
-        command = './bin/vcprompt --path %s ' % self.repository
+        commands = ['./bin/vcprompt', '--path', self.repository]
         for key, value in kwargs.items():
             key = key.replace('_', '-')
-            command += "--%s %s " % (key, value)
-        process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+            commands.append("--%s" % key)
+            commands.append(value)
+        process = subprocess.Popen(commands, stdout=subprocess.PIPE)
         return process.communicate()[0]
 
 
