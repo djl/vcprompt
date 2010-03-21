@@ -120,7 +120,7 @@ def main():
 
     # internally used stuff
     group = optparse.OptionGroup(parser, "Internal options",
-                                 "These options are used internally or for" \
+                                 "These options are used internally or for " \
                                  "testing. Use of these is not recommended.")
     # values
     # used internally
