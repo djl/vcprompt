@@ -96,15 +96,6 @@ Consult the man pages for the VCS you are using for the full documentation.
 
 
 
-Notes
------
-
-* When using the ``%i`` formatting argument with Git, you must have at
-  least Git 1.7.0. Support for earlier versions may be added in the future.
-
-
-
-
 Requirements
 ------------
 

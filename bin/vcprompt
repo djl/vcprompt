@@ -369,20 +369,28 @@ def git(path, string, unknown):
 
     # status
     if '%i' in string:
-        command = 'git status --short'
+        command = 'git status'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         output = process.communicate()[0]
         returncode = process.returncode
 
         # only process if ``git status`` has the --short option
         if not returncode:
+            headers = {'modified': 'M',
+                       'removed': 'D',
+                       'renamed': 'R',
+                       'Untracked': '?'}
             status = ''
             for line in output.split('\n'):
-                code = line.strip().split(' ')[0]
-                status = '%s%s' % (status, code)
-
-    if status != unknown:
-        status = sorted_alpha(status)
+                # strip the hashes from the lines
+                line = line[1:].strip()
+                # ignore informational and blank lines
+                if line and not line.startswith('('):
+                    for key in headers.keys():
+                        if line.startswith(key):
+                            status += headers[key]
+                            break
+            status = sorted_alpha(status)
 
     # formatting
     string = string.replace('%b', branch)
