@@ -329,8 +329,7 @@ def fossil(path, string, unknown):
                 if line:
                     status = "%s%s" % (status, line[0])
 
-    if status != unknown:
-        status = sorted_alpha(status)
+            status = sorted_alpha(status)
 
     # parse out formatting string
     string = string.replace('%b', branch)
