@@ -374,7 +374,6 @@ def git(path, string, unknown):
         output = process.communicate()[0]
         returncode = process.returncode
 
-        # only process if ``git status`` has the --short option
         if not returncode:
             headers = {'modified': 'M',
                        'removed': 'D',
