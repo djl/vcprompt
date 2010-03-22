@@ -16,10 +16,33 @@ SYSTEMS = []
 
 
 def sorted_alpha(sortme, unique=True):
-    upper = [x for x in sortme if x.isupper()]
-    lower = [x for x in sortme if x.islower()]
-    digit = [x for x in sortme if x.isdigit()]
-    punctuation = [x for x in sortme if x in string.punctuation]
+    """
+    Sorts a string alphabetically, but gives is case and punctuation
+    sensitive.
+
+    Example:
+
+    >>> sorted_alpha("aSD??fc?!")
+    afcSD?!
+    """
+    upper, lower, digit, punctuation, passed = ([], [], [], [], [])
+    passed = []
+    for char in sortme:
+        # skip duplicates
+        if unique and char in passed:
+            continue
+
+        if char.isupper():
+            upper.append(char)
+        elif char.islower():
+            lower.append(char)
+        elif char.isdigit():
+            digit.append(char)
+        else:
+            punctuation.append(char)
+
+        passed.append(char)
+
     if unique:
         upper = list(set(upper))
         lower = list(set(lower))
