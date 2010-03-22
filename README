@@ -69,7 +69,7 @@ If not given, the value defaults to ``.``.
 formatting
 ~~~~~~~~~~
 
-The ``--path`` allows the output of ``vcprompt`` to be formatted in a
+The ``--format`` allows the output of ``vcprompt`` to be formatted in a
 specific way.
 
 The formatting arguments are:
