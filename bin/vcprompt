@@ -112,6 +112,18 @@ def main():
     # parser
     parser = optparse.OptionParser("usage: %prog [OPTIONS]")
 
+    # path
+    parser.add_option('-p', '--path', dest='path',
+                      default='.', help='The path to run vcprompt on.')
+    # systems
+    parser.add_option('--systems', dest='systems', action='callback',
+                      callback=systems,
+                      help='Prints the available version control systems.')
+
+    # unknown
+    parser.add_option('--unknown', dest='unknown', default=UNKNOWN,
+                      help='The "unknown" value.')
+
     # version
     parser.add_option('-v', '--version', action='callback', callback=version,
                       help="show program's version number and exit")
@@ -124,6 +136,7 @@ def main():
     group = optparse.OptionGroup(parser, "VCS-specific formatting",
                                  "These options can be used for VCS-specific " \
                                  "prompt formatting.")
+
     for system in SYSTEMS:
         default = 'VCPROMPT_FORMAT_%s' % system.func_name.upper()
         default = os.environ.get(default, None)
@@ -132,19 +145,6 @@ def main():
         help = 'The format string to use for %s' % system.name
         group.add_option(flag, dest=dest, default=default, help=system.name)
     parser.add_option_group(group)
-
-    # path
-    parser.add_option('-p', '--path', dest='path',
-                      default='.', help='The path to run vcprompt on.')
-
-    # unknown
-    parser.add_option('--unknown', dest='unknown', default=UNKNOWN,
-                      help='The "unknown" value.')
-
-    # systems
-    parser.add_option('--systems', dest='systems', action='callback',
-                      callback=systems,
-                      help='Prints the available version control systems.')
 
     # internally used stuff
     group = optparse.OptionGroup(parser, "Internal options",
