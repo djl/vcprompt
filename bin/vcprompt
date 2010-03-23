@@ -17,8 +17,15 @@ SYSTEMS = []
 
 def sorted_alpha(sortme, unique=True):
     """
-    Sorts a string alphabetically, but gives is case and punctuation
-    sensitive.
+    Sorts a string alphabetically, but does (kind of) the opposite of
+    the built-in ``sorted`` function.
+
+    Sorted order is:
+
+      * lowercase
+      * uppercase
+      * digits
+      * punctuation
 
     Example:
 
