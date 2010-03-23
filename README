@@ -116,6 +116,11 @@ To run the tests, you have to initialize the submodule::
     $ git submodule update --init
     $ nosetests || python tests.py
 
+Note: Some tests will fail if you have set any of the ``VCPROMPT_FORMAT_*``
+environment variables.
+
+This will be fixed soon.
+
 
 
 TODO
