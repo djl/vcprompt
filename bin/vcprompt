@@ -4,7 +4,6 @@ from subprocess import Popen, PIPE
 import optparse
 import os
 import re
-import string
 import sqlite3
 import sys
 
