@@ -13,7 +13,7 @@ class Base(unittest.TestCase):
         return location
 
     def unknown(self):
-        process = subprocess.Popen('./bin/vcprompt --values unknown'.split(),
+        process = subprocess.Popen('./bin/vcprompt --values UNKNOWN'.split(),
                                    stdout=subprocess.PIPE)
         output = process.communicate()[0].strip()
         return output

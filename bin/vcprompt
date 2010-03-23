@@ -68,7 +68,6 @@ def systems(*args, **kwargs):
 
 def values(option, opt, value, parser, *args, **kwargs):
     for option in parser.rargs:
-        option = option.upper()
         if option in globals().keys():
             print globals()[option]
     sys.exit(0)
