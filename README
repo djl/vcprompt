@@ -99,7 +99,8 @@ Consult the man pages for the VCS you are using for the full documentation.
 Requirements
 ------------
 
-* Python 2.5+
+* Python 2.5 - 2.X
+* Python 3.x (with 2to3)
 
 
 
