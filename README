@@ -10,33 +10,33 @@ Heavily inspired by Greg Ward's vcprompt_
 
 
 
+
 Installing
 ----------
 
-``vcprompt`` be install either via pypi or as a standalone script.
+``vcprompt`` is best installed as a standalone executable:
 
-pypi
-~~~~
 ::
-
-    # pip
-    $ pip install vcprompt
-
-    # easy_install
-    $ easy_install vcprompt
-
-
-standalone
-~~~~~~~~~~
 
     # assuming ~/bin is on your $PATH
     $ curl -s http://github.com/xvzf/vcprompt/raw/master/bin/vcprompt >> ~/bin/vcprompt
     $ chmod 755 ~/bin/vcprompt
 
 
-prompt
-~~~~~~
-Next, you'll want to add it to your prompt.
+Although not really recommended, ``vcprompt`` can be installed via PyPi:
+
+::
+
+    # easy_install
+    $ easy_install vcprompt
+
+
+
+
+Setting up your prompt
+----------------------
+
+First, you'll want to add it to your prompt.
 
 For bash::
 
@@ -51,47 +51,38 @@ For zsh you need to enable PROMPT_SUBST first::
 
 
 
-Usage
------
+Basic customizing
+-----------------
 
-``vcprompt`` takes two optional arguments: ``--path`` and ``--format``.
+``vcprompt``'s output can be customized to your liking by using the
+``--format`` option. For example:
 
+::
 
-path
-~~~~
-
-The ``--path`` argument can be used to specify a path to begin searching
-for an existing VCS repository.
-
-If not given, the value defaults to ``.``.
+    $ vcprompt --format "%s:%b"
 
 
-formatting
-~~~~~~~~~~
-
-The ``--format`` allows the output of ``vcprompt`` to be formatted in a
-specific way.
-
-The formatting arguments are:
+The complete list of formatting arguments are as follows:
 
 * ``%s`` - the VCS system in use
-* ``%r`` - the current revision or hash if no revision number is
-  present (e.g. Git)
+* ``%r`` - the current revision or hash if no revision number is present
 * ``%h`` - the current hash or revision number if no hash is present
-  (i.e. Subversion, CVS, Bazaar)
-* ``%b`` - the current branch (if applicable)
+* ``%b`` - the current branch
 * ``%i`` - the status of the repository (see below)
 
 If not given, the formatting string defaults to ``%s:%b``, that is the
-current system and the branch. For example::
+current system and the branch. For example:
+
+::
 
     git:master
 
 
 The status indicators for the ``%i`` argument will use the underlying
-status codes from the VCS (e.g. ``git status --short``, ``hg status``).
+status codes from the VCS (e.g. ``git status``, ``hg status``).
 
-Consult the man pages for the VCS you are using for the full documentation.
+For full documentation on all the options available to ``vcprompt`` see the
+bundled manpages.
 
 
 
@@ -104,29 +95,10 @@ Requirements
 
 
 
-Testing
--------
-
-To run the tests, you have to initialize the submodule::
-
-    # clone repo
-    $ git clone git://github.com/xvzf/vcprompt.git
-    $ cd vcprompt
-
-    # init submodules
-    $ git submodule update --init
-    $ nosetests || python tests.py
-
-Note: Some tests will fail if you have set any of the ``VCPROMPT_FORMAT_*``
-environment variables.
-
-This will be fixed soon.
-
-
 
 TODO
 ----
 
-* Only test VCSes which are available on the system
-
+* Add ``--ignore-env-vars`` option to stop the tests failing
 * More complete support and tests for CVS
+* ReST-based documentation to go along with manpages
