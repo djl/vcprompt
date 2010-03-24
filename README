@@ -38,12 +38,16 @@ Setting up your prompt
 
 First, you'll want to add it to your prompt.
 
-For bash::
+For bash:
+
+::
 
     $ export PS1='\u@\h:\w $(vcprompt)\$'
 
 
-For zsh you need to enable PROMPT_SUBST first::
+For zsh you need to enable PROMPT_SUBST first:
+
+::
 
     $ setopt prompt_subst
     $ PS1='[%n@%m] [%~] $(vcprompt)'
@@ -62,14 +66,6 @@ Basic customizing
     $ vcprompt --format "%s:%b"
 
 
-The complete list of formatting arguments are as follows:
-
-* ``%s`` - the VCS system in use
-* ``%r`` - the current revision or hash if no revision number is present
-* ``%h`` - the current hash or revision number if no hash is present
-* ``%b`` - the current branch
-* ``%i`` - the status of the repository (see below)
-
 If not given, the formatting string defaults to ``%s:%b``, that is the
 current system and the branch. For example:
 
@@ -77,6 +73,14 @@ current system and the branch. For example:
 
     git:master
 
+
+The complete list of formatting arguments are as follows:
+
+* ``%s`` - the VCS system in use
+* ``%r`` - the current revision (or hash if no revision number is present)
+* ``%h`` - the current hash (or revision number if no hash is present)
+* ``%b`` - the current branch
+* ``%i`` - the status of the repository (see below)
 
 The status indicators for the ``%i`` argument will use the underlying
 status codes from the VCS (e.g. ``git status``, ``hg status``).
