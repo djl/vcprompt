@@ -20,15 +20,23 @@ in your shell's prompt.
 
 ## INSTALL
 
-Install from the Python Package Index:
+`vcprompt` is best installed a standalone executable:
 
-    $ [sudo] easy_install vcprompt
+    # assuming ~/bin is on your $PATH
+    $ curl -s http://github.com/xvzf/vcprompt/raw/master/bin/vcprompt >> ~/bin/vcprompt
+    $ chmod 755 ~/bin/vcprompt
+    
 
 Or, clone the git repository:
 
     $ git clone git://github.com/xvzf/vcprompt.git
     $ cd vcprompt
     $ [sudo] python setup.py install
+
+
+Although not really recommended, `vcprompt` can be installed from PyPi:
+
+    $ [sudo] easy_install vcprompt
 
 
 ## OPTIONS
