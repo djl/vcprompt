@@ -49,11 +49,6 @@ def sorted_alpha(sortme, unique=True):
 
         passed.append(char)
 
-    if unique:
-        upper = list(set(upper))
-        lower = list(set(lower))
-        digit = list(set(digit))
-        punctuation = list(set(punctuation))
     return ''.join(lower + upper + digit + punctuation)
 
 
