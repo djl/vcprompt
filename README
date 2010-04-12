@@ -27,7 +27,6 @@ Although not really recommended, ``vcprompt`` can be installed via PyPi:
 
 ::
 
-    # easy_install
     $ easy_install vcprompt
 
 
