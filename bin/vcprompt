@@ -123,7 +123,7 @@ def main():
                       help='Prints the available version control systems.')
 
     # unknown
-    parser.add_option('--unknown', dest='unknown', default=UNKNOWN,
+    parser.add_option('-u', '--unknown', dest='unknown', default=UNKNOWN,
                       help='The "unknown" value.')
 
     # version
