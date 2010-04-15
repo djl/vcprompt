@@ -1,7 +1,7 @@
-.\" generated with Ronn/v0.4.1
+.\" generated with Ronn/v0.5
 .\" http://github.com/rtomayko/ronn/
 .
-.TH "VCPROMPT" "1" "March 2010" "" ""
+.TH "VCPROMPT" "1" "April 2010" "" ""
 .
 .SH "NAME"
 \fBvcprompt\fR \-\- Version control information in your prompt
@@ -19,7 +19,7 @@
 \fBvcprompt\fR \-\-path \fIPATH\fR
 .
 .br
-\fBvcprompt\fR \-\-unknown \fIUNKNOWN\fR
+\fBvcprompt\fR \-\-max\-depth \fIDEPTH\fR \fBvcprompt\fR \-\-unknown \fIUNKNOWN\fR
 .
 .br
 \fBvcprompt\fR \-\-values \fIOPTIONS\fR
@@ -39,6 +39,7 @@ in your shell's prompt.
 .IP "" 4
 .
 .nf
+
 # assuming ~/bin is on your $PATH
 $ curl \-s http://github.com/xvzf/vcprompt/raw/master/bin/vcprompt >> ~/bin/vcprompt
 $ chmod 755 ~/bin/vcprompt
@@ -53,6 +54,7 @@ Or, clone the git repository:
 .IP "" 4
 .
 .nf
+
 $ git clone git://github.com/xvzf/vcprompt.git
 $ cd vcprompt
 $ [sudo] python setup.py install
@@ -67,6 +69,7 @@ Although not really recommended, \fBvcprompt\fR can be installed from PyPi:
 .IP "" 4
 .
 .nf
+
 $ [sudo] easy_install vcprompt
 .
 .fi
@@ -100,7 +103,7 @@ repository.
 Defaults to '.'.
 .
 .TP
-\fB\-\-unknown\fR
+\fB\-u\fR, \fB\-\-unknown\fR
 The value to use when \fBvcprompt\fR is unable to determine the
 appropriate output for a formatting option.
 .
@@ -108,6 +111,17 @@ appropriate output for a formatting option.
 If not provided will fall back onto the \fBVCPROMPT_UNKNOWN\fR
 environment variable or the hard\-coded string inside of the \fBvcprompt\fR
 binary.
+.
+.TP
+\fB\-d\fR, \fB\-\-max\-depth\fR
+The maximum number of directories vcprompt will traverse in order to
+find a version control system.
+.
+.IP
+A non\-positive number indicates an infinite depth.
+.
+.IP
+Defaults to 0 (no limit).
 .
 .TP
 \fB\-\-systems\fR

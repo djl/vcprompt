@@ -7,6 +7,7 @@ vcprompt(1) -- Version control information in your prompt
 `vcprompt` --format <FORMAT>  
 `vcprompt` --format-<SYSTEM> <FORMAT>  
 `vcprompt` --path <PATH>  
+`vcprompt` --max-depth <DEPTH>
 `vcprompt` --unknown <UNKNOWN>  
 `vcprompt` --values <OPTIONS>  
 `vcprompt` --systems  
@@ -61,13 +62,21 @@ Although not really recommended, `vcprompt` can be installed from PyPi:
 
     Defaults to '.'.
 
-  * `--unknown`:
+  * `-u`, `--unknown`:
     The value to use when `vcprompt` is unable to determine the
     appropriate output for a formatting option.
 
     If not provided will fall back onto the `VCPROMPT_UNKNOWN`
     environment variable or the hard-coded string inside of the `vcprompt`
     binary.
+    
+  * `-d`, `--max-depth`:
+    The maximum number of directories vcprompt will traverse in order to
+    find a version control system.
+
+    A non-positive number indicates an infinite depth.
+
+    Defaults to 0 (no limit).
 
   * `--systems`:
     Prints all the version control systems which vcprompt is aware off.

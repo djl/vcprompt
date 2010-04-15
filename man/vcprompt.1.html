@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv='content-type' value='text/html;charset=utf8'>
-  <meta name='generator' value='Ronn/v0.4.1'>
+  <meta name='generator' value='Ronn/v0.5'>
   <title>vcprompt(1) -- Version control information in your prompt</title>
   <style type='text/css'>
     body {margin:0}
@@ -71,6 +71,7 @@
 <code>vcprompt</code> --format <var>FORMAT</var><br />
 <code>vcprompt</code> --format-<var>SYSTEM</var> <var>FORMAT</var><br />
 <code>vcprompt</code> --path <var>PATH</var><br />
+<code>vcprompt</code> --max-depth <var>DEPTH</var>
 <code>vcprompt</code> --unknown <var>UNKNOWN</var><br />
 <code>vcprompt</code> --values <var>OPTIONS</var><br />
 <code>vcprompt</code> --systems<br />
@@ -83,9 +84,11 @@ in your shell's prompt.</p>
 
 <h2>INSTALL</h2>
 
-<p>Install from the Python Package Index:</p>
+<p><code>vcprompt</code> is best installed a standalone executable:</p>
 
-<pre><code>$ [sudo] easy_install vcprompt
+<pre><code># assuming ~/bin is on your $PATH
+$ curl -s http://github.com/xvzf/vcprompt/raw/master/bin/vcprompt &gt;&gt; ~/bin/vcprompt
+$ chmod 755 ~/bin/vcprompt
 </code></pre>
 
 <p>Or, clone the git repository:</p>
@@ -93,6 +96,11 @@ in your shell's prompt.</p>
 <pre><code>$ git clone git://github.com/xvzf/vcprompt.git
 $ cd vcprompt
 $ [sudo] python setup.py install
+</code></pre>
+
+<p>Although not really recommended, <code>vcprompt</code> can be installed from PyPi:</p>
+
+<pre><code>$ [sudo] easy_install vcprompt
 </code></pre>
 
 <h2>OPTIONS</h2>
@@ -112,12 +120,18 @@ automatically fall back onto the value of the <code>--format</code> flag.</p></d
 repository.</p>
 
 <p>Defaults to '.'.</p></dd>
-<dt><code>--unknown</code></dt><dd><p>The value to use when <code>vcprompt</code> is unable to determine the
+<dt><code>-u</code>, <code>--unknown</code></dt><dd><p>The value to use when <code>vcprompt</code> is unable to determine the
 appropriate output for a formatting option.</p>
 
 <p>If not provided will fall back onto the <code>VCPROMPT_UNKNOWN</code>
 environment variable or the hard-coded string inside of the <code>vcprompt</code>
 binary.</p></dd>
+<dt><code>-d</code>, <code>--max-depth</code></dt><dd><p>The maximum number of directories vcprompt will traverse in order to
+find a version control system.</p>
+
+<p>A non-positive number indicates an infinite depth.</p>
+
+<p>Defaults to 0 (no limit).</p></dd>
 <dt><code>--systems</code></dt><dd><p>Prints all the version control systems which vcprompt is aware off.</p></dd>
 <dt><code>--values</code></dt><dd><p>Prints the values of the given OPTIONS to stdout if they exist.
 This is used internally for testing but is included here for completeness.</p></dd>
@@ -148,7 +162,7 @@ output for a formatting option.</p></li>
 
 <ol class='foot man'>
   <li class='tl'></li>
-  <li class='tc'>March 2010</li>
+  <li class='tc'>April 2010</li>
   <li class='tr'>vcprompt(1)</li>
 </ol>
 
