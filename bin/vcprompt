@@ -77,10 +77,13 @@ def vcs(name, description):
     return wrapped
 
 
-def vcprompt(path, formats, unknown):
+def vcprompt(path, formats, unknown, *args, **kwargs):
     path = os.path.expanduser(path)
     paths = os.path.abspath(path).split('/')
     prompt = None
+    depth = kwargs['depth']
+    count = 0
+
     while paths:
         path = '/'.join(paths)
         paths.pop()
@@ -92,6 +95,10 @@ def vcprompt(path, formats, unknown):
             prompt = vcs(path, format, unknown)
             if prompt:
                 break
+        if depth > 0:
+            if count == depth:
+                break
+            count += 1
     return ''
 
 
@@ -127,6 +134,12 @@ def main():
     parser.add_option('-f', '--format', dest='format',
                       default=FORMAT, help='The format string to use.')
 
+    # max depth
+    parser.add_option('-d', '--max-depth', dest='depth', type='int', default=0,
+                      help='The maximum number of directories to traverse. ' \
+                            'Defaults to 0 (infinite).')
+
+
     # per-VCS formatting
     group = optparse.OptionGroup(parser, "VCS-specific formatting",
                                  "These options can be used for VCS-specific " \
@@ -159,7 +172,8 @@ def main():
 
     sys.stdout.write(vcprompt(path=options.path,
                               formats=options.__dict__,
-                              unknown=options.unknown))
+                              unknown=options.unknown,
+                              depth=options.depth))
 
 @vcs('Bazaar', 'The Bazaar version control system')
 def bzr(path, string, unknown):
