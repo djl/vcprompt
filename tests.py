@@ -19,7 +19,14 @@ class Base(unittest.TestCase):
         output = process.communicate()[0].strip()
         return output
 
-    def vcprompt(self, *args, **kwargs):
+    def vcprompt(self, environment=False, *args, **kwargs):
+        # ignore environment variables
+        # this should be moved out into an option
+        if not environment:
+            for k in os.environ.keys():
+                if k.startswith('VCPROMPT'):
+                    os.unsetenv(k)
+
         commands = ['./bin/vcprompt', '--path', self.repository]
         for key, value in kwargs.items():
             key = key.replace('_', '-')
