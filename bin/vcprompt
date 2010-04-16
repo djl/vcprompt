@@ -9,6 +9,7 @@ import sys
 
 __version__ = (0, 1, 0)
 
+DEPTH = os.environ.get('VCPROMPT_DEPTH', 0)
 FORMAT = os.environ.get('VCPROMPT_FORMAT', '%s:%b')
 UNKNOWN = os.environ.get('VCPROMPT_UNKNOWN', '(unknown)')
 SYSTEMS = []
@@ -135,7 +136,8 @@ def main():
                       default=FORMAT, help='The format string to use.')
 
     # max depth
-    parser.add_option('-d', '--max-depth', dest='depth', type='int', default=0,
+    parser.add_option('-d', '--max-depth', dest='depth', type='int',
+                      default=DEPTH,
                       help='The maximum number of directories to traverse. ' \
                             'Defaults to 0 (infinite).')
 
