@@ -64,6 +64,8 @@ def systems(*args, **kwargs):
 
 def values(option, opt, value, parser, *args, **kwargs):
     for option in parser.rargs:
+        if option == 'systems':
+            systems()
         if option in globals().keys():
             print globals()[option]
     sys.exit(0)
@@ -79,24 +81,23 @@ def vcs(name, description):
 
 
 def vcprompt(path, formats, unknown, *args, **kwargs):
-    path = os.path.expanduser(path)
-    paths = os.path.abspath(path).split('/')
+    paths = os.path.expanduser(path).split('/')
+    depth = kwargs.get('depth', 0)
+    systems = kwargs.get('systems', None)
     prompt = None
-    depth = kwargs['depth']
     count = 0
 
     while paths:
         path = '/'.join(paths)
         paths.pop()
-        if prompt:
-            return prompt
         for vcs in SYSTEMS:
-            vcs_format = "format-%s" % vcs.func_name
-            format = formats[vcs_format] or formats['format']
-            prompt = vcs(path, format, unknown)
-            if prompt:
-                break
-        if depth > 0:
+            if not systems or systems and vcs.func_name in systems:
+                vcs_format = "format-%s" % vcs.func_name
+                format = formats[vcs_format] or formats['format']
+                prompt = vcs(path, format, unknown)
+                if prompt:
+                    return prompt
+        if depth:
             if count == depth:
                 break
             count += 1
@@ -119,8 +120,7 @@ def main():
     parser.add_option('-p', '--path', dest='path',
                       default='.', help='The path to run vcprompt on.')
     # systems
-    parser.add_option('--systems', dest='systems', action='callback',
-                      callback=systems,
+    parser.add_option('-s', '--systems', dest='systems', action='append',
                       help='Prints the available version control systems.')
 
     # unknown
@@ -172,10 +172,11 @@ def main():
     # parse!
     options, args = parser.parse_args()
 
-    sys.stdout.write(vcprompt(path=options.path,
+    sys.stdout.write(vcprompt(depth=options.depth,
                               formats=options.__dict__,
-                              unknown=options.unknown,
-                              depth=options.depth))
+                              path=options.path,
+                              systems=options.systems,
+                              unknown=options.unknown))
 
 @vcs('Bazaar', 'The Bazaar version control system')
 def bzr(path, string, unknown):

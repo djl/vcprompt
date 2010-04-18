@@ -22,10 +22,7 @@
 \fBvcprompt\fR \-\-max\-depth \fIDEPTH\fR \fBvcprompt\fR \-\-unknown \fIUNKNOWN\fR
 .
 .br
-\fBvcprompt\fR \-\-values \fIOPTIONS\fR
-.
-.br
-\fBvcprompt\fR \-\-systems
+\fBvcprompt\fR \-\-systems \fISYSTEMS\fR \fBvcprompt\fR \-\-values \fIOPTIONS\fR
 .
 .br
 .
@@ -114,7 +111,7 @@ binary.
 .
 .TP
 \fB\-d\fR, \fB\-\-max\-depth\fR
-The maximum number of directories vcprompt will traverse in order to
+The maximum number of directories \fBvcprompt\fR will traverse in order to
 find a version control system.
 .
 .IP
@@ -124,8 +121,11 @@ A non\-positive number indicates an infinite depth.
 Defaults to 0 (no limit).
 .
 .TP
-\fB\-\-systems\fR
-Prints all the version control systems which vcprompt is aware off.
+\fB\-s\fR, \fB\-\-systems\fR
+The systems \fBvcprompt\fR will use when traversing over directories.
+.
+.IP
+Defaults to all available systems.
 .
 .TP
 \fB\-\-values\fR
