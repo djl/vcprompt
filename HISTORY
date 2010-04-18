@@ -2,6 +2,11 @@
 ------------------
 
 * Added: Support for Git < 1.7.0
+* Added: ``--max-depth`` option for limiting the depth of directories to
+  traverse.
+* Changed: The ``--systems`` option is now used for passing in systems to use.
+  The old ``--systems`` behaviour is now available with ``--values systems``.
+* Bugfix: Environment variables are ignored when tests are running.
 
 
 0.1.0 (2010-03-20)
