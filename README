@@ -78,7 +78,7 @@ The complete list of formatting arguments are as follows:
 * ``%s`` - the VCS system in use
 * ``%r`` - the current revision (or hash if no revision number is present)
 * ``%h`` - the current hash (or revision number if no hash is present)
-* ``%b`` - the current branch
+* ``%b`` - the current branch name (or directory where the repository exists)
 * ``%i`` - the status of the repository (see below)
 
 The status indicators for the ``%i`` argument will use the underlying
