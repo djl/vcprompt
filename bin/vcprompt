@@ -114,14 +114,24 @@ def version(*args):
 
 def main():
     # parser
-    parser = optparse.OptionParser("usage: %prog [OPTIONS]")
+    parser = optparse.OptionParser()
+
+    # format
+    parser.add_option('-f', '--format', dest='format',
+                      default=FORMAT, help='The format string to use.')
 
     # path
     parser.add_option('-p', '--path', dest='path',
                       default='.', help='The path to run vcprompt on.')
+
+    # max depth
+    parser.add_option('-d', '--max-depth', dest='depth', type='int',
+                      default=DEPTH,
+                      help='The maximum number of directories to traverse. ' \
+                            'Defaults to 0 (infinite).')
     # systems
     parser.add_option('-s', '--systems', dest='systems', action='append',
-                      help='Prints the available version control systems.')
+                      help='The version control systems to use.')
 
     # unknown
     parser.add_option('-u', '--unknown', dest='unknown', default=UNKNOWN,
@@ -130,16 +140,6 @@ def main():
     # version
     parser.add_option('-v', '--version', action='callback', callback=version,
                       help="show program's version number and exit")
-
-    # format
-    parser.add_option('-f', '--format', dest='format',
-                      default=FORMAT, help='The format string to use.')
-
-    # max depth
-    parser.add_option('-d', '--max-depth', dest='depth', type='int',
-                      default=DEPTH,
-                      help='The maximum number of directories to traverse. ' \
-                            'Defaults to 0 (infinite).')
 
 
     # per-VCS formatting
@@ -153,15 +153,15 @@ def main():
         dest = 'format-%s' % system.func_name
         flag = '--%s' % dest
         help = 'The format string to use for %s' % system.name
-        group.add_option(flag, dest=dest, default=default, help=system.name)
+        group.add_option(flag, dest=dest, default=default, metavar="FORMAT", help=system.name)
     parser.add_option_group(group)
+
 
     # internally used stuff
     group = optparse.OptionGroup(parser, "Internal options",
                                  "These options are used internally or for " \
                                  "testing. Use of these is not recommended.")
     # values
-    # used internally
     group.add_option('--values', dest='values', action='callback',
                      callback=values,
                      help='Prints the values of the "format", "path" ' \
