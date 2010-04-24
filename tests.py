@@ -7,6 +7,10 @@ import unittest
 
 
 class Base(unittest.TestCase):
+    def file(self, path):
+        file = os.path.join(self.repository, path)
+        return open(file, 'r').read()
+
     def repo(self, vcs):
         location = os.path.abspath(__file__).rsplit('/', 1)[0]
         location = os.path.join(location, 'tests/repositories/')
@@ -37,6 +41,9 @@ class Base(unittest.TestCase):
 
 
 class Bazaar(Base):
+    def revision(self):
+        return self.file('.bzr/branch/last-revision').strip().split()[0]
+
     def setUp(self):
         self.repository = self.repo('bzr')
 
@@ -46,7 +53,7 @@ class Bazaar(Base):
 
     def test_format_revision(self, string='%r'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '1')
+        self.assertEquals(output, self.revision())
 
     def test_format_hash(self, string='%h'):
         self.test_format_revision(string)
@@ -57,10 +64,15 @@ class Bazaar(Base):
 
     def test_format_all(self, string='%s:%r'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, 'bzr:1')
+        expected = 'bzr:%s' % (self.revision())
+        self.assertEquals(output, expected)
 
 
 class Darcs(Base):
+    def hash(self):
+        hash = self.file('_darcs/hashed_inventory').strip().split('\n')[0]
+        return hash.split('-')[-1][:7]
+
     def setUp(self):
         self.repository = self.repo('darcs')
 
@@ -73,7 +85,7 @@ class Darcs(Base):
 
     def test_format_hash(self, string='%h'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '4b13fbf')
+        self.assertEquals(output, self.hash())
 
     def test_format_system(self, string='%s'):
         output = self.vcprompt(format=string)
@@ -81,7 +93,7 @@ class Darcs(Base):
 
     def test_format_all(self, string='%s:%b:%r'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, 'darcs:darcs:4b13fbf')
+        self.assertEquals(output, 'darcs:darcs:%s' % self.hash())
 
 
 class Fossil(Base):
@@ -131,19 +143,25 @@ class Fossil(Base):
 
 
 class Git(Base):
+    def branch(self):
+        return self.file('.git/HEAD').strip().split('/')[-1]
+
+    def hash(self):
+        return self.file('.git/refs/heads/%s' % self.branch()).strip()[:7]
+
     def setUp(self):
         self.repository = self.repo('git')
 
     def test_format_branch(self, string='%b'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, 'master')
+        self.assertEquals(output, self.branch())
 
     def test_format_revision(self, string='%r'):
         return self.test_format_hash(string)
 
     def test_format_hash(self, string='%h'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, 'eae51cf')
+        self.assertEquals(output, self.hash())
 
     def test_format_system(self, string='%s'):
         output = self.vcprompt(format=string)
@@ -151,10 +169,24 @@ class Git(Base):
 
     def test_format_all(self, string='%s:%b:%r'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, 'git:master:eae51cf')
+        self.assertEquals(output, 'git:%s:%s' % (self.branch(),
+                                                 self.hash()))
 
 
 class Mercurial(Base):
+    def branch(self):
+        files = ['.hg/branch', '.hg/undo.branch', '.hg/bookmarks.current']
+        for file in files:
+            file = os.path.join(self.repository, file)
+            if os.path.exists(file):
+                return self.file(file).strip()
+
+    def hash(self):
+        return self.file('.hg/tags.cache').strip().split()[-1][:7]
+
+    def revision(self):
+        return self.file('.hg/tags.cache').strip().split()[0]
+
     def setUp(self):
         self.repository = self.repo('hg')
 
@@ -164,19 +196,22 @@ class Mercurial(Base):
 
     def test_format_revision(self, string="%r"):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '0')
+        self.assertEquals(output, self.revision())
 
     def test_format_hash(self, string="%h"):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '8ada0a9')
+        self.assertEquals(output, self.hash())
 
     def test_format_system(self, string="%s"):
         output = self.vcprompt(format=string)
         self.assertEquals(output, 'hg')
 
-    def test_format_all(self, string='%s:%b:r%r:%h'):
+    def test_format_all(self, string='%s:%b:%r:%h'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, 'hg:default:r0:8ada0a9')
+        expected = 'hg:%s:%s:%s' % (self.branch(),
+                                    self.revision(),
+                                    self.hash())
+        self.assertEquals(output, expected)
 
 
 class Subversion(Base):
