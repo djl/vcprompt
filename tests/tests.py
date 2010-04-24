@@ -13,12 +13,12 @@ class Base(unittest.TestCase):
 
     def repo(self, vcs):
         location = os.path.abspath(__file__).rsplit('/', 1)[0]
-        location = os.path.join(location, 'tests/repositories/')
+        location = os.path.join(location, 'repositories/')
         location = os.path.join(location, vcs)
         return location
 
     def unknown(self):
-        process = subprocess.Popen('./bin/vcprompt --values UNKNOWN'.split(),
+        process = subprocess.Popen('../bin/vcprompt --values UNKNOWN'.split(),
                                    stdout=subprocess.PIPE)
         output = process.communicate()[0].strip()
         return output
@@ -31,7 +31,7 @@ class Base(unittest.TestCase):
                 if k.startswith('VCPROMPT'):
                     os.unsetenv(k)
 
-        commands = ['./bin/vcprompt', '--path', self.repository]
+        commands = ['../bin/vcprompt', '--path', self.repository]
         for key, value in kwargs.items():
             key = key.replace('_', '-')
             commands.append("--%s" % key)
@@ -39,8 +39,20 @@ class Base(unittest.TestCase):
         process = subprocess.Popen(commands, stdout=subprocess.PIPE)
         return process.communicate()[0]
 
+class BaseTest(object):
+    def test_depth(self, path='foo/bar/baz', depth='0', format='%s'):
+        path = os.path.join(self.repository, path)
+        output = self.vcprompt(path=path, max_depth=depth, format=format)
+        # TODO find a less hacky way to do this
+        self.assertEquals(output, self.repository.rsplit('/')[-1])
 
-class Bazaar(Base):
+    def test_depth_limited(self, path='foo/bar/baz', depth='2'):
+        path = os.path.join(self.repository, path)
+        output = self.vcprompt(path=path, max_depth=depth)
+        self.assertEquals(output, '')
+
+
+class Bazaar(Base, BaseTest):
     def revision(self):
         return self.file('.bzr/branch/last-revision').strip().split()[0]
 
@@ -68,7 +80,7 @@ class Bazaar(Base):
         self.assertEquals(output, expected)
 
 
-class Darcs(Base):
+class Darcs(Base, BaseTest):
     def hash(self):
         hash = self.file('_darcs/hashed_inventory').strip().split('\n')[0]
         return hash.split('-')[-1][:7]
@@ -96,7 +108,10 @@ class Darcs(Base):
         self.assertEquals(output, 'darcs:darcs:%s' % self.hash())
 
 
-class Fossil(Base):
+class Fossil(Base, BaseTest):
+    def hash(self):
+        return self.file('manifest.uuid').strip()[:7]
+
     def setUp(self):
         self.repository = self.repo('fossil')
         self.repository_file = 'fossil'
@@ -135,14 +150,13 @@ class Fossil(Base):
 
     def test_format_hash(self, string='%h'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '4103d09')
+        self.assertEquals(output, self.hash())
 
     def test_format_revision(self, string='%r'):
-        output = self.vcprompt(format=string)
-        self.assertEquals(output, '4103d09')
+        return self.test_format_hash(string=string)
 
 
-class Git(Base):
+class Git(Base, BaseTest):
     def branch(self):
         return self.file('.git/HEAD').strip().split('/')[-1]
 
@@ -173,7 +187,7 @@ class Git(Base):
                                                  self.hash()))
 
 
-class Mercurial(Base):
+class Mercurial(Base, BaseTest):
     def branch(self):
         files = ['.hg/branch', '.hg/undo.branch', '.hg/bookmarks.current']
         for file in files:
@@ -214,9 +228,14 @@ class Mercurial(Base):
         self.assertEquals(output, expected)
 
 
-class Subversion(Base):
+class Subversion(Base, BaseTest):
     def setUp(self):
         self.repository = self.repo('svn')
+
+    # SVN spews '.svn' directories everywhere, so this will never behave as
+    # you'd expect. Just pass on it for now
+    def test_depth_limited(self):
+        pass
 
     def test_format_branch(self, string="%b"):
         output = self.vcprompt(format=string)
