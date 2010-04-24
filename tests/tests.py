@@ -243,7 +243,7 @@ class Subversion(Base, BaseTest):
 
     def test_format_revision(self, string='%r'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '0')
+        self.assertEquals(output, '2')
 
     def test_format_hash(self, string='%h'):
         return self.test_format_revision(string)
@@ -254,7 +254,7 @@ class Subversion(Base, BaseTest):
 
     def test_format_all(self, string='%s:%b:%h'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, "svn:%s:0" % self.unknown())
+        self.assertEquals(output, "svn:%s:2" % self.unknown())
 
 
 if __name__ == '__main__':
