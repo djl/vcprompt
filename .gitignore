@@ -4,3 +4,4 @@ build/
 dist/
 tests/repositories/fossil/manifest*
 tests/repositories/fossil/_FOSSIL_
+tests/repositories/svn
