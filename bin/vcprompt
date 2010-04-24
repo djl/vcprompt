@@ -322,7 +322,7 @@ def fossil(path, string, unknown):
                 c.execute(query)
                 hash, _rid = c.fetchone()
                 hash = hash[:7]
-            except sqlite3.OperationalError:
+            except (sqlite3.OperationalError, TypeError):
                 pass
             finally:
                 conn.close()
@@ -335,7 +335,7 @@ def fossil(path, string, unknown):
                 c = conn.cursor()
                 c.execute(query)
                 branch = c.fetchone()[0]
-            except sqlite3.OperationalError:
+            except (sqlite3.OperationalError, TypeError):
                 pass
             finally:
                 conn.close()
