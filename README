@@ -104,3 +104,22 @@ TODO
 
 * More complete support and tests for CVS
 * ReST-based documentation to go along with manpages
+
+
+
+Testing
+-------
+
+If you *really* want to run the tests, you have jump through some hoops first.
+
+After cloning the repository, you need to do the following:
+
+::
+
+    # update/init the submodule
+    git submodule update --init
+
+    # clone the SVN repo
+    cd tests/repositories
+    svn checkout http://svn.github.com/xvzf/quotes.git svn
+
