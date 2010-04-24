@@ -1,4 +1,11 @@
-0.1.1 (2010-??-??)
+0.1.2 (2010-04-24)
+------------------
+
+* Fixed: Subdirectories are now correctly processed
+* Fixed: Correct manpages and help text
+
+
+0.1.1 (2010-04-18)
 ------------------
 
 * Added: Support for Git < 1.7.0
