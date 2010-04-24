@@ -81,7 +81,7 @@ def vcs(name, description):
 
 
 def vcprompt(path, formats, unknown, *args, **kwargs):
-    paths = os.path.expanduser(path).split('/')
+    paths = os.path.abspath(os.path.expanduser(path)).split('/')
     depth = kwargs.get('depth', 0)
     systems = kwargs.get('systems', None)
     prompt = None
