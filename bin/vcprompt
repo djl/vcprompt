@@ -388,12 +388,9 @@ def git(path, string, unknown):
             # check if we're currently running on a branch
             if re.match('^ref: refs/heads/', line.strip()):
                 branch = (line.split('/')[-1] or unknown).strip()
-            # we're running with a detached head (submodule?)
-            else:
-                branch = os.listdir(os.path.join(file, 'refs/heads'))[0]
 
         # hash/revision
-        if re.search('%(r|h)', string):
+        if re.search('%(r|h)', string) and branch != unknown:
             hash_file = os.path.join(file, 'refs/heads/%s' % branch)
             with open(hash_file, 'r') as f:
                 hash = f.read().strip()[0:7]
