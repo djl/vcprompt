@@ -433,14 +433,8 @@ def git(path, string, unknown):
 
 @vcs('Mercurial', 'The Mercurial version control system.')
 def hg(path, string, unknown):
-    files = ['.hg/branch', '.hg/undo.branch', '.hg/bookmarks.current']
-    file = None
-    for f in files:
-        f = os.path.join(path, f)
-        if os.path.exists(f):
-            file = f
-            break
-    if not file:
+    file = os.path.join(path, '.hg/branchheads.cache')
+    if not os.path.exists(file):
         return None
 
     branch = revision = hash = status = unknown
@@ -454,9 +448,17 @@ def hg(path, string, unknown):
                 hash = hash[:7]
 
     # branch
-    if '%b' in string:
+    if re.search('%(r|h|b)', string):
+        count = 0
         with open(file, 'r') as f:
-            branch = f.read().strip()
+            for line in f:
+                hash, revision_branch = line.split()
+                hash = hash [:7]
+                if count > 0:
+                    branch = revision_branch
+                else:
+                    revision = revision_branch
+                count += 1
 
     # status
     if '%i' in string:

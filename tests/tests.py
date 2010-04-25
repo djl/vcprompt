@@ -10,7 +10,7 @@ class Base(unittest.TestCase):
 
     def file(self, path):
         file = os.path.join(self.repository, path)
-        return open(file, 'r').read()
+        return file
 
     def repo(self, vcs):
         location = os.path.abspath(__file__).rsplit('/', 1)[0]
@@ -58,7 +58,9 @@ class BaseTest(object):
 class Bazaar(Base, BaseTest):
 
     def revision(self):
-        return self.file('.bzr/branch/last-revision').strip().split()[0]
+        with open(self.file('.bzr/branch/last-revision'), 'r') as f:
+            for line in f:
+                return line.strip().split()[0]
 
     def setUp(self):
         self.repository = self.repo('bzr')
@@ -87,8 +89,9 @@ class Bazaar(Base, BaseTest):
 class Darcs(Base, BaseTest):
 
     def hash(self):
-        hash = self.file('_darcs/hashed_inventory').strip().split('\n')[0]
-        return hash.split('-')[-1][:7]
+        with open(self.file('_darcs/hashed_inventory'), 'r') as f:
+            for line in f:
+                return line.strip().split('\n')[0].split('-')[-1][:7]
 
     def setUp(self):
         self.repository = self.repo('darcs')
@@ -116,7 +119,9 @@ class Darcs(Base, BaseTest):
 class Fossil(Base, BaseTest):
 
     def hash(self):
-        return self.file('manifest.uuid').strip()[:7]
+        with open(self.file('manifest.uuid'), 'r') as f:
+            for line in f:
+                return line.strip()[:7]
 
     def setUp(self):
         self.repository = self.repo('fossil')
@@ -156,11 +161,20 @@ class Fossil(Base, BaseTest):
 
 class Git(Base, BaseTest):
 
+    def _hash_or_branch(self, get='hash'):
+        with open(os.path.join(self.repository, '.git/packed-refs'), 'r') as f:
+            for line in f:
+                if not line.startswith('#'):
+                    hash, branch = line.split()
+                    hash = hash[:7]
+                    branch = branch.rsplit('/')[-1]
+                    return locals()[get]
+
     def branch(self):
-        return self.file('.git/HEAD').strip().split('/')[-1]
+        return self._hash_or_branch('branch')
 
     def hash(self):
-        return self.file('.git/refs/heads/%s' % self.branch()).strip()[:7]
+        return self._hash_or_branch('hash')
 
     def setUp(self):
         self.repository = self.repo('git')
@@ -188,18 +202,28 @@ class Git(Base, BaseTest):
 
 class Mercurial(Base, BaseTest):
 
+    def _branch_hash_revision(self, get='branch'):
+        count = 0
+        with open(self.file('.hg/branchheads.cache'), 'r') as f:
+            for line in f:
+                line = line.strip()
+                hash, revision_branch = line.split()
+                hash = hash[:7]
+                if count > 0:
+                    branch = revision_branch
+                else:
+                    revision = revision_branch
+                count += 1
+            return locals()[get]
+
     def branch(self):
-        files = ['.hg/branch', '.hg/undo.branch', '.hg/bookmarks.current']
-        for file in files:
-            file = os.path.join(self.repository, file)
-            if os.path.exists(file):
-                return self.file(file).strip()
+        return self._branch_hash_revision('branch')
 
     def hash(self):
-        return self.file('.hg/tags.cache').strip().split()[-1][:7]
+        return self._branch_hash_revision('hash')
 
     def revision(self):
-        return self.file('.hg/tags.cache').strip().split()[0]
+        return self._branch_hash_revision('revision')
 
     def setUp(self):
         self.repository = self.repo('hg')
