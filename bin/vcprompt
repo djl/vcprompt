@@ -310,36 +310,26 @@ def fossil(path, string, unknown):
     finally:
         conn.close()
 
-    if repository:
-        # get the hash. we need this to get the current trunk
-        _rid = None
-        if re.search('%(b|h|r)', string):
-            try:
-                query = """SELECT uuid, rid FROM blob
-                           ORDER BY rid DESC LIMIT 1"""
-                conn = sqlite3.connect(repository)
-                c = conn.cursor()
-                c.execute(query)
-                hash, _rid = c.fetchone()
-                hash = hash[:7]
-            except (sqlite3.OperationalError, TypeError):
-                pass
-            finally:
-                conn.close()
+    # we can grab the latest hash the manifest.uuid file
+    manifest = os.path.join(path, 'manifest.uuid')
+    if os.path.exists(manifest):
+        with open(manifest, 'r') as f:
+            hash = f.read().strip()[:7]
 
-           # now we grab the branch
-            try:
-                query = """SELECT value FROM tagxref WHERE rid = %d and
-                           value is not NULL LIMIT 1 """ % _rid
-                conn = sqlite3.connect(repository)
-                c = conn.cursor()
-                c.execute(query)
-                branch = c.fetchone()[0]
-            except (sqlite3.OperationalError, TypeError):
-                pass
-            finally:
-                conn.close()
-
+    # branch
+    if hash != unknown:
+        try:
+            query = """SELECT value FROM tagxref WHERE rid =
+                       (SELECT rid FROM blob WHERE uuid LIKE '%s%%')
+                       AND value is not NULL LIMIT 1 """ % hash
+            conn = sqlite3.connect(repository)
+            c = conn.cursor()
+            c.execute(query)
+            branch = c.fetchone()[0]
+        except (sqlite3.OperationalError, TypeError):
+            pass
+        finally:
+            conn.close()
 
     # status
     if '%i' in string:
