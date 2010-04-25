@@ -7,6 +7,7 @@ import unittest
 
 
 class Base(unittest.TestCase):
+
     def file(self, path):
         file = os.path.join(self.repository, path)
         return open(file, 'r').read()
@@ -39,7 +40,9 @@ class Base(unittest.TestCase):
         process = subprocess.Popen(commands, stdout=subprocess.PIPE)
         return process.communicate()[0]
 
+
 class BaseTest(object):
+
     def test_depth(self, path='foo/bar/baz', depth='0', format='%s'):
         path = os.path.join(self.repository, path)
         output = self.vcprompt(path=path, max_depth=depth, format=format)
@@ -53,6 +56,7 @@ class BaseTest(object):
 
 
 class Bazaar(Base, BaseTest):
+
     def revision(self):
         return self.file('.bzr/branch/last-revision').strip().split()[0]
 
@@ -81,6 +85,7 @@ class Bazaar(Base, BaseTest):
 
 
 class Darcs(Base, BaseTest):
+
     def hash(self):
         hash = self.file('_darcs/hashed_inventory').strip().split('\n')[0]
         return hash.split('-')[-1][:7]
@@ -109,23 +114,18 @@ class Darcs(Base, BaseTest):
 
 
 class Fossil(Base, BaseTest):
+
     def hash(self):
         return self.file('manifest.uuid').strip()[:7]
 
     def setUp(self):
         self.repository = self.repo('fossil')
         self.repository_file = 'fossil'
-        self.repository_db = os.path.join(self.repository,
-                                          '_FOSSIL')
-        if not self.is_open():
-            self.open()
+        self.repository_db = os.path.join(self.repository, '_FOSSIL')
+        self.open()
 
     def tearDown(self):
-        if self.is_open():
-            self.close()
-
-    def is_open(self):
-        return os.path.exists(self.repository_db)
+        self.close()
 
     def open(self):
         with open('/dev/null', 'w') as devnull:
@@ -135,10 +135,8 @@ class Fossil(Base, BaseTest):
                              stderr=devnull)
 
     def close(self):
-        with open('/dev/null', 'w') as devnull:
-            command = "cd %s && fossil close" % self.repository
-            subprocess.Popen(command, shell=True, stdout=devnull,
-                             stderr=devnull)
+        command = "cd %s && fossil close" % self.repository
+        subprocess.Popen(command, shell=True)
 
     def test_format_system(self, string='%s'):
         output = self.vcprompt(format=string)
@@ -157,6 +155,7 @@ class Fossil(Base, BaseTest):
 
 
 class Git(Base, BaseTest):
+
     def branch(self):
         return self.file('.git/HEAD').strip().split('/')[-1]
 
@@ -188,6 +187,7 @@ class Git(Base, BaseTest):
 
 
 class Mercurial(Base, BaseTest):
+
     def branch(self):
         files = ['.hg/branch', '.hg/undo.branch', '.hg/bookmarks.current']
         for file in files:
@@ -229,13 +229,12 @@ class Mercurial(Base, BaseTest):
 
 
 class Subversion(Base, BaseTest):
+
     def setUp(self):
         self.repository = self.repo('svn')
 
-    # SVN spews '.svn' directories everywhere, so this will never behave as
-    # you'd expect. Just pass on it for now
     def test_depth_limited(self):
-        pass
+        return self.test_depth()
 
     def test_format_branch(self, string="%b"):
         output = self.vcprompt(format=string)

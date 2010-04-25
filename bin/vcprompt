@@ -144,8 +144,8 @@ def main():
 
     # per-VCS formatting
     group = optparse.OptionGroup(parser, "VCS-specific formatting",
-                                 "These options can be used for VCS-specific " \
-                                 "prompt formatting.")
+                                 "These options can be used for VCS-specific" \
+                                 " prompt formatting.")
 
     for system in SYSTEMS:
         default = 'VCPROMPT_FORMAT_%s' % system.func_name.upper()
@@ -153,7 +153,8 @@ def main():
         dest = 'format-%s' % system.func_name
         flag = '--%s' % dest
         help = 'The format string to use for %s' % system.name
-        group.add_option(flag, dest=dest, default=default, metavar="FORMAT", help=system.name)
+        group.add_option(flag, dest=dest, default=default, metavar="FORMAT",
+                         help=system.name)
     parser.add_option_group(group)
 
 
@@ -177,6 +178,7 @@ def main():
                               path=options.path,
                               systems=options.systems,
                               unknown=options.unknown))
+
 
 @vcs('Bazaar', 'The Bazaar version control system')
 def bzr(path, string, unknown):

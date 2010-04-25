@@ -120,6 +120,5 @@ After cloning the repository, you need to do the following:
     git submodule update --init
 
     # clone the SVN repo
-    cd tests/repositories
-    svn checkout http://svn.github.com/xvzf/quotes.git svn
+    svn checkout http://svn.github.com/xvzf/quotes.git tests/repositories/svn
 
