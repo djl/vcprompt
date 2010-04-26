@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import with_statement
 import os
+import re
 import sys
 import subprocess
 import unittest
@@ -162,13 +163,21 @@ class Fossil(Base, BaseTest):
 class Git(Base, BaseTest):
 
     def _hash_or_branch(self, get='hash'):
-        with open(os.path.join(self.repository, '.git/packed-refs'), 'r') as f:
+        branch = hash = self.unknown()
+        # get the branch name
+        with open(os.path.join(self.repository, '.git/HEAD'), 'r') as f:
             for line in f:
-                if not line.startswith('#'):
-                    hash, branch = line.split()
-                    hash = hash[:7]
-                    branch = branch.rsplit('/')[-1]
-                    return locals()[get]
+                if re.match('^ref', line):
+                    branch = line.strip().split('/')[-1]
+                    break
+
+        # open the branch file, grab the hash
+        if branch != self.unknown():
+            with open(self.file('.git/refs/heads/%s' % branch), 'r') as bf:
+                for bfline in bf:
+                    hash = bfline.strip()[:7]
+                    break
+        return locals()[get]
 
     def branch(self):
         return self._hash_or_branch('branch')
