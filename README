@@ -99,14 +99,6 @@ Requirements
 
 
 
-TODO
-----
-
-* More complete support and tests for CVS
-* ReST-based documentation to go along with manpages
-
-
-
 Testing
 -------
 
@@ -122,3 +114,11 @@ After cloning the repository, you need to do the following:
     # clone the SVN repo
     svn checkout http://svn.github.com/xvzf/quotes.git tests/repositories/svn
 
+
+
+
+TODO
+----
+
+* More complete support and tests for CVS
+* ReST-based documentation to go along with manpages
