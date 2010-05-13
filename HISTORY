@@ -1,7 +1,7 @@
 0.1.4 (2010-??-??)
 ------------------
 
-* Bazaar now returns the current has when using the '%h' format argument
+* Bazaar now returns the current hash when using the '%h' format argument
 
 
 0.1.3 (2010-04-26)
