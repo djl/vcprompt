@@ -75,7 +75,9 @@ class Bazaar(Base, BaseTest):
         self.assertEquals(output, self.revision())
 
     def test_format_hash(self, string='%h'):
-        self.test_format_revision(string)
+        with open(self.file('.bzr/branch/last-revision'), 'r') as f:
+            for line in f:
+                return line.strip().rsplit('-', 1)[0][:7]
 
     def test_format_system(self, string='%s'):
         output = self.vcprompt(format=string)

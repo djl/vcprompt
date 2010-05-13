@@ -186,12 +186,14 @@ def bzr(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = hash = status = unknown
+    branch = revision = hash = status = unknown
 
     # local revision number
     if re.search('%(r|h)', string):
         with open(file, 'r') as f:
-            hash = f.read().strip().split(' ', 1)[0]
+            line = f.read().strip()
+            revision = line.split()[0]
+            hash = line.rsplit('-', 1)[0][:7]
 
 
     # status
@@ -224,7 +226,7 @@ def bzr(path, string, unknown):
     # TODO figure out something more correct
     string = string.replace('%b', os.path.basename(path))
     string = string.replace('%h', hash)
-    string = string.replace('%r', hash)
+    string = string.replace('%r', revision)
     string = string.replace('%i', status)
     string = string.replace('%s', 'bzr')
     return string
