@@ -115,6 +115,7 @@ def version(*args):
 def main():
     # parser
     parser = optparse.OptionParser()
+    parser.description = "Version control information in your prompt."
 
     # format
     parser.add_option('-f', '--format', dest='format',
