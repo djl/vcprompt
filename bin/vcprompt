@@ -31,6 +31,7 @@ def sorted_alpha(sortme, unique=True):
 
     >>> sorted_alpha("aSD??fc?!")
     afcSD?!
+
     """
     upper, lower, digit, punctuation, passed = ([], [], [], [], [])
     passed = []
@@ -53,7 +54,8 @@ def sorted_alpha(sortme, unique=True):
     return ''.join(lower + upper + digit + punctuation)
 
 
-def systems(*args, **kwargs):
+def systems():
+    """Prints all available systems to stdout."""
     for system in SYSTEMS:
         name = getattr(system, 'name', system.func_name)
         desc = getattr(system, 'description', '')
@@ -63,6 +65,11 @@ def systems(*args, **kwargs):
 
 
 def values(option, opt, value, parser, *args, **kwargs):
+    """
+    Prints the given values to stdout.
+
+    This function is *private* and should not be relied on.
+    """
     for option in parser.rargs:
         if option == 'systems':
             systems()
@@ -72,6 +79,21 @@ def values(option, opt, value, parser, *args, **kwargs):
 
 
 def vcs(name, description):
+    """
+    Adds the given ``name`` and ``description`` as attributes on the
+    wrapped function.
+
+    Arguments:
+
+        ``name``
+            The display name for the system. E.g. "Mercurial" or
+            "Subversion".
+
+         ``description``
+             The description for the system. E.g.:
+             "The fast version continue system".
+
+    """
     def wrapped(function):
         function.name = name
         function.description = name
@@ -80,7 +102,61 @@ def vcs(name, description):
     return wrapped
 
 
+def version(*args):
+    """
+    Convenience function for returning a version number.
+
+    If *args contains '-v' or '--version', it prints the version string
+    to stdout.
+
+    Otherwise, it returns the version string.
+
+    """
+    v = '.'.join(map(str, __version__))
+    if '-v' in args or '--version' in args:
+        print "vcprompt", v
+        sys.exit(0)
+    return v
+
+
 def vcprompt(path, formats, unknown, *args, **kwargs):
+    """
+    Returns a formatted version control string for use in a shell prompt
+    or elsewhere.
+
+    Arguments:
+
+        ``path``
+            A path for vcprompt to check for version control systems
+
+            Defaults to the current working directory.
+
+        ``formats``
+            A dictionary mapping version control systems to formatting
+            strings to use for said system.
+
+         ``unknown``
+             The string to use for when ``vcprompt`` cannot determine a
+             value.
+
+    Keyword Arguments:
+
+        ``depth``
+           The maximum number of directories that ``vcprompt`` will traverse
+           in order to find a version control system.
+
+           Defaults to 0 (no limit).
+
+
+       ``systems``
+
+           A list of systems for ``vcprompt`` to search for over the given
+           ``path``.
+
+           Defaults to all systems.
+
+    """
+
     paths = os.path.abspath(os.path.expanduser(path)).split('/')
     depth = kwargs.get('depth', 0)
     systems = kwargs.get('systems', None)
@@ -102,14 +178,6 @@ def vcprompt(path, formats, unknown, *args, **kwargs):
                 break
             count += 1
     return ''
-
-
-def version(*args):
-    v = '.'.join(map(str, __version__))
-    if '-v' in args or '--version' in args:
-        print "vcprompt", v
-        sys.exit(0)
-    return v
 
 
 def main():
