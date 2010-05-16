@@ -257,7 +257,7 @@ def bzr(path, string, unknown):
 
     branch = revision = hash = status = unknown
 
-    # local revision number
+    # local revision or global hash
     if re.search('%(r|h)', string):
         with open(file, 'r') as f:
             line = f.read().strip()
