@@ -1,4 +1,29 @@
 #!/usr/bin/env python
+"""
+    vcprompt
+    ~~~~~~~~
+
+    Version control information in your prompt.
+
+    Nutshell
+    --------
+
+    Super simple::
+
+        $ vcprompt
+
+
+    Formatting::
+
+        $ vcprompt --format "%s:%b"
+
+
+    Using on a different path::
+
+        $ vcprompt --path /path/to/somewhere
+
+"""
+
 from __future__ import with_statement
 from subprocess import Popen, PIPE
 import optparse
