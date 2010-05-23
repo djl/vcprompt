@@ -1,7 +1,8 @@
 0.1.4 (2010-??-??)
 ------------------
 
-* Bazaar now returns the current hash when using the '%h' format argument
+* Fixed: The '%h' format argument now works correctly with Bazaar
+* Changed: The help output is slightly less ugly
 
 
 0.1.3 (2010-04-26)
