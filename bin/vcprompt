@@ -1,27 +1,35 @@
 #!/usr/bin/env python
 """
-    vcprompt
-    ~~~~~~~~
+Usage: vcprompt [options]
 
-    Version control information in your prompt.
+Version control information in your prompt.
 
-    Nutshell
-    --------
+Options:
+  -f, --format FORMAT        The format string to use.
+  -p, --path PATH            The path to run vcprompt on.
+  -d, --max-depth DEPTH      The maximum number of directories to traverse.
+  -s, --systems SYSTEMS      The version control systems to use.
+  -u, --unknown UNKNOWN      The "unknown" value.
+  -v, --version              Show program's version number and exit
+  -h, --help                 Show this help message and exit
 
-    Super simple::
+VCS-specific formatting:
+  These options can be used for VCS-specific prompt formatting.
 
-        $ vcprompt
+  --format-bzr FORMAT        Bazaar
+  --format-cvs FORMAT        CVS
+  --format-darcs FORMAT      Darcs
+  --format-fossil FORMAT     Fossil
+  --format-git FORMAT        Git
+  --format-hg FORMAT         Mercurial
+  --format-svn FORMAT        Subversion
 
+Internal options:
+  These options are used internally or for testing. Use of these is not
+  recommended.
 
-    Formatting::
-
-        $ vcprompt --format "%s:%b"
-
-
-    Using on a different path::
-
-        $ vcprompt --path /path/to/somewhere
-
+  --values [VALUES]        Prints the values of the "format", "path" and
+                           "unknown" options.
 """
 
 from __future__ import with_statement
@@ -205,73 +213,70 @@ def vcprompt(path, formats, unknown, *args, **kwargs):
     return ''
 
 
+def helper(*args, **kwargs):
+    """
+    Prints the module's docstring.
+
+    Doing this kills two birds with one stone: it adds PEP 257
+    compliance and allows us to stop using optparse's built-in
+    help flag.
+
+    """
+    print __doc__.strip()
+    sys.exit(0)
+
+
 def main():
     # parser
     parser = optparse.OptionParser()
-    parser.description = "Version control information in your prompt."
+
+    # dump the provided --help option
+    parser.remove_option('--help')
+
+    # our own --help flag
+    parser.add_option('-h', '--help', action='callback', callback=helper)
 
     # format
-    parser.add_option('-f', '--format', dest='format',
-                      default=FORMAT, help='The format string to use.')
+    parser.add_option('-f', '--format', dest='format', default=FORMAT)
 
     # path
-    parser.add_option('-p', '--path', dest='path',
-                      default='.', help='The path to run vcprompt on.')
+    parser.add_option('-p', '--path', dest='path', default='.')
 
     # max depth
     parser.add_option('-d', '--max-depth', dest='depth', type='int',
-                      default=DEPTH,
-                      help='The maximum number of directories to traverse. ' \
-                            'Defaults to 0 (infinite).')
+                      default=DEPTH)
     # systems
-    parser.add_option('-s', '--systems', dest='systems', action='append',
-                      help='The version control systems to use.')
+    parser.add_option('-s', '--systems', dest='systems', action='append')
 
     # unknown
-    parser.add_option('-u', '--unknown', dest='unknown', default=UNKNOWN,
-                      help='The "unknown" value.')
+    parser.add_option('-u', '--unknown', dest='unknown', default=UNKNOWN)
 
     # version
-    parser.add_option('-v', '--version', action='callback', callback=version,
-                      help="show program's version number and exit")
+    parser.add_option('-v', '--version', action='callback', callback=version)
 
+    # values
+    parser.add_option('--values', dest='values', action='callback',
+                      callback=values)
 
-    # per-VCS formatting
-    group = optparse.OptionGroup(parser, "VCS-specific formatting",
-                                 "These options can be used for VCS-specific" \
-                                 " prompt formatting.")
-
+    # vcs-specific formatting
     for system in SYSTEMS:
         default = 'VCPROMPT_FORMAT_%s' % system.func_name.upper()
         default = os.environ.get(default, None)
         dest = 'format-%s' % system.func_name
         flag = '--%s' % dest
-        help = 'The format string to use for %s' % system.name
-        group.add_option(flag, dest=dest, default=default, metavar="FORMAT",
-                         help=system.name)
-    parser.add_option_group(group)
+        parser.add_option(flag, dest=dest, default=default, metavar="FORMAT")
 
-
-    # internally used stuff
-    group = optparse.OptionGroup(parser, "Internal options",
-                                 "These options are used internally or for " \
-                                 "testing. Use of these is not recommended.")
-    # values
-    group.add_option('--values', dest='values', action='callback',
-                     callback=values,
-                     help='Prints the values of the "format", "path" ' \
-                          'and "unknown" options.')
-
-    parser.add_option_group(group)
 
     # parse!
     options, args = parser.parse_args()
 
-    sys.stdout.write(vcprompt(depth=options.depth,
-                              formats=options.__dict__,
-                              path=options.path,
-                              systems=options.systems,
-                              unknown=options.unknown))
+    output = vcprompt(depth=options.depth,
+                      formats=options.__dict__,
+                      path=options.path,
+                      systems=options.systems,
+                      unknown=options.unknown)
+
+    print output
 
 
 @vcs('Bazaar', 'The Bazaar version control system')
