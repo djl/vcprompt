@@ -19,16 +19,8 @@ Installing
 ::
 
     # assuming ~/bin is on your $PATH
-    $ curl -s http://github.com/xvzf/vcprompt/raw/master/bin/vcprompt >> ~/bin/vcprompt
+    $ curl -s http://github.com/xvzf/vcprompt/raw/master/bin/vcprompt > ~/bin/vcprompt
     $ chmod 755 ~/bin/vcprompt
-
-
-Although not really recommended, ``vcprompt`` can be installed via PyPi:
-
-::
-
-    $ easy_install vcprompt
-
 
 
 
@@ -93,8 +85,8 @@ bundled manpages.
 Requirements
 ------------
 
-* Python 2.5 - 2.X
-* Python 3.x (with 2to3)
+* Python 2.5+
+* Python 3.0+ (with 2to3)
 
 
 
@@ -102,7 +94,8 @@ Requirements
 Testing
 -------
 
-If you *really* want to run the tests, you have jump through some hoops first.
+If you *really* want to run the tests, you have to jump through some hoops
+first.
 
 After cloning the repository, you need to do the following:
 
@@ -121,4 +114,3 @@ TODO
 ----
 
 * More complete support and tests for CVS
-* ReST-based documentation to go along with manpages
