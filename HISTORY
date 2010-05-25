@@ -1,4 +1,4 @@
-0.1.4 (2010-??-??)
+0.1.4 (2010-05-25)
 ------------------
 
 * Fixed: The '%h' format argument now works correctly with Bazaar
