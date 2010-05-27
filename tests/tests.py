@@ -39,7 +39,7 @@ class Base(unittest.TestCase):
             commands.append("--%s" % key)
             commands.append(value)
         process = subprocess.Popen(commands, stdout=subprocess.PIPE)
-        return process.communicate()[0]
+        return process.communicate()[0].strip()
 
 
 class BaseTest(object):
