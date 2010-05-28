@@ -28,10 +28,10 @@ Internal options:
   These options are used internally or for testing. Use of these is not
   recommended.
 
-  --values [VALUES]        Prints the values of the "format", "path" and
-                           "unknown" options.
+  --values OPTIONS         Prints the values of the given `OPTIONS` to stdout.
   --without-environment    Ignore any environment variables and fall back to
-                           just the provided (or default) values.
+                           just the provided (or default) values. If used, this
+                           option must come before any other provided options.
 """
 
 from __future__ import with_statement
@@ -286,7 +286,7 @@ def main():
         default = os.environ.get(default, None)
         dest = 'format-%s' % system.func_name
         flag = '--%s' % dest
-        parser.add_option(flag, dest=dest, default=default, metavar="FORMAT")
+        parser.add_option(flag, dest=dest, default=default)
 
 
     # parse!

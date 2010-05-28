@@ -73,9 +73,7 @@
 <code>vcprompt</code> --path <var>PATH</var><br />
 <code>vcprompt</code> --max-depth <var>DEPTH</var>
 <code>vcprompt</code> --unknown <var>UNKNOWN</var><br />
-<code>vcprompt</code> --systems <var>SYSTEMS</var>
-<code>vcprompt</code> --values <var>OPTIONS</var><br />
-</p>
+<code>vcprompt</code> --systems <var>SYSTEMS</var></p>
 
 <h2>DESCRIPTION</h2>
 
@@ -108,35 +106,33 @@ $ [sudo] python setup.py install
 <p><code>vcprompt</code> takes a few options:</p>
 
 <dl>
-<dt><code>-f</code>, <code>--format</code></dt><dd><p>The format string to use when displaying information.</p>
+<dt><code>-f</code>, <code>--format</code>=FORMAT</dt><dd><p>The format string to use when displaying information.</p>
 
 <p>If not provided this will fall back onto the <code>VCPROMPT_FORMAT</code>
 environment variable or the hard-coded string inside of
 the <code>vprompt</code> binary.</p></dd>
-<dt><code>--format-&lt;SYSTEM></code></dt><dd><p>The format string to be used for a specific version control system.
+<dt><code>--format-&lt;SYSTEM></code>=FORMAT</dt><dd><p>The format string to be used for a specific version control system.
 If a system's formatting is not explicitly specified, it will
 automatically fall back onto the value of the <code>--format</code> flag.</p></dd>
-<dt><code>-p</code>, <code>--path</code></dt><dd><p>The path to for vcprompt to start looking for a version control
+<dt><code>-p</code>, <code>--path</code>=PATH</dt><dd><p>The path to for vcprompt to start looking for a version control
 repository.</p>
 
 <p>Defaults to '.'.</p></dd>
-<dt><code>-u</code>, <code>--unknown</code></dt><dd><p>The value to use when <code>vcprompt</code> is unable to determine the
+<dt><code>-u</code>, <code>--unknown</code>=UNKNOWN</dt><dd><p>The value to use when <code>vcprompt</code> is unable to determine the
 appropriate output for a formatting option.</p>
 
 <p>If not provided will fall back onto the <code>VCPROMPT_UNKNOWN</code>
 environment variable or the hard-coded string inside of the <code>vcprompt</code>
 binary.</p></dd>
-<dt><code>-d</code>, <code>--max-depth</code></dt><dd><p>The maximum number of directories <code>vcprompt</code> will traverse in order to
+<dt><code>-d</code>, <code>--max-depth</code>=DEPTH</dt><dd><p>The maximum number of directories <code>vcprompt</code> will traverse in order to
 find a version control system.</p>
 
 <p>A non-positive number indicates an infinite depth.</p>
 
 <p>Defaults to 0 (no limit).</p></dd>
-<dt><code>-s</code>, <code>--systems</code></dt><dd><p>The systems <code>vcprompt</code> will use when traversing over directories.</p>
+<dt><code>-s</code>, <code>--systems</code>=SYSTEMS</dt><dd><p>The systems <code>vcprompt</code> will use when traversing over directories.</p>
 
 <p>Defaults to all available systems.</p></dd>
-<dt><code>--values</code></dt><dd><p>Prints the values of the given OPTIONS to stdout if they exist.
-This is used internally for testing but is included here for completeness.</p></dd>
 </dl>
 
 
@@ -154,6 +150,9 @@ it's own environment variable.</p></li>
 <li><p><code>VCPROMPT_UNKNOWN</code>:
 The value to be used when <code>vcprompt</code> is unable to determine the
 output for a formatting option.</p></li>
+<li><p><code>VCPROMPT_DEPTH</code>:
+The maximum number of directories <code>vcprompt</code> should traverse when looking
+for a usable version control system.</p></li>
 </ul>
 
 
@@ -164,7 +163,7 @@ output for a formatting option.</p></li>
 
 <ol class='foot man'>
   <li class='tl'></li>
-  <li class='tc'>April 2010</li>
+  <li class='tc'>May 2010</li>
   <li class='tr'>vcprompt(1)</li>
 </ol>
 

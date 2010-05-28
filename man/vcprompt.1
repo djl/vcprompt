@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.5
 .\" http://github.com/rtomayko/ronn/
 .
-.TH "VCPROMPT" "1" "April 2010" "" ""
+.TH "VCPROMPT" "1" "May 2010" "" ""
 .
 .SH "NAME"
 \fBvcprompt\fR \-\- Version control information in your prompt
@@ -19,12 +19,13 @@
 \fBvcprompt\fR \-\-path \fIPATH\fR
 .
 .br
-\fBvcprompt\fR \-\-max\-depth \fIDEPTH\fR \fBvcprompt\fR \-\-unknown \fIUNKNOWN\fR
+\fBvcprompt\fR \-\-max\-depth \fIDEPTH\fR
 .
 .br
-\fBvcprompt\fR \-\-systems \fISYSTEMS\fR \fBvcprompt\fR \-\-values \fIOPTIONS\fR
+\fBvcprompt\fR \-\-unknown \fIUNKNOWN\fR
 .
 .br
+\fBvcprompt\fR \-\-systems \fISYSTEMS\fR
 .
 .SH "DESCRIPTION"
 vcprompt is a small utility for displaying version control information
@@ -77,7 +78,7 @@ $ [sudo] easy_install vcprompt
 \fBvcprompt\fR takes a few options:
 .
 .TP
-\fB\-f\fR, \fB\-\-format\fR
+\fB\-f\fR, \fB\-\-format\fR=FORMAT
 The format string to use when displaying information.
 .
 .IP
@@ -86,13 +87,13 @@ environment variable or the hard\-coded string inside of
 the \fBvprompt\fR binary.
 .
 .TP
-\fB\-\-format\-<SYSTEM>\fR
+\fB\-\-format\-<SYSTEM>\fR=FORMAT
 The format string to be used for a specific version control system.
 If a system's formatting is not explicitly specified, it will
 automatically fall back onto the value of the \fB\-\-format\fR flag.
 .
 .TP
-\fB\-p\fR, \fB\-\-path\fR
+\fB\-p\fR, \fB\-\-path\fR=PATH
 The path to for vcprompt to start looking for a version control
 repository.
 .
@@ -100,7 +101,7 @@ repository.
 Defaults to '.'.
 .
 .TP
-\fB\-u\fR, \fB\-\-unknown\fR
+\fB\-u\fR, \fB\-\-unknown\fR=UNKNOWN
 The value to use when \fBvcprompt\fR is unable to determine the
 appropriate output for a formatting option.
 .
@@ -110,7 +111,7 @@ environment variable or the hard\-coded string inside of the \fBvcprompt\fR
 binary.
 .
 .TP
-\fB\-d\fR, \fB\-\-max\-depth\fR
+\fB\-d\fR, \fB\-\-max\-depth\fR=DEPTH
 The maximum number of directories \fBvcprompt\fR will traverse in order to
 find a version control system.
 .
@@ -121,16 +122,11 @@ A non\-positive number indicates an infinite depth.
 Defaults to 0 (no limit).
 .
 .TP
-\fB\-s\fR, \fB\-\-systems\fR
+\fB\-s\fR, \fB\-\-systems\fR=SYSTEMS
 The systems \fBvcprompt\fR will use when traversing over directories.
 .
 .IP
 Defaults to all available systems.
-.
-.TP
-\fB\-\-values\fR
-Prints the values of the given OPTIONS to stdout if they exist.
-This is used internally for testing but is included here for completeness.
 .
 .SH "ENVIRONMENT"
 .
@@ -151,6 +147,11 @@ it's own environment variable.
 \fBVCPROMPT_UNKNOWN\fR:
 The value to be used when \fBvcprompt\fR is unable to determine the
 output for a formatting option.
+.
+.IP "\(bu" 4
+\fBVCPROMPT_DEPTH\fR:
+The maximum number of directories \fBvcprompt\fR should traverse when looking
+for a usable version control system.
 .
 .IP "" 0
 .

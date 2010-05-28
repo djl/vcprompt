@@ -7,10 +7,9 @@ vcprompt(1) -- Version control information in your prompt
 `vcprompt` --format <FORMAT>  
 `vcprompt` --format-<SYSTEM> <FORMAT>  
 `vcprompt` --path <PATH>  
-`vcprompt` --max-depth <DEPTH>
+`vcprompt` --max-depth <DEPTH>  
 `vcprompt` --unknown <UNKNOWN>  
 `vcprompt` --systems <SYSTEMS>
-`vcprompt` --values <OPTIONS>  
 
 
 ## DESCRIPTION
@@ -44,25 +43,25 @@ Although not really recommended, `vcprompt` can be installed from PyPi:
 
 `vcprompt` takes a few options:
 
-  * `-f`, `--format`:
+  * `-f`, `--format`=FORMAT:
     The format string to use when displaying information.
 
     If not provided this will fall back onto the `VCPROMPT_FORMAT`
     environment variable or the hard-coded string inside of
     the `vprompt` binary.
 
-  * `--format-<SYSTEM>`:
+  * `--format-<SYSTEM>`=FORMAT:
     The format string to be used for a specific version control system.
     If a system's formatting is not explicitly specified, it will
     automatically fall back onto the value of the `--format` flag.
 
-  * `-p`, `--path`:
+  * `-p`, `--path`=PATH:
     The path to for vcprompt to start looking for a version control
     repository.
 
     Defaults to '.'.
 
-  * `-u`, `--unknown`:
+  * `-u`, `--unknown`=UNKNOWN:
     The value to use when `vcprompt` is unable to determine the
     appropriate output for a formatting option.
 
@@ -70,7 +69,7 @@ Although not really recommended, `vcprompt` can be installed from PyPi:
     environment variable or the hard-coded string inside of the `vcprompt`
     binary.
     
-  * `-d`, `--max-depth`:
+  * `-d`, `--max-depth`=DEPTH:
     The maximum number of directories `vcprompt` will traverse in order to
     find a version control system.
 
@@ -78,14 +77,10 @@ Although not really recommended, `vcprompt` can be installed from PyPi:
 
     Defaults to 0 (no limit).
 
-  * `-s`, `--systems`:
+  * `-s`, `--systems`=SYSTEMS:
     The systems `vcprompt` will use when traversing over directories.
 
     Defaults to all available systems.
-
-  * `--values`:
-    Prints the values of the given OPTIONS to stdout if they exist.
-    This is used internally for testing but is included here for completeness.
 
 
 
@@ -104,6 +99,10 @@ Although not really recommended, `vcprompt` can be installed from PyPi:
   * `VCPROMPT_UNKNOWN`:
     The value to be used when `vcprompt` is unable to determine the
     output for a formatting option.
+
+  * `VCPROMPT_DEPTH`:
+    The maximum number of directories `vcprompt` should traverse when looking
+	for a usable version control system.
 
 
 ## SEE ALSO
