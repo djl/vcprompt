@@ -30,6 +30,8 @@ Internal options:
 
   --values [VALUES]        Prints the values of the "format", "path" and
                            "unknown" options.
+  --without-environment    Ignore any environment variables and fall back to
+                           just the provided (or default) values.
 """
 
 from __future__ import with_statement
@@ -41,6 +43,25 @@ import sqlite3
 import sys
 
 __version__ = (0, 1, 4)
+
+
+# check to make sure the '--without-environment' flag is called first
+# this could be done in a callback, but we'd have to keep a note of every
+# option which is affected by this flag
+if '--without-environment' in sys.argv and \
+   sys.argv[1] != '--without-environment':
+    print "The '--without-environment' option must be called before any other"
+    print "options."
+    sys.exit(1)
+
+# we need to get this in early because callbacks are always called after
+# every other option is already set, regardless of when the callback option
+# is actually used in the script
+if len(sys.argv) > 1 and sys.argv[1] == '--without-environment':
+    for k in os.environ.keys():
+        if k.startswith('VCPROMPT'):
+            del os.environ[k]
+    del sys.argv[1]
 
 DEPTH = os.environ.get('VCPROMPT_DEPTH', 0)
 FORMAT = os.environ.get('VCPROMPT_FORMAT', '%s:%b')
@@ -140,6 +161,7 @@ def vcs(name, description):
              "The fast version continue system".
 
     """
+
     def wrapped(function):
         function.name = name
         function.description = name
@@ -551,7 +573,7 @@ def hg(path, string, unknown):
         with open(file, 'r') as f:
             for line in f:
                 hash, revision_branch = line.split()
-                hash = hash [:7]
+                hash = hash[:7]
                 if count > 0:
                     branch = revision_branch
                 else:
