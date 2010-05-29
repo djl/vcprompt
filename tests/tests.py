@@ -9,6 +9,8 @@ import unittest
 
 class Base(unittest.TestCase):
 
+    commands = ['../bin/vcprompt', '--without-environment']
+
     def file(self, path):
         file = os.path.join(self.repository, path)
         return file
@@ -20,14 +22,13 @@ class Base(unittest.TestCase):
         return location
 
     def unknown(self):
-        process = subprocess.Popen('../bin/vcprompt --values UNKNOWN'.split(),
-                                   stdout=subprocess.PIPE)
+        commands = Base.commands + ['--values', 'UNKNOWN']
+        process = subprocess.Popen(commands, stdout=subprocess.PIPE)
         output = process.communicate()[0].strip()
         return output
 
     def vcprompt(self, environment=False, *args, **kwargs):
-        commands = ['../bin/vcprompt', '--without-environment',
-                    '--path', self.repository]
+        commands = Base.commands + ['--path', self.repository]
         for key, value in kwargs.items():
             key = key.replace('_', '-')
             commands.append("--%s" % key)
