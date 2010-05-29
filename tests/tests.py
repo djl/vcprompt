@@ -123,7 +123,6 @@ class Fossil(Base, BaseTest):
     def setUp(self):
         self.repository = self.repo('fossil')
         self.repository_file = 'fossil'
-        self.repository_db = os.path.join(self.repository, '_FOSSIL_')
         self.open()
 
     def tearDown(self):
