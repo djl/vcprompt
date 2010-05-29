@@ -42,7 +42,6 @@ class BaseTest(object):
     def test_depth(self, path='foo/bar/baz', depth='0', format='%s'):
         path = os.path.join(self.repository, path)
         output = self.vcprompt(path=path, max_depth=depth, format=format)
-        # TODO find a less hacky way to do this
         self.assertEquals(output, self.repository.rsplit('/')[-1])
 
     def test_depth_limited(self, path='foo/bar/baz', depth='2'):

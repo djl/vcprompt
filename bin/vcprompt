@@ -63,6 +63,7 @@ if len(sys.argv) > 1 and sys.argv[1] == '--without-environment':
             del os.environ[k]
     del sys.argv[1]
 
+
 DEPTH = os.environ.get('VCPROMPT_DEPTH', 0)
 FORMAT = os.environ.get('VCPROMPT_FORMAT', '%s:%b')
 UNKNOWN = os.environ.get('VCPROMPT_UNKNOWN', '(unknown)')
@@ -203,6 +204,8 @@ def vcprompt(path, formats, unknown, *args, **kwargs):
             A dictionary mapping version control systems to formatting
             strings to use for said system.
 
+            The default format key should be named 'default'.
+
          ``unknown``
              The string to use for when ``vcprompt`` cannot determine a
              value.
@@ -236,8 +239,7 @@ def vcprompt(path, formats, unknown, *args, **kwargs):
         paths.pop()
         for vcs in SYSTEMS:
             if not systems or systems and vcs.func_name in systems:
-                vcs_format = "format-%s" % vcs.func_name
-                format = formats[vcs_format] or formats['format']
+                format = formats[vcs.func_name] or formats['default']
                 prompt = vcs(path, format, unknown)
                 if prompt:
                     return prompt
@@ -292,13 +294,19 @@ def main():
     # parse!
     options, args = parser.parse_args()
 
-    output = vcprompt(depth=options.depth,
-                      formats=options.__dict__,
-                      path=options.path,
-                      systems=options.systems,
-                      unknown=options.unknown)
+    # break out formats into their own dictionary
+    formats = {}
+    for k, v in options.__dict__.iteritems():
+        if k.startswith('format'):
+            k = k.split('format-')[-1]
+            if k == 'format':
+                k = 'default'
+            formats[k] = v
 
-    print output
+    output = vcprompt(depth=options.depth, formats=formats, path=options.path,
+                      systems=options.systems, unknown=options.unknown)
+
+    return output
 
 
 @vcs('Bazaar', 'The Bazaar version control system')
@@ -662,4 +670,4 @@ def svn(path, string, unknown):
 
 
 if __name__ == '__main__':
-    main()
+    print main()
