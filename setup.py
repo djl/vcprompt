@@ -31,6 +31,8 @@ setup(
     scripts=['bin/vcprompt'],
     license='BSD',
     description='Version control information in your prompt (or anywhere!).',
+    data_files=[('man/man1', ['man/vcprompt.1']),
+                ('man/man5', ['man/vcprompt.5']),],
     long_description=__doc__,
     classifiers=[
         'Development Status :: 3 - Alpha'
