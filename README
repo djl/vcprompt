@@ -23,6 +23,15 @@ Installing
     $ chmod 755 ~/bin/vcprompt
 
 
+Alternatively, you can clone the repository and run setup.py manually:
+
+::
+
+    $ git clone git://github.com/xvzf/vcprompt.git
+    $ cd vcprompt
+    $ python setup.py install
+
+
 
 Setting up your prompt
 ----------------------
