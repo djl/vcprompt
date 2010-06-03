@@ -320,9 +320,11 @@ def bzr(path, string, unknown):
     # local revision or global hash
     if re.search('%(r|h)', string):
         with open(file, 'r') as f:
-            line = f.read().strip()
-            revision = line.split()[0]
-            hash = line.rsplit('-', 1)[0][:7]
+            for line in f:
+                line = line.strip()
+                revision = line.split()[0]
+                hash = line.rsplit('-', 1)[0][:7]
+                break
 
 
     # status
@@ -389,8 +391,10 @@ def darcs(path, string, unknown):
     # hash
     if re.search('%(h|r)', string):
         with open(file, 'r') as f:
-            size, hash = f.read().strip().split('\n')[0].split('-')
-            hash = hash[:7]
+            for line in f:
+                size, hash = line.strip().split('-')
+                hash = hash[:7]
+                break
 
     # branch
     # darcs doesn't have in-repo local branching (yet)
@@ -447,7 +451,9 @@ def fossil(path, string, unknown):
     manifest = os.path.join(path, 'manifest.uuid')
     if os.path.exists(manifest):
         with open(manifest, 'r') as f:
-            hash = f.read().strip()[:7]
+            for line in f:
+                hash = line.strip()[:7]
+                break
 
     # branch
     if hash != unknown:
@@ -514,17 +520,19 @@ def git(path, string, unknown):
     if re.search('%(b|r|h)', string):
         branch_file = os.path.join(file, 'HEAD')
         with open(branch_file, 'r') as f:
-            line = f.read()
-
-            # check if we're currently running on a branch
-            if re.match('^ref: refs/heads/', line.strip()):
-                branch = (line.split('/')[-1] or unknown).strip()
+            for line in f:
+                line = line.strip()
+                if re.match('^ref: refs/heads/', line.strip()):
+                    branch = (line.split('/')[-1] or unknown).strip()
+                    break
 
         # hash/revision
         if re.search('%(r|h)', string) and branch != unknown:
             hash_file = os.path.join(file, 'refs/heads/%s' % branch)
             with open(hash_file, 'r') as f:
-                hash = f.read().strip()[0:7]
+                for line in f:
+                    hash = line.strip()[0:7]
+                    break
 
     # status
     if '%i' in string:
@@ -572,8 +580,10 @@ def hg(path, string, unknown):
         cache_file = os.path.join(path, '.hg/tags.cache')
         if os.path.exists(cache_file):
             with open(cache_file, 'r') as f:
-                revision, hash = f.read().split()
-                hash = hash[:7]
+                for line in f:
+                    revision, hash = line.strip().split()
+                    hash = hash[:7]
+                    break
 
     # branch
     if re.search('%(r|h|b)', string):
@@ -584,6 +594,7 @@ def hg(path, string, unknown):
                 hash = hash[:7]
                 if count > 0:
                     branch = revision_branch
+                    break
                 else:
                     revision = revision_branch
                 count += 1
