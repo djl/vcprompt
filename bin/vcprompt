@@ -353,8 +353,7 @@ def bzr(path, string, unknown):
 
             status = sorted_alpha(status)
 
-    # branch
-    # TODO figure out something more correct
+    # formatting
     string = string.replace('%b', os.path.basename(path))
     string = string.replace('%h', hash)
     string = string.replace('%r', revision)
@@ -371,10 +370,12 @@ def cvs(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = revision = unknown
+    branch = revision = status = unknown
 
     string = string.replace('%s', 'cvs')
     string = string.replace('%b', branch)
+    string = string.replace('%i', status)
+    string = string.replace('%h', revision)
     string = string.replace('%r', revision)
     return string
 
@@ -388,6 +389,7 @@ def darcs(path, string, unknown):
         return None
 
     hash = branch = status = unknown
+
     # hash
     if re.search('%(h|r)', string):
         with open(file, 'r') as f:
@@ -397,9 +399,9 @@ def darcs(path, string, unknown):
                 break
 
     # branch
-    # darcs doesn't have in-repo local branching (yet)
-    # http://bugs.darcs.net/issue555
-    # until it does, or I can think of something better, this'll have to do
+    # darcs doesn't have in-repo local branching (yet), so just use
+    # the directory name for now
+    # see also: http://bugs.darcs.net/issue555
     branch = os.path.basename(path)
 
     # status
@@ -427,7 +429,6 @@ def darcs(path, string, unknown):
 
 @vcs('Fossil', 'The Fossil version control system.')
 def fossil(path, string, unknown):
-    # In my five minutes of playing with Fossil this looks OK
     file = os.path.join(path, '_FOSSIL_')
     if not os.path.exists(file):
         return None
