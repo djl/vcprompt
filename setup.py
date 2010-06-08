@@ -24,7 +24,7 @@ from distutils.core import setup
 
 setup(
     name='vcprompt',
-    version=commands.getoutput('./bin/vcprompt --version'),
+    version=commands.getoutput('./bin/vcprompt --version').split()[-1],
     author='David Logie',
     author_email='david@davidlogie.com',
     url='http://github.com/xvzf/vcprompt',

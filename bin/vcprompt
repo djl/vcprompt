@@ -182,10 +182,8 @@ def version(*args):
 
     """
     v = '.'.join(map(str, __version__))
-    if '-v' in args or '--version' in args:
-        print "vcprompt", v
-        sys.exit(0)
-    return v
+    print "vcprompt", v
+    sys.exit(0)
 
 
 def vcprompt(path, formats, unknown, *args, **kwargs):
