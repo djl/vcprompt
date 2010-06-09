@@ -173,13 +173,7 @@ def vcs(name, description):
 
 def version(*args):
     """
-    Convenience function for returning a version number.
-
-    If *args contains '-v' or '--version', it prints the version string
-    to stdout.
-
-    Otherwise, it returns the version string.
-
+    Convenience function for printing a version number.
     """
     v = '.'.join(map(str, __version__))
     print "vcprompt", v
