@@ -1,2 +1,2 @@
-include HISTORY LICENSE MANIFEST.in
+include HISTORY LICENSE README
 recursive-include man/ *.[0-9]
