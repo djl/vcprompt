@@ -42,7 +42,7 @@ import re
 import sqlite3
 import sys
 
-__version__ = (0, 1, 4)
+__version__ = (0, 1, 5)
 
 
 # check to make sure the '--without-environment' flag is called first
@@ -175,8 +175,7 @@ def version(*args):
     """
     Convenience function for printing a version number.
     """
-    v = '.'.join(map(str, __version__))
-    print "vcprompt", v
+    print 'vcprompt %s' % '.'.join(map(str, __version__))
     sys.exit(0)
 
 
