@@ -139,7 +139,7 @@ def values(option, opt, value, parser, *args, **kwargs):
     This function is *private* and should not be relied on.
     """
     for option in parser.rargs:
-        if option == 'systems':
+        if option == 'SYSTEMS':
             systems()
         if option in globals().keys():
             print globals()[option]

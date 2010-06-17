@@ -3,7 +3,8 @@
 
 * Added: New '--without-environment' option for ignoring environment variables.
 * Fixed: CVS is now aware of all formatting arguments.
-* Fixed: Setup.py now uses the correct version number
+* Fixed: Setup.py now uses the correct version number.
+* Fixed: '--values SYSTEMS' now works correctly.
 
 
 0.1.4 (2010-05-25)
