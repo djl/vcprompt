@@ -50,8 +50,8 @@ __version__ = (0, 1, 5)
 # option which is affected by this flag
 if '--without-environment' in sys.argv and \
    sys.argv[1] != '--without-environment':
-    print "The '--without-environment' option must be called before any other"
-    print "options."
+    output = "The '--without-environment' option must come before any "
+    print "%s other options." % output
     sys.exit(1)
 
 # we need to get this in early because callbacks are always called after
