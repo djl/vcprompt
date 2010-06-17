@@ -125,7 +125,7 @@ def sorted_alpha(sortme, unique=True):
 def systems():
     """Prints all available systems to stdout."""
     for system in SYSTEMS:
-        name = getattr(system, 'name', system.func_name)
+        name = getattr(system, 'name', system.__name__)
         desc = getattr(system, 'description', '')
         output = "%s: %s" % (name, desc)
         print output
@@ -229,8 +229,8 @@ def vcprompt(path, formats, unknown, *args, **kwargs):
         path = '/'.join(paths)
         paths.pop()
         for vcs in SYSTEMS:
-            if not systems or systems and vcs.func_name in systems:
-                format = formats[vcs.func_name] or formats['default']
+            if not systems or systems and vcs.__name__ in systems:
+                format = formats[vcs.__name__] or formats['default']
                 prompt = vcs(path, format, unknown)
                 if prompt:
                     return prompt
@@ -275,9 +275,9 @@ def main():
 
     # vcs-specific formatting
     for system in SYSTEMS:
-        default = 'VCPROMPT_FORMAT_%s' % system.func_name.upper()
+        default = 'VCPROMPT_FORMAT_%s' % system.__name__.upper()
         default = os.environ.get(default, None)
-        dest = 'format-%s' % system.func_name
+        dest = 'format-%s' % system.__name__
         flag = '--%s' % dest
         parser.add_option(flag, dest=dest, default=default)
 
@@ -287,7 +287,7 @@ def main():
 
     # break out formats into their own dictionary
     formats = {}
-    for k, v in options.__dict__.iteritems():
+    for k, v in options.__dict__.items():
         if k.startswith('format'):
             k = k.split('format-')[-1]
             if k == 'format':
