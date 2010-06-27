@@ -521,10 +521,11 @@ def git(path, string, unknown):
         # hash/revision
         if re.search('%(r|h)', string) and branch != unknown:
             hash_file = os.path.join(file, 'refs/heads/%s' % branch)
-            with open(hash_file, 'r') as f:
-                for line in f:
-                    hash = line.strip()[0:7]
-                    break
+            if os.path.exists(hash_file):
+                with open(hash_file, 'r') as f:
+                    for line in f:
+                        hash = line.strip()[0:7]
+                        break
 
     # status
     if '%i' in string:
