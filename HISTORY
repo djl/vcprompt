@@ -2,6 +2,7 @@
 ------------------
 
 * Added: New '--without-environment' option for ignoring environment variables.
+* Changed: Test repositories are stored externally now to prevent possible corruption (current exceptions are Darcs and Fossil)
 * Fixed: CVS is now aware of all formatting arguments.
 * Fixed: Setup.py now uses the correct version number.
 * Fixed: '--values SYSTEMS' now works correctly.
