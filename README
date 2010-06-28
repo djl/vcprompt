@@ -102,22 +102,17 @@ Requirements
 Testing
 -------
 
-If you *really* want to run the tests, you have to jump through some hoops
-first.
-
-After cloning the repository, you need to do the following:
+To run the tests, just the provide Makefile:
 
 ::
 
-    # update/init the submodule
-    git submodule update --init
+    make test
 
-    # clone the SVN repo
-    svn checkout http://svn.github.com/xvzf/quotes.git tests/repositories/svn
 
-    # clone the Mercurial repository
-    hg clone http://xvzf@bitbucket.org/xvzf/quotes tests/repositories/hg
+A few notes on testing:
 
+* Tests have to fetch remote repositories, so network access is required
+* Fetching remote repositories requires each VCS to be installed
 
 
 
