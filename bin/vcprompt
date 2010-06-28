@@ -313,8 +313,12 @@ def bzr(path, string, unknown):
         with open(file, 'r') as f:
             for line in f:
                 line = line.strip()
-                revision = line.split()[0]
-                hash = line.rsplit('-', 1)[0][:7]
+                revision, hash = line.split(' ', 1)
+                # compensate for empty Bazaar repositories
+                if hash == "null:":
+                    hash = unknown
+                else:
+                    hash = hash.rsplit('-', 1)[0][:7]
                 break
 
 
