@@ -7,6 +7,11 @@ fetch-submodules:
 	@echo "Updating Git submodules..."
 	@git submodule updating --init
 
+fetch-bzr:
+	@echo "Branching Bazaar repository"
+	@[ -d tests/repositories/bzr ] && rm -rf tests/repositories/bzr
+	@bzr branch lp:~davidlogie/vcprompt-quotes/trunk tests/repositories/bzr
+
 fetch-hg:
 	@echo "Cloning Mercurial repository"
 	@[ -d tests/repositories/hg ] && rm -rf tests/repositories/hg

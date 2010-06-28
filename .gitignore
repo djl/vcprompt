@@ -4,6 +4,7 @@
 build/
 dist/
 MANIFEST
+tests/repositories/bzr
 tests/repositories/fossil/manifest*
 tests/repositories/fossil/_FOSSIL_*
 tests/repositories/fossil/.fos*
