@@ -5,7 +5,7 @@ help:
 
 fetch-submodules:
 	@echo "Updating Git submodules..."
-	@git submodule updating --init > /dev/null 2>&1
+	@git submodule update --init > /dev/null 2>&1
 
 fetch-bzr:
 	@echo "Branching Bazaar repository..."
