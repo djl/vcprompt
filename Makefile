@@ -5,28 +5,26 @@ help:
 
 fetch-submodules:
 	@echo "Updating Git submodules..."
-	@git submodule updating --init
+	@git submodule updating --init > /dev/null 2>&1
 
 fetch-bzr:
-	@echo "Branching Bazaar repository"
-	@[ -d tests/repositories/bzr ] && rm -rf tests/repositories/bzr
-	@bzr branch lp:~davidlogie/vcprompt-quotes/trunk tests/repositories/bzr
+	@echo "Branching Bazaar repository..."
+	@if [ -d tests/repositories/bzr ]; then rm -rf tests/repositories/bzr; fi
+	@bzr branch lp:~davidlogie/vcprompt-quotes/trunk tests/repositories/bzr > /dev/null 2>&1
 
 fetch-hg:
-	@echo "Cloning Mercurial repository"
-	@[ -d tests/repositories/hg ] && rm -rf tests/repositories/hg
-	@hg clone http://xvzf@bitbucket.org/xvzf/quotes tests/repositories/hg
+	@echo "Cloning Mercurial repository..."
+	@if [ -d tests/repositories/hg ]; then rm -rf tests/repositories/hg; fi
+	@hg clone http://xvzf@bitbucket.org/xvzf/quotes tests/repositories/hg > /dev/null 2>&1
 
 fetch-svn:
-	@echo "Checking out SVN repository"
-	@[ -d tests/repositories/svn ] && rm -rf tests/repositories/svn
-	@svn checkout http://svn.github.com/xvzf/quotes.git tests/repositories/svn
+	@echo "Checking out SVN repository.."
+	@if [ -d tests/repositories/svn ]; then rm -rf tests/repositories/svn; fi
+	@svn checkout http://svn.github.com/xvzf/quotes.git tests/repositories/svn > /dev/null 2>&1
 
 fetch-repositories: fetch-submodules fetch-hg fetch-svn
-	@echo "Updating Git submodules..."
-	@git submodule update --init
 
 test:
 	@cd tests && python tests.py
 
-.PHONY: fetch-repositories fetch-submodules fetch-hg fetch-svn help test
+.PHONY: fetch-bzr fetch-repositories fetch-submodules fetch-hg fetch-svn help test
