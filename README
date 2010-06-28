@@ -115,6 +115,9 @@ After cloning the repository, you need to do the following:
     # clone the SVN repo
     svn checkout http://svn.github.com/xvzf/quotes.git tests/repositories/svn
 
+    # clone the Mercurial repository
+    hg clone http://xvzf@bitbucket.org/xvzf/quotes tests/repositories/hg
+
 
 
 
