@@ -324,28 +324,18 @@ def bzr(path, string, unknown):
 
     # status
     if '%i' in string:
-        command = 'bzr status'
+        command = 'bzr status --short'
         process = Popen(command.split(), stdout=PIPE)
         output = process.communicate()[0]
         returncode = process.returncode
 
         if not returncode:
-            # the list of headers in 'bzr status' output
-            headers = {'added': 'A',
-                       'modified': 'M',
-                       'removed': 'R',
-                       'renamed': 'V',
-                       'kind changed': 'K',
-                       'unknown': '?'}
-            headers_regex = '%s:' % '|'.join(headers.keys())
-
             status = ''
             for line in output.split('\n'):
                 line = line.strip()
-                if re.match(headers_regex, line):
-                    header = line.split(':')[0]
-                    status = '%s%s' % (status, headers[header])
-
+                if not line:
+                    continue
+                status += line[0]
             status = sorted_alpha(status)
 
     # formatting
