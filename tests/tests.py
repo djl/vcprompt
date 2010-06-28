@@ -115,11 +115,6 @@ class Darcs(Base, BaseTest):
 
 class Fossil(Base, BaseTest):
 
-    def hash(self):
-        with open(self.file('manifest.uuid'), 'r') as f:
-            for line in f:
-                return line.strip()[:7]
-
     def setUp(self):
         self.repository = self.repo('fossil')
         self.repository_file = 'fossil'
@@ -127,6 +122,11 @@ class Fossil(Base, BaseTest):
 
     def tearDown(self):
         self.close()
+
+    def hash(self):
+        with open(self.file('manifest.uuid'), 'r') as f:
+            for line in f:
+                return line.strip()[:7]
 
     def open(self):
         with open('/dev/null', 'w') as devnull:
@@ -136,8 +136,10 @@ class Fossil(Base, BaseTest):
                              stderr=devnull)
 
     def close(self):
-        command = "cd %s && fossil close" % self.repository
-        subprocess.Popen(command, shell=True)
+        with open('/dev/null', 'w') as devnull:
+            command = "cd %s && fossil close" % self.repository
+            subprocess.Popen(command, shell=True, stdout=devnull,
+                             stderr=devnull)
 
     def test_format_system(self, string='%s'):
         output = self.vcprompt(format=string)
