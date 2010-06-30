@@ -551,8 +551,8 @@ def git(path, string, unknown):
 
 @vcs('Mercurial', 'The Mercurial version control system.')
 def hg(path, string, unknown):
-    file = os.path.join(path, '.hg/branchheads.cache')
-    if not os.path.exists(file):
+    file = os.path.join(path, '.hg')
+    if not os.path.isdir(file):
         return None
 
     branch = revision = hash = status = unknown
@@ -569,17 +569,23 @@ def hg(path, string, unknown):
 
     # branch
     if re.search('%(r|h|b)', string):
-        count = 0
-        with open(file, 'r') as f:
-            for line in f:
-                hash, revision_branch = line.split()
-                hash = hash[:7]
-                if count > 0:
-                    branch = revision_branch
-                    break
-                else:
-                    revision = revision_branch
-                count += 1
+        file = os.path.join(path, '.hg/branchheads.cache')
+        # newer versions of Mercurial don't create the '.hg/branch*' files
+        # on running 'hg init'
+        if not os.path.exists(file):
+            branch = "default"
+        else:
+            count = 0
+            with open(file, 'r') as f:
+                for line in f:
+                    hash, revision_branch = line.split()
+                    hash = hash[:7]
+                    if count > 0:
+                        branch = revision_branch
+                        break
+                    else:
+                        revision = revision_branch
+                    count += 1
 
     # status
     if '%i' in string:
