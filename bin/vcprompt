@@ -318,7 +318,7 @@ def bzr(path, string, unknown):
                 if hash == "null:":
                     hash = unknown
                 else:
-                    hash = hash.rsplit('-', 1)[0][:7]
+                    hash = hash.rsplit('-', 1)[-1][:7]
                 break
 
 
