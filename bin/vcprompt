@@ -558,34 +558,35 @@ def hg(path, string, unknown):
     branch = revision = hash = status = unknown
 
     # changeset ID or global hash
+    # this is probably far more complicated than it needs to be
     if re.search('%(r|h)', string):
-        cache_file = os.path.join(path, '.hg/tags.cache')
-        if os.path.exists(cache_file):
+        cache_files = map(lambda x: os.path.join(path, '.hg/', '%s.cache' % x),
+                          ['branchheads', 'tags'])
+        cache_files = filter(os.path.exists, cache_files)
+        if cache_files:
+            cache_file = cache_files[0]
             with open(cache_file, 'r') as f:
                 for line in f:
-                    revision, hash = line.strip().split()
+                    hash, revision = line.strip().split()
+                    # tags.cache file format is (revid, hash)
+                    # branchheads.cache is (hash, revid)
+                    if 'tags.cache' in cache_file:
+                        hash, revision = revision, hash
                     hash = hash[:7]
                     break
 
     # branch
-    if re.search('%(r|h|b)', string):
-        file = os.path.join(path, '.hg/branchheads.cache')
+    if '%b' in string:
+        file = os.path.join(path, '.hg/branch')
         # newer versions of Mercurial don't create the '.hg/branch*' files
-        # on running 'hg init'
+        # on running 'hg init', but the default branch is named 'default'
         if not os.path.exists(file):
             branch = "default"
         else:
-            count = 0
             with open(file, 'r') as f:
                 for line in f:
-                    hash, revision_branch = line.split()
-                    hash = hash[:7]
-                    if count > 0:
-                        branch = revision_branch
-                        break
-                    else:
-                        revision = revision_branch
-                    count += 1
+                    branch = line.strip()
+                    break
 
     # status
     if '%i' in string:
