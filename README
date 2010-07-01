@@ -102,7 +102,7 @@ Requirements
 Testing
 -------
 
-To run the tests, just the provide Makefile:
+To run the tests, use the provided Makefile:
 
 ::
 
