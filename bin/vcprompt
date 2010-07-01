@@ -560,7 +560,7 @@ def hg(path, string, unknown):
     # changeset ID or global hash
     # this is probably far more complicated than it needs to be
     if re.search('%(r|h)', string):
-        cache_files = map(lambda x: os.path.join(path, '.hg/', '%s.cache' % x),
+        cache_files = map(lambda x: os.path.join(file, '%s.cache' % x),
                           ['branchheads', 'tags'])
         cache_files = filter(os.path.exists, cache_files)
         if cache_files:
