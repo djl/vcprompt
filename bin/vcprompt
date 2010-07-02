@@ -508,8 +508,8 @@ def git(path, string, unknown):
         with open(branch_file, 'r') as f:
             for line in f:
                 line = line.strip()
-                if re.match('^ref: refs/heads/', line.strip()):
-                    branch = (line.split('/')[-1] or unknown).strip()
+                if re.match('^ref: refs/heads/', line):
+                    branch = (line.split('/')[-1] or unknown)
                     break
 
         # hash/revision
