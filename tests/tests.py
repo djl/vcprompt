@@ -22,7 +22,7 @@ class Base(unittest.TestCase):
         return location
 
     def unknown(self):
-        commands = Base.commands + ['--values', 'UNKNOWN']
+        commands = self.commands + ['--values', 'UNKNOWN']
         process = subprocess.Popen(commands, stdout=subprocess.PIPE)
         output = process.communicate()[0].strip()
         return output
