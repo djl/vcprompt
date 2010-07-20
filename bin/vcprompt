@@ -51,7 +51,7 @@ __version__ = (0, 1, 5)
 if '--without-environment' in sys.argv and \
    sys.argv[1] != '--without-environment':
     output = "The '--without-environment' option must come before any "
-    print "%s other options." % output
+    print >> sys.stderr, "%s other options." % output
     sys.exit(1)
 
 # we need to get this in early because callbacks are always called after
