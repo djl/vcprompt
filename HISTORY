@@ -2,11 +2,13 @@
 ------------------
 
 * Added: New '--without-environment' option for ignoring environment variables.
-* Changed: Test repositories are stored externally now to prevent possible corruption (current exceptions are Darcs and Fossil)
+* Changed: Test repositories are stored externally now to prevent possible
+  corruption (current exceptions are Darcs and Fossil).
 * Fixed: CVS is now aware of all formatting arguments.
 * Fixed: Setup.py now uses the correct version number.
 * Fixed: '--values SYSTEMS' now works correctly.
-* Fixed: Newly initialised repositories now work correctly with '%h' and '%r' format arguments.
+* Fixed: Newly initialised repositories now work correctly with '%h' and '%r'
+  format arguments.
 * Fixed: Fixed a bug with Bazaar hashes not being calculated correctly.
 * Fixed: Errors are now written to stderr.
 
@@ -14,27 +16,27 @@
 0.1.4 (2010-05-25)
 ------------------
 
-* Fixed: The '%h' format argument now works correctly with Bazaar
-* Changed: The help output is slightly less ugly
+* Fixed: The '%h' format argument now works correctly with Bazaar.
+* Changed: The help output is slightly less ugly.
 
 
 0.1.3 (2010-04-26)
 ------------------
 
-* Fixed: Fixed all known bugs in tests
+* Fixed: Fixed all known bugs in tests.
 
 
 0.1.2 (2010-04-24)
 ------------------
 
-* Fixed: Subdirectories are now correctly processed
-* Fixed: Correct manpages and help text
+* Fixed: Subdirectories are now correctly processed.
+* Fixed: Correct manpages and help text.
 
 
 0.1.1 (2010-04-18)
 ------------------
 
-* Added: Support for Git < 1.7.0
+* Added: Support for Git < 1.7.0.
 * Added: ``--max-depth`` option for limiting the depth of directories to
   traverse.
 * Changed: The ``--systems`` option is now used for passing in systems to use.
@@ -45,11 +47,11 @@
 0.1.0 (2010-03-20)
 ------------------
 
-* Added: manpages
-* Added: history file (oh my, how meta!)
-* Added: Formatting support for Fossil
-* Changed: Merged the two new decorators into the original ``vcs`` decorator
-* Changed: Renamed ``--unknown`` flag to ``--values``
-* Changed: The ``--unknown`` flag is now used for setting the 'unknown' value
-* Bugfix: The '%i' format argument no longer fails with multiple character statuses
-* Bugfix: The '%i' format argument no longer ignores punctuation
+* Added: manpages.
+* Added: history file (oh my, how meta!).
+* Added: Formatting support for Fossil.
+* Changed: Merged the two new decorators into the original ``vcs`` decorator.
+* Changed: Renamed ``--unknown`` flag to ``--values``.
+* Changed: The ``--unknown`` flag is now used for setting the 'unknown' value.
+* Bugfix: The '%i' format argument no longer fails with multiple character statuses.
+* Bugfix: The '%i' format argument no longer ignores punctuation.
