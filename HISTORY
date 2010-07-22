@@ -8,6 +8,7 @@
 * Fixed: '--values SYSTEMS' now works correctly.
 * Fixed: Newly initialised repositories now work correctly with '%h' and '%r' format arguments.
 * Fixed: Fixed a bug with Bazaar hashes not being calculated correctly.
+* Fixed: Errors are now written to stderr.
 
 
 0.1.4 (2010-05-25)
