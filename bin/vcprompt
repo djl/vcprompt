@@ -102,7 +102,6 @@ def sorted_alpha(sortme, unique=True):
 
     """
     upper, lower, digit, punctuation, passed = ([], [], [], [], [])
-    passed = []
     for char in sortme:
         # skip duplicates
         if unique and char in passed:
