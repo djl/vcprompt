@@ -51,7 +51,7 @@ __version__ = (0, 1, 5)
 if '--without-environment' in sys.argv and \
    sys.argv[1] != '--without-environment':
     output = "The '--without-environment' option must come before any "
-    print >> sys.stderr, "%s other options." % output
+    print >> sys.stderr, '%s other options.' % output
     sys.exit(1)
 
 # we need to get this in early because callbacks are always called after
@@ -126,7 +126,7 @@ def systems():
     for system in SYSTEMS:
         name = getattr(system, 'name', system.__name__)
         desc = getattr(system, 'description', '')
-        output = "%s: %s" % (name, desc)
+        output = '%s: %s' % (name, desc)
         print output
     sys.exit(0)
 
@@ -314,7 +314,7 @@ def bzr(path, string, unknown):
                 line = line.strip()
                 revision, hash = line.split(' ', 1)
                 # compensate for empty Bazaar repositories
-                if hash == "null:":
+                if hash == 'null:':
                     hash = unknown
                 else:
                     hash = hash.rsplit('-', 1)[-1][:7]
@@ -466,7 +466,7 @@ def fossil(path, string, unknown):
         if not returncode and output:
             if status == unknown:
                 status = ''
-            status = "%s?" % status
+            status = '%s?' % status
 
         command = 'fossil changes'
         process = Popen(command.split(), stdout=PIPE)
@@ -481,7 +481,7 @@ def fossil(path, string, unknown):
             for line in output.split('\n'):
                 line = line.strip()
                 if line:
-                    status = "%s%s" % (status, line[0])
+                    status = '%s%s' % (status, line[0])
 
             status = sorted_alpha(status)
 
@@ -580,7 +580,7 @@ def hg(path, string, unknown):
         # newer versions of Mercurial don't create the '.hg/branch*' files
         # on running 'hg init', but the default branch is named 'default'
         if not os.path.exists(file):
-            branch = "default"
+            branch = 'default'
         else:
             with open(file, 'r') as f:
                 for line in f:
