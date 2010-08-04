@@ -124,8 +124,8 @@ def sorted_alpha(sortme, unique=True):
 def systems():
     """Prints all available systems to stdout."""
     for system in SYSTEMS:
-        name = getattr(system, 'name', system.__name__)
-        desc = getattr(system, 'description', '')
+        name = getattr(system, 'vcprompt_name', system.__name__)
+        desc = getattr(system, 'vcprompt_description', '')
         output = '%s: %s' % (name, desc)
         print output
     sys.exit(0)
@@ -163,8 +163,8 @@ def vcs(name, description):
     """
 
     def wrapped(function):
-        function.name = name
-        function.description = name
+        function.vcprompt_name = name
+        function.vcprompt_description = description
         SYSTEMS.append(function)
         return function
     return wrapped
