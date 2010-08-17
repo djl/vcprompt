@@ -113,10 +113,3 @@ A few notes on testing:
 
 * Tests have to fetch remote repositories, so network access is required
 * Fetching remote repositories requires each VCS to be installed
-
-
-
-TODO
-----
-
-* More complete support and tests for CVS

@@ -1,0 +1,5 @@
+NEXT
+
+[ ] Stop fork()ing out to VCS binaries wherever possible
+[ ] Add tests for empty repositories
+[ ] More complete support and tests for CVS
