@@ -43,6 +43,6 @@ update-svn:
 	@echo "Updating SVN repository..."
 	@cd tests/repositories/svn && svn up
 
-update-repositories: update-
+update-repositories: update-bzr update-git update-hg update-svn
 
 .PHONY: help test $(wildcard fetch-*) $(wildcard update-*)
