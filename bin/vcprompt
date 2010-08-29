@@ -124,8 +124,8 @@ def sorted_alpha(sortme, unique=True):
 def systems():
     """Prints all available systems to stdout."""
     for system in SYSTEMS:
-        name = getattr(system, 'vcprompt_name', system.__name__)
-        desc = getattr(system, 'vcprompt_description', '')
+        doc = system.__doc__.split('\n')
+        name, desc = filter(bool, map(lambda x: x.strip(), doc))
         output = '%s: %s' % (name, desc)
         print output
     sys.exit(0)
@@ -145,7 +145,7 @@ def values(option, opt, value, parser, *args, **kwargs):
     sys.exit(0)
 
 
-def vcs(name, description):
+def vcs(function):
     """
     Adds the given ``name`` and ``description`` as attributes on the
     wrapped function.
@@ -161,13 +161,8 @@ def vcs(name, description):
              "The fast version continue system".
 
     """
-
-    def wrapped(function):
-        function.vcprompt_name = name
-        function.vcprompt_description = description
-        SYSTEMS.append(function)
-        return function
-    return wrapped
+    SYSTEMS.append(function)
+    return function
 
 
 def version(*args):
@@ -217,7 +212,6 @@ def vcprompt(path, formats, unknown, *args, **kwargs):
            Defaults to all systems.
 
     """
-
     paths = os.path.abspath(os.path.expanduser(path)).split('/')
     depth = kwargs.get('depth', 0)
     systems = kwargs.get('systems', None)
@@ -299,8 +293,13 @@ def main():
     return output
 
 
-@vcs('Bazaar', 'The Bazaar version control system')
+@vcs
 def bzr(path, string, unknown):
+    """
+    Bazaar
+
+    The Bazaar version control system
+    """
     file = os.path.join(path, '.bzr/branch/last-revision')
     if not os.path.exists(file):
         return None
@@ -346,10 +345,13 @@ def bzr(path, string, unknown):
     return string
 
 
-@vcs('CVS', 'Concurrent Versions System.')
+@vcs
 def cvs(path, string, unknown):
-    # Stabbing in the dark here
-    # TODO make this not suck
+    """
+    CVS
+
+    Concurrent Versions System.
+    """
     file = os.path.join(path, 'CVS/')
     if not os.path.exists(file):
         return None
@@ -364,10 +366,13 @@ def cvs(path, string, unknown):
     return string
 
 
-@vcs('Darcs', 'Distributed. Interactive. Smart.')
+@vcs
 def darcs(path, string, unknown):
-    # It's almost a given that everything in here is
-    # going to be wrong
+    """
+    Darcs
+
+    Distributed. Interactive. Smart.
+    """
     file = os.path.join(path, '_darcs/hashed_inventory')
     if not os.path.exists(file):
         return None
@@ -411,8 +416,13 @@ def darcs(path, string, unknown):
     return string
 
 
-@vcs('Fossil', 'The Fossil version control system.')
+@vcs
 def fossil(path, string, unknown):
+    """
+    Fossil
+
+    The Fossil version control system.
+    """
     file = os.path.join(path, '_FOSSIL_')
     if not os.path.exists(file):
         return None
@@ -494,8 +504,13 @@ def fossil(path, string, unknown):
     return string
 
 
-@vcs('Git', 'The fast version control system.')
+@vcs
 def git(path, string, unknown):
+    """
+    Git
+
+    The fast version control system.
+    """
     file = os.path.join(path, '.git/')
     if not os.path.exists(file):
         return None
@@ -548,8 +563,13 @@ def git(path, string, unknown):
     return string
 
 
-@vcs('Mercurial', 'The Mercurial version control system.')
+@vcs
 def hg(path, string, unknown):
+    """
+    Mercurial
+
+    The Mercurial version control system.
+    """
     file = os.path.join(path, '.hg')
     if not os.path.isdir(file):
         return None
@@ -610,8 +630,13 @@ def hg(path, string, unknown):
     return string
 
 
-@vcs('Subversion', 'The Subversion version control system.')
+@vcs
 def svn(path, string, unknown):
+    """
+    Subversion
+
+    The Subversion version control system.
+    """
     file = os.path.join(path, '.svn/entries')
     if not os.path.exists(file):
         return None
