@@ -26,7 +26,7 @@ setup(
     name='vcprompt',
     version=commands.getoutput('./bin/vcprompt --version').split()[-1],
     author='David Logie',
-    author_email='david@davidlogie.com',
+    author_email='d@djl.im',
     url='http://github.com/xvzf/vcprompt',
     scripts=['bin/vcprompt'],
     license='BSD',
