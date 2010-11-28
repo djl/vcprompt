@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 from __future__ import with_statement
+from subprocess import Popen, PIPE
 import os
 import re
 import sys
-import subprocess
 import unittest
 
 
@@ -21,9 +21,18 @@ class Base(unittest.TestCase):
         location = os.path.join(location, vcs)
         return location
 
+    def revert(self):
+        command = 'cd %s && %s' % (self.repository,
+                                   self.revert_command)
+        Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
+
+    def touch(self, file):
+        with open(file, 'w') as f:
+            pass
+
     def unknown(self):
         commands = self.commands + ['--values', 'UNKNOWN']
-        process = subprocess.Popen(commands, stdout=subprocess.PIPE)
+        process = Popen(commands, stdout=PIPE)
         output = process.communicate()[0].strip()
         return output
 
@@ -33,7 +42,7 @@ class Base(unittest.TestCase):
             key = key.replace('_', '-')
             commands.append("--%s" % key)
             commands.append(value)
-        process = subprocess.Popen(commands, stdout=subprocess.PIPE)
+        process = Popen(commands, stdout=PIPE)
         return process.communicate()[0].strip()
 
 
@@ -49,8 +58,44 @@ class BaseTest(object):
         output = self.vcprompt(path=path, max_depth=depth)
         self.assertEquals(output, '')
 
+    def test_format_modified(self, string='%m'):
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '')
+
+        with open(self.file('quotes.txt'), 'a') as f:
+            f.write('foo')
+
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '+')
+
+        self.revert()
+
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '')
+
+    def test_format_system_alt(self, string='%n'):
+        return self.test_format_system(string=string)
+
+    def test_format_untracked_files(self, string="%u"):
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '')
+
+        file = self.file('untracked_file')
+        self.touch(file)
+
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '?')
+
+        os.remove(file)
+
+        output = self.vcprompt(format=string)
+        self.assertEquals(output, '')
+
+
 
 class Bazaar(Base, BaseTest):
+
+    revert_command = 'bzr revert --no-backup'
 
     def revision(self):
         with open(self.file('.bzr/branch/last-revision'), 'r') as f:
@@ -77,13 +122,15 @@ class Bazaar(Base, BaseTest):
         output = self.vcprompt(format=string)
         self.assertEquals(output, 'bzr')
 
-    def test_format_all(self, string='%s:%r'):
+    def test_format_all(self, string='%s:%n:%r'):
         output = self.vcprompt(format=string)
-        expected = 'bzr:%s' % (self.revision())
+        expected = 'bzr:bzr:%s' % (self.revision())
         self.assertEquals(output, expected)
 
 
 class Darcs(Base, BaseTest):
+
+    revert_command = 'darcs revert -a'
 
     def hash(self):
         with open(self.file('_darcs/hashed_inventory'), 'r') as f:
@@ -108,20 +155,18 @@ class Darcs(Base, BaseTest):
         output = self.vcprompt(format=string)
         self.assertEquals(output, 'darcs')
 
-    def test_format_all(self, string='%s:%b:%r'):
+    def test_format_all(self, string='%s:%n:%b:%r'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, 'darcs:darcs:%s' % self.hash())
+        self.assertEquals(output, 'darcs:darcs:darcs:%s' % self.hash())
 
 
 class Fossil(Base, BaseTest):
 
+    revert_command = 'fossil revert'
+
     def setUp(self):
         self.repository = self.repo('fossil')
         self.repository_file = 'fossil'
-        self.open()
-
-    def tearDown(self):
-        self.close()
 
     def hash(self):
         with open(self.file('manifest.uuid'), 'r') as f:
@@ -132,14 +177,12 @@ class Fossil(Base, BaseTest):
         with open('/dev/null', 'w') as devnull:
             command = "cd %s && fossil open %s" % (self.repository,
                                                    self.repository_file)
-            subprocess.Popen(command, shell=True, stdout=devnull,
-                             stderr=devnull)
+            Popen(command, stdout=devnull, stderr=devnull, shell=True)
 
     def close(self):
         with open('/dev/null', 'w') as devnull:
             command = "cd %s && fossil close" % self.repository
-            subprocess.Popen(command, shell=True, stdout=devnull,
-                             stderr=devnull)
+            Popen(command, stdout=devnull, stderr=devnull, shell=True)
 
     def test_format_system(self, string='%s'):
         output = self.vcprompt(format=string)
@@ -158,6 +201,8 @@ class Fossil(Base, BaseTest):
 
 
 class Git(Base, BaseTest):
+
+    revert_command = 'git reset -q --hard HEAD'
 
     def _hash_or_branch(self, get='hash'):
         branch = hash = self.unknown()
@@ -200,13 +245,15 @@ class Git(Base, BaseTest):
         output = self.vcprompt(format=string)
         self.assertEquals(output, 'git')
 
-    def test_format_all(self, string='%s:%b:%r'):
+    def test_format_all(self, string='%s:%n:%b:%r'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, 'git:%s:%s' % (self.branch(),
-                                                 self.hash()))
+        self.assertEquals(output, 'git:git:%s:%s' % (self.branch(),
+                                                     self.hash()))
 
 
 class Mercurial(Base, BaseTest):
+
+    revert_command = 'hg revert -a --no-backup'
 
     def _branch_hash_revision(self, get='branch'):
         count = 0
@@ -250,15 +297,17 @@ class Mercurial(Base, BaseTest):
         output = self.vcprompt(format=string)
         self.assertEquals(output, 'hg')
 
-    def test_format_all(self, string='%s:%b:%r:%h'):
+    def test_format_all(self, string='%s:%n:%b:%r:%h'):
         output = self.vcprompt(format=string)
-        expected = 'hg:%s:%s:%s' % (self.branch(),
-                                    self.revision(),
-                                    self.hash())
+        expected = 'hg:hg:%s:%s:%s' % (self.branch(),
+                                       self.revision(),
+                                       self.hash())
         self.assertEquals(output, expected)
 
 
 class Subversion(Base, BaseTest):
+
+    revert_command = 'svn revert -R .'
 
     def setUp(self):
         self.repository = self.repo('svn')
@@ -281,9 +330,9 @@ class Subversion(Base, BaseTest):
         output = self.vcprompt(format=string)
         self.assertEquals(output, 'svn')
 
-    def test_format_all(self, string='%s:%b:%h'):
+    def test_format_all(self, string='%s:%n:%b:%h'):
         output = self.vcprompt(format=string)
-        self.assertEquals(output, "svn:%s:2" % self.unknown())
+        self.assertEquals(output, "svn:svn:%s:2" % self.unknown())
 
 
 if __name__ == '__main__':

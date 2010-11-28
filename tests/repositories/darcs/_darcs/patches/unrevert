@@ -1,0 +1,29 @@
+
+New patches:
+
+[unrevert
+anon**20101205120428
+ Ignore-this: 184a7384d182b11c110be25333c34265
+] hunk ./quotes.txt 15
+ That or His Dudeness... Duder... or El Duderino, if, you know, 
+ you're not into the whole brevity thing.
+ 
+-I don't want FOP Damn it, I'm a Dapper Dan Man!
++I don't want FOP Damn it, I'm a Dapper Dan Man!foo
+
+Context:
+
+[fixes
+davidlogie@me.com**20101205120306
+ Ignore-this: a4d07e0e72ac5f8df358e4b0983a1f3e
+] 
+[Add some directories.
+davidlogie@me.com**20100424181500
+ Ignore-this: 423dca88f078123b224a06a81bfd36fe
+] 
+[Initial commit
+davidlogie@me.com**20100228111109
+ Ignore-this: b82f846c1a868901ed66d3fa79ba4065
+] 
+Patch bundle hash:
+e7d1d9c25e5b237f1b0425cdb47f5c3a87187693

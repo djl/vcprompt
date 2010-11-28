@@ -35,7 +35,7 @@ Internal options:
 """
 
 from __future__ import with_statement
-from subprocess import Popen, PIPE
+from subprocess import call, Popen, PIPE
 import optparse
 import os
 import re
@@ -64,10 +64,15 @@ if len(sys.argv) > 1 and sys.argv[1] == '--without-environment':
     del sys.argv[1]
 
 
+# user editable options
 DEPTH = os.environ.get('VCPROMPT_DEPTH', 0)
 FORMAT = os.environ.get('VCPROMPT_FORMAT', '%s:%b')
 UNKNOWN = os.environ.get('VCPROMPT_UNKNOWN', '(unknown)')
 SYSTEMS = []
+
+# status indicators
+MODIFIED = '+'
+UNTRACKED = '?'
 
 
 def helper(*args, **kwargs):
@@ -81,44 +86,6 @@ def helper(*args, **kwargs):
     """
     print __doc__.strip()
     sys.exit(0)
-
-
-def sorted_alpha(sortme, unique=True):
-    """
-    Sorts a string alphabetically, but does (kind of) the opposite of
-    the built-in ``sorted`` function.
-
-    Sorted order is:
-
-      * lowercase
-      * uppercase
-      * digits
-      * punctuation
-
-    Example:
-
-    >>> sorted_alpha("aSD??fc?!")
-    afcSD?!
-
-    """
-    upper, lower, digit, punctuation, passed = ([], [], [], [], [])
-    for char in sortme:
-        # skip duplicates
-        if unique and char in passed:
-            continue
-
-        if char.isupper():
-            upper.append(char)
-        elif char.islower():
-            lower.append(char)
-        elif char.isdigit():
-            digit.append(char)
-        else:
-            punctuation.append(char)
-
-        passed.append(char)
-
-    return ''.join(lower + upper + digit + punctuation)
 
 
 def systems():
@@ -212,25 +179,31 @@ def vcprompt(path, formats, unknown, *args, **kwargs):
            Defaults to all systems.
 
     """
-    paths = os.path.abspath(os.path.expanduser(path)).split('/')
+    path = os.path.abspath(os.path.expanduser(path))
     depth = kwargs.get('depth', 0)
     systems = kwargs.get('systems', None)
     prompt = None
     count = 0
 
-    while paths:
-        path = '/'.join(paths)
-        paths.pop()
+    while path:
+        # We need to change the current working directory or the '--path'
+        # flag might not work correctly with some formatting args.
+        # It's easier to do this here, rather than in every VCS function
+        if path != os.getcwd():
+            os.chdir(path)
+
         for vcs in SYSTEMS:
             if not systems or systems and vcs.__name__ in systems:
                 format = formats[vcs.__name__] or formats['default']
                 prompt = vcs(path, format, unknown)
-                if prompt:
+                if prompt is not None:
                     return prompt
         if depth:
             if count == depth:
                 break
             count += 1
+
+        path = path.rsplit('/', 1)[0]
     return ''
 
 
@@ -304,7 +277,7 @@ def bzr(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = revision = hash = status = unknown
+    branch = revision = hash = modified = untracked = unknown
 
     # local revision or global hash
     if re.search('%(r|h)', string):
@@ -319,29 +292,33 @@ def bzr(path, string, unknown):
                     hash = hash.rsplit('-', 1)[-1][:7]
                 break
 
-
-    # status
-    if '%i' in string:
+    # status (modified/untracked)
+    if re.search('%[mu]', string):
         command = 'bzr status --short'
         process = Popen(command.split(), stdout=PIPE)
-        output = process.communicate()[0]
+        output = process.communicate()[0].strip()
         returncode = process.returncode
 
-        if not returncode:
-            status = ''
-            for line in output.split('\n'):
-                line = line.strip()
-                if not line:
-                    continue
-                status += line[0]
-            status = sorted_alpha(status)
+        if returncode == 0:
+            if output == '':
+                modified = ''
+                untracked = ''
+            else:
+                for line in output.split('\n'):
+                    if line.startswith('M'):
+                        modified = MODIFIED
+                    elif line.startswith('?'):
+                        untracked = UNTRACKED
+
 
     # formatting
     string = string.replace('%b', os.path.basename(path))
     string = string.replace('%h', hash)
     string = string.replace('%r', revision)
-    string = string.replace('%i', status)
+    string = string.replace('%m', modified)
+    string = string.replace('%u', untracked)
     string = string.replace('%s', 'bzr')
+    string = string.replace('%n', 'bzr')
     return string
 
 
@@ -356,13 +333,13 @@ def cvs(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = revision = status = unknown
 
+    string = string.replace('%b', unknown)
+    string = string.replace('%h', unknown)
+    string = string.replace('%r', unknown)
+    string = string.replace('%m', unknown)
     string = string.replace('%s', 'cvs')
-    string = string.replace('%b', branch)
-    string = string.replace('%i', status)
-    string = string.replace('%h', revision)
-    string = string.replace('%r', revision)
+    string = string.replace('%n', 'cvs')
     return string
 
 
@@ -377,7 +354,7 @@ def darcs(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    hash = branch = status = unknown
+    hash = branch = modified = untracked = unknown
 
     # hash
     if re.search('%(h|r)', string):
@@ -393,26 +370,33 @@ def darcs(path, string, unknown):
     # see also: http://bugs.darcs.net/issue555
     branch = os.path.basename(path)
 
-    # status
-    if '%i' in string:
-        status = ''
-        command = 'darcs whatsnew -l'
+    # modified
+    if re.search('%[mu]', string):
+        command = 'darcs whatsnew -l -s'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         output = process.communicate()[0]
         returncode = process.returncode
 
-        if not returncode:
-            for line in output.split('\n'):
-                code = line.split(' ')[0]
-                status = '%s%s' % (status, code)
-            status = sorted_alpha(status)
+        if returncode == 1:
+            modified = ''
+            untracked = ''
+        elif returncode == 0:
+            for line in output:
+                line = line.strip()
+                if line.startswith('M'):
+                    modified = MODIFIED
+                elif line.startswith('a'):
+                    untracked = UNTRACKED
+
 
     # formatting
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
     string = string.replace('%r', hash)
-    string = string.replace('%i', status)
+    string = string.replace('%m', modified)
+    string = string.replace('%u', untracked)
     string = string.replace('%s', 'darcs')
+    string = string.replace('%n', 'darcs')
     return string
 
 
@@ -427,7 +411,7 @@ def fossil(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = hash = status = unknown
+    branch = hash = modified = untracked = unknown
 
     # all this just to get the repository file :(
     repository = None
@@ -465,42 +449,40 @@ def fossil(path, string, unknown):
         finally:
             conn.close()
 
-    # status
-    if '%i' in string:
-        # new files
-        command = 'fossil extra'
-        process = Popen(command.split(), stdout=PIPE)
-        output = process.communicate()[0]
-        returncode = process.returncode
-
-        if not returncode and output:
-            if status == unknown:
-                status = ''
-            status = '%s?' % status
-
+    # modified
+    if '%m' in string:
         command = 'fossil changes'
         process = Popen(command.split(), stdout=PIPE)
         output = process.communicate()[0]
         returncode = process.returncode
 
-        if not returncode:
-            if status == unknown:
-                status = ''
-            headers = {'EDITED': 'M',
-                       'MISSING': 'R'}
-            for line in output.split('\n'):
-                line = line.strip()
-                if line:
-                    status = '%s%s' % (status, line[0])
+        if returncode == 0:
+            if output:
+                modified = MODIFIED
+            else:
+                modified = ''
 
-            status = sorted_alpha(status)
+    # untracked files
+    if '%u' in string:
+        command = 'fossil extras'
+        process = Popen(command.split(), stdout=PIPE)
+        output = process.communicate()[0]
+        returncode = process.returncode
+
+        if returncode == 0:
+            if output:
+                untracked = UNTRACKED
+            else:
+                untracked = ''
 
     # parse out formatting string
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
     string = string.replace('%r', hash)
-    string = string.replace('%i', status)
+    string = string.replace('%m', modified)
+    string = string.replace('%u', untracked)
     string = string.replace('%s', 'fossil')
+    string = string.replace('%n', 'fossil')
     return string
 
 
@@ -515,7 +497,8 @@ def git(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = hash = status = unknown
+    branch = hash = modified = untracked = unknown
+
     # the current branch is required to get the hash
     if re.search('%(b|r|h)', string):
         branch_file = os.path.join(file, 'HEAD')
@@ -535,31 +518,37 @@ def git(path, string, unknown):
                         hash = line.strip()[0:7]
                         break
 
-    # status
-    if '%i' in string:
-        command = 'git status --short -z'
+    # modified
+    if '%m' in string:
+        command = 'git diff --diff-filter=M --exit-code'
+        returncode = call(command, stdout=PIPE, stderr=PIPE, shell=True)
+
+        if returncode == 1:
+            modified = MODIFIED
+        else:
+            modified = ''
+
+    # untracked files
+    if '%u' in string:
+        command = 'git ls-files --other --exclude-standard'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         output = process.communicate()[0]
         returncode = process.returncode
 
-        if not returncode:
-            status = 'clean'
-            status_codes = []
-            for line in output.split('\n'):
-                line = line.strip()
-                if not line:
-                    continue
-                status_codes.append(line.split()[0])
-
-            if status_codes:
-                status = sorted_alpha(status_codes)
+        if returncode == 0:
+            if output == '':
+                untracked = ''
+            else:
+                untracked = UNTRACKED
 
     # formatting
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
     string = string.replace('%r', hash)
-    string = string.replace('%i', status)
+    string = string.replace('%m', modified)
+    string = string.replace('%u', untracked)
     string = string.replace('%s', 'git')
+    string = string.replace('%n', 'git')
     return string
 
 
@@ -574,7 +563,7 @@ def hg(path, string, unknown):
     if not os.path.isdir(file):
         return None
 
-    branch = revision = hash = status = unknown
+    branch = revision = hash = modified = untracked = unknown
 
     # changeset ID or global hash
     # this is probably far more complicated than it needs to be
@@ -607,26 +596,38 @@ def hg(path, string, unknown):
                     branch = line.strip()
                     break
 
-    # status
-    if '%i' in string:
-        command = 'hg status'
-        process = Popen(command.split(), stdout=PIPE)
+    # modified
+    if '%m' in string:
+        command = 'hg status --modified'
+        process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
+        output = process.communicate()[0].strip()
+        returncode = process.returncode
+
+        if returncode == 0:
+            if output == '':
+                modified = ''
+            else:
+                modified = MODIFIED
+
+    # untracked
+    if '%u' in string:
+        command = 'hg status --unknown'
+        process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         output = process.communicate()[0]
         returncode = process.returncode
-        if not returncode:
-            status = ''
-            for line in output.split('\n'):
-                code = line.strip().split(' ')[0]
-                status = '%s%s' % (status, code)
 
-            # sort the string to make it all pretty like
-            status = sorted_alpha(status)
+        if output == '':
+            untracked = ''
+        else:
+            untracked = UNTRACKED
 
     string = string.replace('%b', branch)
     string = string.replace('%h', hash)
     string = string.replace('%r', revision)
-    string = string.replace('%i', status)
+    string = string.replace('%m', modified)
+    string = string.replace('%u', untracked)
     string = string.replace('%s', 'hg')
+    string = string.replace('%n', 'hg')
     return string
 
 
@@ -641,7 +642,7 @@ def svn(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = revision = status = unknown
+    branch = revision = modified = untracked = unknown
 
     # branch
     command = 'svn info %s' % path
@@ -649,7 +650,7 @@ def svn(path, string, unknown):
     output = process.communicate()[0]
     returncode = process.returncode
 
-    if not returncode:
+    if returncode == 0:
         # compile some regexes
         branch_regex = re.compile('((tags|branches)|trunk)')
         revision_regex = re.compile('^Revision: (?P<revision>\d+)')
@@ -669,27 +670,32 @@ def svn(path, string, unknown):
                     if 'revision' in matches.groupdict():
                         revision = matches.group('revision')
 
-    # status
-    if '%i' in string:
+    # modified
+    if re.search('%[mu]', string):
         command = 'svn status'
         process = Popen(command, shell=True, stdout=PIPE)
         output = process.communicate()[0]
         returncode = process.returncode
 
-        if not returncode:
-            status = ''
-            for line in output.split('\n'):
-                code = line.strip().split(' ')[0]
-                status = '%s%s' % (status, code)
-
-            status = sorted_alpha(status)
+        if returncode == 0:
+            if not output:
+                modified = ''
+                untracked = ''
+            else:
+                codes = [line[0] for line in output.split('\n') if line]
+                if 'M' in codes:
+                    modified = MODIFIED
+                if '?' in codes:
+                    untracked = UNTRACKED
 
     # formatting
     string = string.replace('%r', revision)
     string = string.replace('%h', revision)
     string = string.replace('%b', branch)
-    string = string.replace('%i', status)
+    string = string.replace('%m', modified)
+    string = string.replace('%u', untracked)
     string = string.replace('%s', 'svn')
+    string = string.replace('%n', 'svn')
     return string
 
 
