@@ -79,14 +79,8 @@ The complete list of formatting arguments are as follows:
 * ``%r`` - the current revision (or hash if no revision number is present)
 * ``%h`` - the current hash (or revision number if no hash is present)
 * ``%b`` - the current branch name (or directory where the repository exists)
-* ``%i`` - the status of the repository (see below)
-
-The status indicators for the ``%i`` argument will use the underlying
-status codes from the VCS (e.g. ``git status``, ``hg status``).
-
-For full documentation on all the options available to ``vcprompt`` see the
-bundled manpages.
-
+* ``%m`` - shows "+" if a file has been modified
+* ``%u`` - shows "?" if any untracked files are present
 
 
 

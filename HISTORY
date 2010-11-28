@@ -2,6 +2,8 @@
 ------------------
 
 * Added: New '--without-environment' option for ignoring environment variables.
+* Changed: The '%i' format argument has been replaced with '%m' and '%u'
+  arguments.
 * Changed: Test repositories are stored externally now to prevent possible
   corruption (current exceptions are Darcs and Fossil).
 * Fixed: CVS is now aware of all formatting arguments.

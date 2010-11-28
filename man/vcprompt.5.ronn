@@ -12,10 +12,10 @@ vcprompt(5) -- Prompt formatting syntax
   If the version control system does not provide a hash for each commit
   or changeset, it will fall back onto the revision number.
 
-* `%i`:
-  A brief overview of the current state of the repository.
-  
-  The output is a string of zero or more characters
+* `%m`:
+  Indicates whether the repository contains modified files.
+
+  The output is a plus symbol ('+').
 
 
 * `%r`:
@@ -27,7 +27,11 @@ vcprompt(5) -- Prompt formatting syntax
 
 * `%s`:
   The version control system in use.
-  
+
   Uses the 'short' or executable name for each system.
 
+* `%u`:
+  Indicates whether the repository contains untracked files.
+
+  The output is a plus symbol ('?').
 
