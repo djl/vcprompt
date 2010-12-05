@@ -23,7 +23,7 @@ fetch-git:
 fetch-hg:
 	@echo "Fetching Mercurial repository..."
 	@if [ -d tests/repositories/hg ]; then rm -rf tests/repositories/hg; fi
-	@hg clone http://xvzf@bitbucket.org/xvzf/quotes tests/repositories/hg > /dev/null 2>&1
+	@hg clone https://bitbucket.org/xvzf/quotes tests/repositories/hg > /dev/null 2>&1
 
 fetch-svn:
 	@echo "Fetching out SVN repository..."
