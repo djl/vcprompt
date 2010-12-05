@@ -80,13 +80,7 @@ The complete list of formatting arguments are as follows:
 * ``%h`` - the current hash (or revision number if no hash is present)
 * ``%b`` - the current branch name (or directory where the repository exists)
 * ``%m`` - shows "+" if a file has been modified
-
-Previous versions of vcprompt included a '%i' format argument. This was removed
-because it was slow, ugly and generally useless.
-
-The only useful information this argument contained can now be duplicated using
-'%m' instead.
-
+* ``%u`` - shows "?" if any untracked files are present
 
 
 

@@ -11,6 +11,11 @@ fetch-bzr:
 	@if [ -d tests/repositories/bzr ]; then rm -rf tests/repositories/bzr; fi
 	@bzr branch lp:~davidlogie/vcprompt-quotes/trunk tests/repositories/bzr > /dev/null 2>&1
 
+fetch-darcs:
+	@echo "Fetching Darcs repository..."
+	@if [ -d tests/repositories/darcs ]; then rm -rf tests/repositories/darcs; fi
+	@darcs get http://patch-tag.com/r/davidlogie/quotes tests/repositories/darcs > /dev/null 2>&1
+
 fetch-git:
 	@echo "Fetching Git repository..."
 	@git submodule update --init > /dev/null 2>&1
@@ -18,18 +23,22 @@ fetch-git:
 fetch-hg:
 	@echo "Fetching Mercurial repository..."
 	@if [ -d tests/repositories/hg ]; then rm -rf tests/repositories/hg; fi
-	@hg clone http://xvzf@bitbucket.org/xvzf/quotes tests/repositories/hg > /dev/null 2>&1
+	@hg clone https://bitbucket.org/xvzf/quotes tests/repositories/hg > /dev/null 2>&1
 
 fetch-svn:
 	@echo "Fetching out SVN repository..."
 	@if [ -d tests/repositories/svn ]; then rm -rf tests/repositories/svn; fi
 	@svn checkout http://svn.github.com/xvzf/quotes.git tests/repositories/svn > /dev/null 2>&1
 
-fetch-repositories: fetch-bzr fetch-git fetch-hg fetch-svn
+fetch-repositories: fetch-bzr fetch-darcs fetch-git fetch-hg fetch-svn
 
 update-bzr:
 	@echo "Updating Bazaar repository..."
 	@cd tests/repositories/bzr && bzr pull > /dev/null 2>&1
+
+update-darcs:
+	@echo "Updating Darcs repository..."
+	@cd tests/repositories/darcs && darcs pull -a > /dev/null 2>&1
 
 update-git:
 	@echo "Updating Git repository..."
@@ -43,6 +52,6 @@ update-svn:
 	@echo "Updating SVN repository..."
 	@cd tests/repositories/svn && svn up
 
-update-repositories: update-bzr update-git update-hg update-svn
+update-repositories: update-bzr update-darcs update-git update-hg update-svn
 
 .PHONY: help test $(wildcard fetch-*) $(wildcard update-*)

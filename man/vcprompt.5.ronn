@@ -27,7 +27,11 @@ vcprompt(5) -- Prompt formatting syntax
 
 * `%s`:
   The version control system in use.
-  
+
   Uses the 'short' or executable name for each system.
 
+* `%u`:
+  Indicates whether the repository contains untracked files.
+
+  The output is a plus symbol ('?').
 
