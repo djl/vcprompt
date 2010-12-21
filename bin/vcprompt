@@ -23,15 +23,6 @@ VCS-specific formatting:
   --format-git FORMAT        Git
   --format-hg FORMAT         Mercurial
   --format-svn FORMAT        Subversion
-
-Internal options:
-  These options are used internally or for testing. Use of these is not
-  recommended.
-
-  --values OPTIONS         Prints the values of the given `OPTIONS` to stdout.
-  --without-environment    Ignore any environment variables and fall back to
-                           just the provided (or default) values. If used, this
-                           option must come before any other provided options.
 """
 
 from __future__ import with_statement
