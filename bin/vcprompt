@@ -417,13 +417,18 @@ def fossil(path, string, unknown):
     finally:
         conn.close()
 
-    # we can grab the latest hash the manifest.uuid file
-    manifest = os.path.join(path, 'manifest.uuid')
-    if os.path.exists(manifest):
-        with open(manifest, 'r') as f:
-            for line in f:
-                hash = line.strip()[:7]
-                break
+    # grab the hash from the repo
+    if repository is not None:
+        try:
+            query = "SELECT uuid from blob ORDER BY rid DESC LIMIT 1"
+            conn = sqlite3.connect(repository)
+            c = conn.cursor()
+            c.execute(query)
+            hash = c.fetchone()[0][:7]
+        except sqlite3.OperationalError:
+            pass
+        finally:
+            conn.close()
 
     # branch
     if hash != unknown:
