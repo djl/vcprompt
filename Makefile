@@ -6,6 +6,14 @@ help:
 test:
 	@cd tests && python tests.py
 
+revert:
+	@cd tests/repositories/bzr && bzr revert --no-backup > /dev/null 2>&1
+	@cd tests/repositories/darcs && darcs revert -a > /dev/null 2>&1
+	@cd tests/repositories/fossil && fossil revert > /dev/null 2>&1
+	@cd tests/repositories/git && git reset -q --hard HEAD > /dev/null 2>&1
+	@cd tests/repositories/hg && hg revert -a --no-backup > /dev/null 2>&1
+	@cd tests/repositories/svn && svn revert -R . > /dev/null 2>&1
+
 fetch-bzr:
 	@echo "Fetching Bazaar repository..."
 	@if [ -d tests/repositories/bzr ]; then rm -rf tests/repositories/bzr; fi
