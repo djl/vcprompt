@@ -349,11 +349,15 @@ def darcs(path, string, unknown):
 
     # hash
     if re.search('%(h|r)', string):
-        with open(file, 'r') as f:
-            for line in f:
-                size, hash = line.strip().split('-')
-                hash = hash[:7]
-                break
+        command = 'darcs changes --last 1 --xml'
+        process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
+        output = process.communicate()[0]
+        returncode = process.returncode
+
+        if returncode == 0:
+            dom = parseString(output)
+            patch = dom.getElementsByTagName("patch")[0].getAttribute("hash")
+            hash = patch.rsplit('-', 1)[-1].split('.')[0][:7]
 
     # branch
     # darcs doesn't have in-repo local branching (yet), so just use
