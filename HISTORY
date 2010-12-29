@@ -2,6 +2,7 @@
 ------------------
 
 * Added: New '--without-environment' option for ignoring environment variables.
+* Added: Experimental support for Python 2.4
 * Changed: The '%i' format argument has been replaced with '%m' and '%u'
   arguments.
 * Changed: Test repositories are stored externally now to prevent possible

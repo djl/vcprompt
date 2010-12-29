@@ -25,13 +25,17 @@ VCS-specific formatting:
   --format-svn FORMAT        Subversion
 """
 
-from __future__ import with_statement
 from subprocess import call, Popen, PIPE
+from xml.dom.minidom import parseString
 import optparse
 import os
 import re
-import sqlite3
 import sys
+
+try:
+    import sqlite3
+except ImportError:
+    from pysqlite2 import dbapi2 as sqlite3
 
 __version__ = (0, 1, 5)
 
@@ -272,16 +276,23 @@ def bzr(path, string, unknown):
 
     # local revision or global hash
     if re.search('%(r|h)', string):
-        with open(file, 'r') as f:
-            for line in f:
-                line = line.strip()
-                revision, hash = line.split(' ', 1)
-                # compensate for empty Bazaar repositories
-                if hash == 'null:':
-                    hash = unknown
-                else:
-                    hash = hash.rsplit('-', 1)[-1][:7]
-                break
+        try:
+            try:
+                f = open(file, 'r')
+                for line in f:
+                    line = line.strip()
+                    revision, hash = line.split(' ', 1)
+                    # compensate for empty Bazaar repositories
+                    if hash == 'null:':
+                        hash = unknown
+                    else:
+                        hash = hash.rsplit('-', 1)[-1][:7]
+                        break
+            except IOError:
+                pass
+        finally:
+            if f:
+                f.close()
 
     # status (modified/untracked)
     if re.search('%[mu]', string):
@@ -411,43 +422,49 @@ def fossil(path, string, unknown):
     # all this just to get the repository file :(
     repository = None
     try:
-        query = "SELECT value FROM vvar where name = 'repository'"
-        conn = sqlite3.connect(file)
-        c = conn.cursor()
-        c.execute(query)
-        repository = c.fetchone()[0]
-    except sqlite3.OperationalError:
-        pass
+        try:
+            query = "SELECT value FROM vvar where name = 'repository'"
+            conn = sqlite3.connect(file)
+            c = conn.cursor()
+            c.execute(query)
+            repository = c.fetchone()[0]
+        except sqlite3.OperationalError:
+            pass
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
     # grab the hash from the repo
     if repository is not None:
         try:
-            query = "SELECT uuid from blob ORDER BY rid DESC LIMIT 1"
-            conn = sqlite3.connect(repository)
-            c = conn.cursor()
-            c.execute(query)
-            hash = c.fetchone()[0][:7]
-        except sqlite3.OperationalError:
-            pass
+            try:
+                query = "SELECT uuid from blob ORDER BY rid DESC LIMIT 1"
+                conn = sqlite3.connect(repository)
+                c = conn.cursor()
+                c.execute(query)
+                hash = c.fetchone()[0][:7]
+            except sqlite3.OperationalError:
+                pass
         finally:
-            conn.close()
+            if conn:
+                conn.close()
 
     # branch
     if hash != unknown:
         try:
-            query = """SELECT value FROM tagxref WHERE rid =
-                       (SELECT rid FROM blob WHERE uuid LIKE '%s%%')
-                       AND value is not NULL LIMIT 1 """ % hash
-            conn = sqlite3.connect(repository)
-            c = conn.cursor()
-            c.execute(query)
-            branch = c.fetchone()[0]
-        except (sqlite3.OperationalError, TypeError):
-            pass
+            try:
+                query = """SELECT value FROM tagxref WHERE rid =
+                           (SELECT rid FROM blob WHERE uuid LIKE '%s%%')
+                           AND value is not NULL LIMIT 1 """ % hash
+                conn = sqlite3.connect(repository)
+                c = conn.cursor()
+                c.execute(query)
+                branch = c.fetchone()[0]
+            except (sqlite3.OperationalError, TypeError):
+                pass
         finally:
-            conn.close()
+            if conn:
+                conn.close()
 
     # modified
     if '%m' in string:
@@ -502,21 +519,35 @@ def git(path, string, unknown):
     # the current branch is required to get the hash
     if re.search('%(b|r|h)', string):
         branch_file = os.path.join(file, 'HEAD')
-        with open(branch_file, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if re.match('^ref: refs/heads/', line):
-                    branch = (line.split('/')[-1] or unknown)
-                    break
+        try:
+            try:
+                f = open(branch_file, 'r')
+                for line in f:
+                    line = line.strip()
+                    if re.match('^ref: refs/heads/', line):
+                        branch = (line.split('/')[-1] or unknown)
+                        break
+            except IOError:
+                pass
+        finally:
+            if f:
+                f.close()
 
         # hash/revision
         if re.search('%(r|h)', string) and branch != unknown:
             hash_file = os.path.join(file, 'refs/heads/%s' % branch)
             if os.path.exists(hash_file):
-                with open(hash_file, 'r') as f:
-                    for line in f:
-                        hash = line.strip()[0:7]
-                        break
+                try:
+                    try:
+                        f = open(hash_file, 'r')
+                        for line in f:
+                            hash = line.strip()[0:7]
+                            break
+                    except IOError:
+                        pass
+                finally:
+                    if f:
+                        f.close()
 
     # modified
     if '%m' in string:
@@ -566,35 +597,34 @@ def hg(path, string, unknown):
     branch = revision = hash = modified = untracked = unknown
 
     # changeset ID or global hash
-    # this is probably far more complicated than it needs to be
     if re.search('%(r|h)', string):
-        cache_files = map(lambda x: os.path.join(file, '%s.cache' % x),
-                          ['branchheads', 'tags'])
-        cache_files = filter(os.path.exists, cache_files)
-        if cache_files:
-            cache_file = cache_files[0]
-            with open(cache_file, 'r') as f:
+        try:
+            try:
+                f = open(os.path.join(file, 'tags.cache'), 'r')
                 for line in f:
-                    hash, revision = line.strip().split()
-                    # tags.cache file format is (revid, hash)
-                    # branchheads.cache is (hash, revid)
-                    if 'tags.cache' in cache_file:
-                        hash, revision = revision, hash
+                    revision, hash = line.strip().split()
                     hash = hash[:7]
                     break
+            except IOError:
+                pass
+        finally:
+            if f:
+                f.close()
 
     # branch
     if '%b' in string:
-        file = os.path.join(path, '.hg/branch')
-        # newer versions of Mercurial don't create the '.hg/branch*' files
-        # on running 'hg init', but the default branch is named 'default'
-        if not os.path.exists(file):
-            branch = 'default'
-        else:
-            with open(file, 'r') as f:
+        file = os.path.join(path, '.hg/undo.branch')
+        try:
+            try:
+                f = open(file, 'r')
                 for line in f:
                     branch = line.strip()
                     break
+            except IOError:
+                pass
+        finally:
+            if f:
+                f.close()
 
     # modified
     if '%m' in string:

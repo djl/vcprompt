@@ -87,8 +87,11 @@ The complete list of formatting arguments are as follows:
 Requirements
 ------------
 
-* Python 2.5+
+* Python 2.4+ (with the SQLite3 module)
 * Python 3.0+ (with 2to3)
+
+Warning! Python 2.4 is experimental at best but should work for the most part.
+Expect it to break or change in the future.
 
 
 

@@ -36,9 +36,10 @@ class Base(unittest.TestCase):
 
     def touch(self, file):
         try:
-            f = open(file, 'w')
-        except IOError:
-            pass
+            try:
+                f = open(file, 'w')
+            except IOError:
+                pass
         finally:
             f.close()
 
@@ -97,10 +98,11 @@ class BaseTest(object):
         self.assertEquals(output, '')
 
         try:
-            f = open(self.file('quotes.txt'), 'a')
-            f.write('foo')
-        except IOError:
-            self.fail()
+            try:
+                f = open(self.file('quotes.txt'), 'a')
+                f.write('foo')
+            except IOError:
+                self.fail()
         finally:
             f.close()
 
