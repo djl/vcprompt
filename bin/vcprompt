@@ -34,8 +34,12 @@ import sys
 
 try:
     import sqlite3
+    has_sqlite3 = True
 except ImportError:
-    from pysqlite2 import dbapi2 as sqlite3
+    try:
+        from pysqlite2 import dbapi2 as sqlite3
+    except ImportError:
+        has_sqlite3 = False
 
 __version__ = (0, 1, 5)
 
@@ -421,21 +425,22 @@ def fossil(path, string, unknown):
 
     # all this just to get the repository file :(
     repository = None
-    try:
+    if has_sqlite3:
         try:
-            query = "SELECT value FROM vvar where name = 'repository'"
-            conn = sqlite3.connect(file)
-            c = conn.cursor()
-            c.execute(query)
-            repository = c.fetchone()[0]
-        except sqlite3.OperationalError:
-            pass
-    finally:
-        if conn:
-            conn.close()
+            try:
+                query = "SELECT value FROM vvar where name = 'repository'"
+                conn = sqlite3.connect(file)
+                c = conn.cursor()
+                c.execute(query)
+                repository = c.fetchone()[0]
+            except sqlite3.OperationalError:
+                pass
+        finally:
+            if conn:
+                conn.close()
 
     # grab the hash from the repo
-    if repository is not None:
+    if repository is not None and has_sqlite3:
         try:
             try:
                 query = "SELECT uuid from blob ORDER BY rid DESC LIMIT 1"
@@ -450,7 +455,7 @@ def fossil(path, string, unknown):
                 conn.close()
 
     # branch
-    if hash != unknown:
+    if hash != unknown and has_sqlite3:
         try:
             try:
                 query = """SELECT value FROM tagxref WHERE rid =

@@ -87,13 +87,14 @@ The complete list of formatting arguments are as follows:
 Requirements
 ------------
 
-* Python 2.4+ (with the SQLite3 module)
+* Python 2.4+
 * Python 3.0+ (with 2to3)
 
 Warning! Python 2.4 is experimental at best but should work for the most part.
 Expect it to break or change in the future.
 
-
+Fossil support requires the SQLite3 module to be installed (built in on
+Python 2.5+).
 
 
 Testing
