@@ -27,6 +27,7 @@ fetch-darcs:
 fetch-git:
 	@echo "Fetching Git repository..."
 	@git submodule update --init > /dev/null 2>&1
+	@cd tests/repositories/git && git checkout master
 
 fetch-hg:
 	@echo "Fetching Mercurial repository..."
