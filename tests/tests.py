@@ -6,22 +6,20 @@ import re
 import sys
 import unittest
 
+config = ConfigParser.ConfigParser()
+config.read('tests.cfg')
+
 
 class BaseTest(unittest.TestCase):
 
     commands = ['../bin/vcprompt', '--without-environment']
-
-    def __init__(self, *args, **kwargs):
-        self.cfg = ConfigParser.ConfigParser()
-        self.cfg.read('tests.cfg')
-        super(BaseTest, self).__init__(*args, **kwargs)
 
     def config(self, field):
         """
         Returns the value for the given ``field`` from the
         configuration file.
         """
-        return self.cfg.get(self.__class__.__name__.lower(), field)
+        return config.get(self.__class__.__name__.lower(), field)
 
     def get_repository(self):
         """
@@ -131,7 +129,7 @@ class Base(object):
         output = self.vcprompt(format=string)
         self.assertEquals(output, '')
 
-        f = open(os.path.join(self.get_repository(), 'quotes.txt'), 'a')
+        f = open(os.path.join(self.get_repository(), 'quotes.txt'), 'w')
         f.write('foo')
 
         output = self.vcprompt(format=string)
