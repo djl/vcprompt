@@ -276,21 +276,21 @@ def bzr(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = revision = hash = modified = untracked = unknown
+    branch = revision = sha = modified = untracked = unknown
 
-    # local revision or global hash
+    # local revision or global sha
     if re.search('%(r|h)', string):
         try:
             try:
                 f = open(file, 'r')
                 for line in f:
                     line = line.strip()
-                    revision, hash = line.split(' ', 1)
+                    revision, sha = line.split(' ', 1)
                     # compensate for empty Bazaar repositories
-                    if hash == 'null:':
-                        hash = unknown
+                    if sha == 'null:':
+                        sha = unknown
                     else:
-                        hash = hash.rsplit('-', 1)[-1][:7]
+                        sha = sha.rsplit('-', 1)[-1][:7]
                         break
             except IOError:
                 pass
@@ -319,7 +319,7 @@ def bzr(path, string, unknown):
 
     # formatting
     string = string.replace('%b', os.path.basename(path))
-    string = string.replace('%h', hash)
+    string = string.replace('%h', sha)
     string = string.replace('%r', revision)
     string = string.replace('%m', modified)
     string = string.replace('%u', untracked)
@@ -360,9 +360,9 @@ def darcs(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    hash = branch = modified = untracked = unknown
+    branch = sha = modified = untracked = unknown
 
-    # hash
+    # sha
     if re.search('%(h|r)', string):
         command = 'darcs changes --last 1 --xml'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
@@ -372,7 +372,7 @@ def darcs(path, string, unknown):
         if returncode == 0:
             dom = parseString(output)
             patch = dom.getElementsByTagName("patch")[0].getAttribute("hash")
-            hash = patch.rsplit('-', 1)[-1].split('.')[0][:7]
+            sha = patch.rsplit('-', 1)[-1].split('.')[0][:7]
 
     # branch
     # darcs doesn't have in-repo local branching (yet), so just use
@@ -401,8 +401,8 @@ def darcs(path, string, unknown):
 
     # formatting
     string = string.replace('%b', branch)
-    string = string.replace('%h', hash)
-    string = string.replace('%r', hash)
+    string = string.replace('%h', sha)
+    string = string.replace('%r', sha)
     string = string.replace('%m', modified)
     string = string.replace('%u', untracked)
     string = string.replace('%s', 'darcs')
@@ -421,7 +421,7 @@ def fossil(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = hash = modified = untracked = unknown
+    branch = sha = modified = untracked = unknown
 
     # all this just to get the repository file :(
     repository = None
@@ -439,7 +439,7 @@ def fossil(path, string, unknown):
             if conn:
                 conn.close()
 
-    # grab the hash from the repo
+    # grab the sha from the repo
     if repository is not None and has_sqlite3:
         try:
             try:
@@ -447,7 +447,7 @@ def fossil(path, string, unknown):
                 conn = sqlite3.connect(repository)
                 c = conn.cursor()
                 c.execute(query)
-                hash = c.fetchone()[0][:7]
+                sha = c.fetchone()[0][:7]
             except sqlite3.OperationalError:
                 pass
         finally:
@@ -455,12 +455,12 @@ def fossil(path, string, unknown):
                 conn.close()
 
     # branch
-    if hash != unknown and has_sqlite3:
+    if sha != unknown and has_sqlite3:
         try:
             try:
                 query = """SELECT value FROM tagxref WHERE rid =
                            (SELECT rid FROM blob WHERE uuid LIKE '%s%%')
-                           AND value is not NULL LIMIT 1 """ % hash
+                           AND value is not NULL LIMIT 1 """ % sha
                 conn = sqlite3.connect(repository)
                 c = conn.cursor()
                 c.execute(query)
@@ -499,8 +499,8 @@ def fossil(path, string, unknown):
 
     # parse out formatting string
     string = string.replace('%b', branch)
-    string = string.replace('%h', hash)
-    string = string.replace('%r', hash)
+    string = string.replace('%h', sha)
+    string = string.replace('%r', sha)
     string = string.replace('%m', modified)
     string = string.replace('%u', untracked)
     string = string.replace('%s', 'fossil')
@@ -519,9 +519,9 @@ def git(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = hash = modified = untracked = unknown
+    branch = sha = modified = untracked = unknown
 
-    # the current branch is required to get the hash
+    # the current branch is required to get the sha
     if re.search('%(b|r|h)', string):
         branch_file = os.path.join(file, 'HEAD')
         try:
@@ -538,15 +538,15 @@ def git(path, string, unknown):
             if f:
                 f.close()
 
-        # hash/revision
+        # sha/revision
         if re.search('%(r|h)', string) and branch != unknown:
-            hash_file = os.path.join(file, 'refs/heads/%s' % branch)
-            if os.path.exists(hash_file):
+            sha_file = os.path.join(file, 'refs/heads/%s' % branch)
+            if os.path.exists(sha_file):
                 try:
                     try:
-                        f = open(hash_file, 'r')
+                        f = open(sha_file, 'r')
                         for line in f:
-                            hash = line.strip()[0:7]
+                            sha = line.strip()[0:7]
                             break
                     except IOError:
                         pass
@@ -579,8 +579,8 @@ def git(path, string, unknown):
 
     # formatting
     string = string.replace('%b', branch)
-    string = string.replace('%h', hash)
-    string = string.replace('%r', hash)
+    string = string.replace('%h', sha)
+    string = string.replace('%r', sha)
     string = string.replace('%m', modified)
     string = string.replace('%u', untracked)
     string = string.replace('%s', 'git')
@@ -599,16 +599,16 @@ def hg(path, string, unknown):
     if not os.path.isdir(file):
         return None
 
-    branch = revision = hash = modified = untracked = unknown
+    branch = revision = sha = modified = untracked = unknown
 
-    # changeset ID or global hash
+    # changeset ID or global sha
     if re.search('%(r|h)', string):
         try:
             try:
                 f = open(os.path.join(file, 'tags.cache'), 'r')
                 for line in f:
-                    revision, hash = line.strip().split()
-                    hash = hash[:7]
+                    revision, sha = line.strip().split()
+                    sha = sha[:7]
                     break
             except IOError:
                 pass
@@ -657,7 +657,7 @@ def hg(path, string, unknown):
             untracked = UNTRACKED
 
     string = string.replace('%b', branch)
-    string = string.replace('%h', hash)
+    string = string.replace('%h', sha)
     string = string.replace('%r', revision)
     string = string.replace('%m', modified)
     string = string.replace('%u', untracked)
@@ -698,7 +698,7 @@ def svn(path, string, unknown):
                     if matches:
                         branch = matches.groups(0)[0]
 
-            # revision/hash
+            # revision/sha
             if re.search('%(r|h)', string):
                 if re.match('Revision:', line):
                     matches = re.search(revision_regex, line)
