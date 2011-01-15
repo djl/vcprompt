@@ -281,6 +281,7 @@ def bzr(path, string, unknown):
     # local revision or global sha
     if re.search('%(r|h)', string):
         try:
+            f = None
             try:
                 f = open(file, 'r')
                 for line in f:
@@ -427,6 +428,7 @@ def fossil(path, string, unknown):
     repository = None
     if has_sqlite3:
         try:
+            conn = None
             try:
                 query = "SELECT value FROM vvar where name = 'repository'"
                 conn = sqlite3.connect(file)
@@ -442,6 +444,7 @@ def fossil(path, string, unknown):
     # grab the sha from the repo
     if repository is not None and has_sqlite3:
         try:
+            conn = None
             try:
                 query = "SELECT uuid from blob ORDER BY rid DESC LIMIT 1"
                 conn = sqlite3.connect(repository)
@@ -457,6 +460,7 @@ def fossil(path, string, unknown):
     # branch
     if sha != unknown and has_sqlite3:
         try:
+            conn = None
             try:
                 query = """SELECT value FROM tagxref WHERE rid =
                            (SELECT rid FROM blob WHERE uuid LIKE '%s%%')
@@ -525,6 +529,7 @@ def git(path, string, unknown):
     if re.search('%(b|r|h)', string):
         branch_file = os.path.join(file, 'HEAD')
         try:
+            f = None
             try:
                 f = open(branch_file, 'r')
                 for line in f:
@@ -543,6 +548,7 @@ def git(path, string, unknown):
             sha_file = os.path.join(file, 'refs/heads/%s' % branch)
             if os.path.exists(sha_file):
                 try:
+                    f = None
                     try:
                         f = open(sha_file, 'r')
                         for line in f:
@@ -604,6 +610,7 @@ def hg(path, string, unknown):
     # changeset ID or global sha
     if re.search('%(r|h)', string):
         try:
+            f = None
             try:
                 f = open(os.path.join(file, 'tags.cache'), 'r')
                 for line in f:
@@ -620,6 +627,7 @@ def hg(path, string, unknown):
     if '%b' in string:
         file = os.path.join(path, '.hg/undo.branch')
         try:
+            f = None
             try:
                 f = open(file, 'r')
                 for line in f:
