@@ -70,6 +70,7 @@ UNKNOWN = os.environ.get('VCPROMPT_UNKNOWN', '(unknown)')
 SYSTEMS = []
 
 # status indicators
+STAGED = '*'
 MODIFIED = '+'
 UNTRACKED = '?'
 
@@ -523,7 +524,7 @@ def git(path, string, unknown):
     if not os.path.exists(file):
         return None
 
-    branch = sha = modified = untracked = unknown
+    staged = branch = sha = modified = untracked = unknown
 
     # the current branch is required to get the sha
     if re.search('%(b|r|h)', string):
@@ -583,12 +584,26 @@ def git(path, string, unknown):
             else:
                 untracked = UNTRACKED
 
+    # staged files
+    if '%a' in string:
+        command = 'git diff --name-only --cached'
+        process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
+        output = process.communicate()[0]
+        returncode = process.returncode
+
+        if returncode == 0:
+            if output == '':
+                staged = ''
+            else:
+                staged = STAGED
+
     # formatting
     string = string.replace('%b', branch)
     string = string.replace('%h', sha)
     string = string.replace('%r', sha)
     string = string.replace('%m', modified)
     string = string.replace('%u', untracked)
+    string = string.replace('%a', staged)
     string = string.replace('%s', 'git')
     string = string.replace('%n', 'git')
     return string
