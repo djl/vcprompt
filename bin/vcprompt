@@ -140,70 +140,51 @@ def version(*args):
     sys.exit(0)
 
 
-def vcprompt(path, formats, unknown, *args, **kwargs):
+def vcprompt(options):
     """
     Returns a formatted version control string for use in a shell prompt
     or elsewhere.
 
     Arguments:
 
-        ``path``
-            A path for vcprompt to check for version control systems
-
-            Defaults to the current working directory.
-
-        ``formats``
-            A dictionary mapping version control systems to formatting
-            strings to use for said system.
-
-            The default format key should be named 'default'.
-
-         ``unknown``
-             The string to use for when ``vcprompt`` cannot determine a
-             value.
-
-    Keyword Arguments:
-
-        ``depth``
-           The maximum number of directories that ``vcprompt`` will traverse
-           in order to find a version control system.
-
-           Defaults to 0 (no limit).
-
-
-       ``systems``
-
-           A list of systems for ``vcprompt`` to search for over the given
-           ``path``.
-
-           Defaults to all systems.
+        ``options``
+            An optparse.Values instance.
 
     """
-    path = os.path.abspath(os.path.expanduser(path))
-    depth = kwargs.get('depth', 0)
-    systems = kwargs.get('systems', None)
+    options.path = os.path.abspath(os.path.expanduser(options.path))
     prompt = None
     count = 0
 
-    while path:
+    while options.path:
+        # bail out on non-existant paths
+        if not os.path.exists(options.path):
+            break
+
         # We need to change the current working directory or the '--path'
         # flag might not work correctly with some formatting args.
         # It's easier to do this here, rather than in every VCS function
-        if path != os.getcwd():
-            os.chdir(path)
+        if options.path != os.getcwd():
+            os.chdir(options.path)
 
         for vcs in SYSTEMS:
-            if not systems or systems and vcs.__name__ in systems:
-                format = formats[vcs.__name__] or formats['default']
-                prompt = vcs(path, format, unknown)
+            if not options.systems or options.systems and \
+                   vcs.__name__ in options.systems:
+
+                # set up custom formatting
+                vcs_format = getattr(options, 'format-' + vcs.__name__, None)
+                if vcs_format:
+                    options.format = vcs_format
+
+                prompt = vcs(options)
                 if prompt is not None:
                     return prompt
-        if depth:
-            if count == depth:
+
+        if options.depth:
+            if count == options.depth:
                 break
             count += 1
 
-        path = path.rsplit('/', 1)[0]
+        options.path = options.path.rsplit('/', 1)[0]
     return ''
 
 
@@ -248,39 +229,27 @@ def main():
         parser.add_option(flag, dest=dest, default=default)
 
 
-    # parse!
     options, args = parser.parse_args()
-
-    # break out formats into their own dictionary
-    formats = {}
-    for k, v in options.__dict__.items():
-        if k.startswith('format'):
-            k = k.split('format-')[-1]
-            if k == 'format':
-                k = 'default'
-            formats[k] = v
-
-    output = vcprompt(depth=options.depth, formats=formats, path=options.path,
-                      systems=options.systems, unknown=options.unknown)
+    output = vcprompt(options)
 
     return output
 
 
 @vcs
-def bzr(path, string, unknown):
+def bzr(options):
     """
     Bazaar
 
     The Bazaar version control system
     """
-    file = os.path.join(path, '.bzr/branch/last-revision')
+    file = os.path.join(options.path, '.bzr/branch/last-revision')
     if not os.path.exists(file):
         return None
 
-    branch = revision = sha = modified = untracked = unknown
+    branch = revision = sha = modified = untracked = options.unknown
 
     # local revision or global sha
-    if re.search('%(r|h)', string):
+    if re.search('%(r|h)', options.format):
         try:
             f = None
             try:
@@ -301,7 +270,7 @@ def bzr(path, string, unknown):
                 f.close()
 
     # status (modified/untracked)
-    if re.search('%[mu]', string):
+    if re.search('%[mu]', options.format):
         command = 'bzr status --short'
         process = Popen(command.split(), stdout=PIPE)
         output = process.communicate()[0].strip()
@@ -320,52 +289,54 @@ def bzr(path, string, unknown):
 
 
     # formatting
-    string = string.replace('%b', os.path.basename(path))
-    string = string.replace('%h', sha)
-    string = string.replace('%r', revision)
-    string = string.replace('%m', modified)
-    string = string.replace('%u', untracked)
-    string = string.replace('%s', 'bzr')
-    string = string.replace('%n', 'bzr')
-    return string
+    output = options.format
+    output = output.replace('%b', os.path.basename(options.path))
+    output = output.replace('%h', sha)
+    output = output.replace('%r', revision)
+    output = output.replace('%m', modified)
+    output = output.replace('%u', untracked)
+    output = output.replace('%s', 'bzr')
+    output = output.replace('%n', 'bzr')
+    return output
 
 
 @vcs
-def cvs(path, string, unknown):
+def cvs(options):
     """
     CVS
 
     Concurrent Versions System.
     """
-    file = os.path.join(path, 'CVS/')
+    file = os.path.join(options.path, 'CVS/')
     if not os.path.exists(file):
         return None
 
 
-    string = string.replace('%b', unknown)
-    string = string.replace('%h', unknown)
-    string = string.replace('%r', unknown)
-    string = string.replace('%m', unknown)
-    string = string.replace('%s', 'cvs')
-    string = string.replace('%n', 'cvs')
-    return string
+    output = options.format
+    output = output.replace('%b', options.unknown)
+    output = output.replace('%h', options.unknown)
+    output = output.replace('%r', options.unknown)
+    output = output.replace('%m', options.unknown)
+    output = output.replace('%s', 'cvs')
+    output = output.replace('%n', 'cvs')
+    return output
 
 
 @vcs
-def darcs(path, string, unknown):
+def darcs(options):
     """
     Darcs
 
     Distributed. Interactive. Smart.
     """
-    file = os.path.join(path, '_darcs/hashed_inventory')
+    file = os.path.join(options.path, '_darcs/hashed_inventory')
     if not os.path.exists(file):
         return None
 
-    branch = sha = modified = untracked = unknown
+    branch = sha = modified = untracked = options.unknown
 
     # sha
-    if re.search('%(h|r)', string):
+    if re.search('%(h|r)', options.format):
         command = 'darcs changes --last 1 --xml'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         output = process.communicate()[0]
@@ -380,10 +351,10 @@ def darcs(path, string, unknown):
     # darcs doesn't have in-repo local branching (yet), so just use
     # the directory name for now
     # see also: http://bugs.darcs.net/issue555
-    branch = os.path.basename(path)
+    branch = os.path.basename(options.path)
 
     # modified
-    if re.search('%[mu]', string):
+    if re.search('%[mu]', options.format):
         command = 'darcs whatsnew -l -s'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         output = process.communicate()[0]
@@ -402,28 +373,29 @@ def darcs(path, string, unknown):
 
 
     # formatting
-    string = string.replace('%b', branch)
-    string = string.replace('%h', sha)
-    string = string.replace('%r', sha)
-    string = string.replace('%m', modified)
-    string = string.replace('%u', untracked)
-    string = string.replace('%s', 'darcs')
-    string = string.replace('%n', 'darcs')
-    return string
+    output = options.format
+    output = output.replace('%b', branch)
+    output = output.replace('%h', sha)
+    output = output.replace('%r', sha)
+    output = output.replace('%m', modified)
+    output = output.replace('%u', untracked)
+    output = output.replace('%s', 'darcs')
+    output = output.replace('%n', 'darcs')
+    return output
 
 
 @vcs
-def fossil(path, string, unknown):
+def fossil(options):
     """
     Fossil
 
     The Fossil version control system.
     """
-    file = os.path.join(path, '_FOSSIL_')
+    file = os.path.join(options.path, '_FOSSIL_')
     if not os.path.exists(file):
         return None
 
-    branch = sha = modified = untracked = unknown
+    branch = sha = modified = untracked = options.unknown
 
     # all this just to get the repository file :(
     repository = None
@@ -459,7 +431,7 @@ def fossil(path, string, unknown):
                 conn.close()
 
     # branch
-    if sha != unknown and has_sqlite3:
+    if sha != options.unknown and has_sqlite3:
         try:
             conn = None
             try:
@@ -477,7 +449,7 @@ def fossil(path, string, unknown):
                 conn.close()
 
     # modified
-    if '%m' in string:
+    if '%m' in options.format:
         command = 'fossil changes'
         process = Popen(command.split(), stdout=PIPE)
         output = process.communicate()[0]
@@ -490,7 +462,7 @@ def fossil(path, string, unknown):
                 modified = ''
 
     # untracked files
-    if '%u' in string:
+    if '%u' in options.format:
         command = 'fossil extras'
         process = Popen(command.split(), stdout=PIPE)
         output = process.communicate()[0]
@@ -503,31 +475,32 @@ def fossil(path, string, unknown):
                 untracked = ''
 
     # parse out formatting string
-    string = string.replace('%b', branch)
-    string = string.replace('%h', sha)
-    string = string.replace('%r', sha)
-    string = string.replace('%m', modified)
-    string = string.replace('%u', untracked)
-    string = string.replace('%s', 'fossil')
-    string = string.replace('%n', 'fossil')
-    return string
+    output = options.format
+    output = output.replace('%b', branch)
+    output = output.replace('%h', sha)
+    output = output.replace('%r', sha)
+    output = output.replace('%m', modified)
+    output = output.replace('%u', untracked)
+    output = output.replace('%s', 'fossil')
+    output = output.replace('%n', 'fossil')
+    return output
 
 
 @vcs
-def git(path, string, unknown):
+def git(options):
     """
     Git
 
     The fast version control system.
     """
-    file = os.path.join(path, '.git/')
+    file = os.path.join(options.path, '.git/')
     if not os.path.exists(file):
         return None
 
-    staged = branch = sha = modified = untracked = unknown
+    staged = branch = sha = modified = untracked = options.unknown
 
     # the current branch is required to get the sha
-    if re.search('%(b|r|h)', string):
+    if re.search('%(b|r|h)', options.format):
         branch_file = os.path.join(file, 'HEAD')
         try:
             f = None
@@ -536,7 +509,7 @@ def git(path, string, unknown):
                 for line in f:
                     line = line.strip()
                     if re.match('^ref: refs/heads/', line):
-                        branch = (line.split('/')[-1] or unknown)
+                        branch = (line.split('/')[-1] or options.unknown)
                         break
             except IOError:
                 pass
@@ -545,7 +518,7 @@ def git(path, string, unknown):
                 f.close()
 
         # sha/revision
-        if re.search('%(r|h)', string) and branch != unknown:
+        if re.search('%(r|h)', options.format) and branch != options.unknown:
             sha_file = os.path.join(file, 'refs/heads/%s' % branch)
             if os.path.exists(sha_file):
                 try:
@@ -562,7 +535,7 @@ def git(path, string, unknown):
                         f.close()
 
     # modified
-    if '%m' in string:
+    if '%m' in options.format:
         command = 'git diff --diff-filter=M --exit-code'
         returncode = call(command, stdout=PIPE, stderr=PIPE, shell=True)
 
@@ -572,7 +545,7 @@ def git(path, string, unknown):
             modified = ''
 
     # untracked files
-    if '%u' in string:
+    if '%u' in options.format:
         command = 'git ls-files --other --exclude-standard'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         output = process.communicate()[0]
@@ -585,7 +558,7 @@ def git(path, string, unknown):
                 untracked = UNTRACKED
 
     # staged files
-    if '%a' in string:
+    if '%a' in options.format:
         command = 'git diff --name-only --cached'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         output = process.communicate()[0]
@@ -598,32 +571,33 @@ def git(path, string, unknown):
                 staged = STAGED
 
     # formatting
-    string = string.replace('%b', branch)
-    string = string.replace('%h', sha)
-    string = string.replace('%r', sha)
-    string = string.replace('%m', modified)
-    string = string.replace('%u', untracked)
-    string = string.replace('%a', staged)
-    string = string.replace('%s', 'git')
-    string = string.replace('%n', 'git')
-    return string
+    output = options.format
+    output = output.replace('%b', branch)
+    output = output.replace('%h', sha)
+    output = output.replace('%r', sha)
+    output = output.replace('%m', modified)
+    output = output.replace('%u', untracked)
+    output = output.replace('%a', staged)
+    output = output.replace('%s', 'git')
+    output = output.replace('%n', 'git')
+    return output
 
 
 @vcs
-def hg(path, string, unknown):
+def hg(options):
     """
     Mercurial
 
     The Mercurial version control system.
     """
-    file = os.path.join(path, '.hg')
+    file = os.path.join(options.path, '.hg')
     if not os.path.isdir(file):
         return None
 
-    branch = revision = sha = modified = untracked = unknown
+    branch = revision = sha = modified = untracked = options.unknown
 
     # changeset ID or global sha
-    if re.search('%(r|h)', string):
+    if re.search('%(r|h)', options.format):
         try:
             f = None
             try:
@@ -639,8 +613,8 @@ def hg(path, string, unknown):
                 f.close()
 
     # branch
-    if '%b' in string:
-        file = os.path.join(path, '.hg/undo.branch')
+    if '%b' in options.format:
+        file = os.path.join(options.path, '.hg/undo.branch')
         try:
             f = None
             try:
@@ -655,7 +629,7 @@ def hg(path, string, unknown):
                 f.close()
 
     # modified
-    if '%m' in string:
+    if '%m' in options.format:
         command = 'hg status --modified'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         output = process.communicate()[0].strip()
@@ -668,7 +642,7 @@ def hg(path, string, unknown):
                 modified = MODIFIED
 
     # untracked
-    if '%u' in string:
+    if '%u' in options.format:
         command = 'hg status --unknown'
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         output = process.communicate()[0]
@@ -679,31 +653,32 @@ def hg(path, string, unknown):
         else:
             untracked = UNTRACKED
 
-    string = string.replace('%b', branch)
-    string = string.replace('%h', sha)
-    string = string.replace('%r', revision)
-    string = string.replace('%m', modified)
-    string = string.replace('%u', untracked)
-    string = string.replace('%s', 'hg')
-    string = string.replace('%n', 'hg')
-    return string
+    output = options.format
+    output = output.replace('%b', branch)
+    output = output.replace('%h', sha)
+    output = output.replace('%r', revision)
+    output = output.replace('%m', modified)
+    output = output.replace('%u', untracked)
+    output = output.replace('%s', 'hg')
+    output = output.replace('%n', 'hg')
+    return output
 
 
 @vcs
-def svn(path, string, unknown):
+def svn(options):
     """
     Subversion
 
     The Subversion version control system.
     """
-    file = os.path.join(path, '.svn/entries')
+    file = os.path.join(options.path, '.svn/entries')
     if not os.path.exists(file):
         return None
 
-    branch = revision = modified = untracked = unknown
+    branch = revision = modified = untracked = options.unknown
 
     # branch
-    command = 'svn info %s' % path
+    command = 'svn info %s' % options.path
     process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
     output = process.communicate()[0]
     returncode = process.returncode
@@ -715,21 +690,21 @@ def svn(path, string, unknown):
 
         for line in output.split('\n'):
             # branch
-            if '%b' in string:
+            if '%b' in options.format:
                 if re.match('URL:', line):
                     matches = re.search(branch_regex, line)
                     if matches:
                         branch = matches.groups(0)[0]
 
             # revision/sha
-            if re.search('%(r|h)', string):
+            if re.search('%(r|h)', options.format):
                 if re.match('Revision:', line):
                     matches = re.search(revision_regex, line)
                     if 'revision' in matches.groupdict():
                         revision = matches.group('revision')
 
     # modified
-    if re.search('%[mu]', string):
+    if re.search('%[mu]', options.format):
         command = 'svn status'
         process = Popen(command, shell=True, stdout=PIPE)
         output = process.communicate()[0]
@@ -747,14 +722,15 @@ def svn(path, string, unknown):
                     untracked = UNTRACKED
 
     # formatting
-    string = string.replace('%r', revision)
-    string = string.replace('%h', revision)
-    string = string.replace('%b', branch)
-    string = string.replace('%m', modified)
-    string = string.replace('%u', untracked)
-    string = string.replace('%s', 'svn')
-    string = string.replace('%n', 'svn')
-    return string
+    output = options.format
+    output = output.replace('%r', revision)
+    output = output.replace('%h', revision)
+    output = output.replace('%b', branch)
+    output = output.replace('%m', modified)
+    output = output.replace('%u', untracked)
+    output = output.replace('%s', 'svn')
+    output = output.replace('%n', 'svn')
+    return output
 
 
 if __name__ == '__main__':
