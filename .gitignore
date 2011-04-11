@@ -6,8 +6,7 @@ dist/
 MANIFEST
 tests/repositories/bzr
 tests/repositories/darcs
-tests/repositories/fossil/manifest*
-tests/repositories/fossil/_FOSSIL_*
-tests/repositories/fossil/.fos*
+tests/repositories/fossil/*
+!tests/repositories/fossil/fossil
 tests/repositories/hg
 tests/repositories/svn
