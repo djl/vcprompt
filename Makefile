@@ -13,6 +13,7 @@ revert:
 	@cd tests/repositories/git && git reset -q --hard HEAD > /dev/null 2>&1
 	@cd tests/repositories/hg && hg revert -a --no-backup > /dev/null 2>&1
 	@cd tests/repositories/svn && svn revert -R . > /dev/null 2>&1
+	@find . -name untracked_file | xargs rm
 
 fetch-bzr:
 	@echo "Fetching Bazaar repository..."
