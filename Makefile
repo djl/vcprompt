@@ -27,7 +27,7 @@ fetch-darcs:
 
 fetch-fossil:
 	@echo "Fetching Fossil repository..."
-	@cd tests/repositories/fossil && fossil open fossil
+	@cd tests/repositories/fossil && fossil open fossil > /dev/null 2>&1
 
 fetch-git:
 	@echo "Fetching Git repository..."
