@@ -3,12 +3,12 @@ help:
 	@echo '  fetch-repositories   - fetch repositories required for testing'
 	@echo '  test                 - run tests'
 
-test: run_tests revert
+test: run_tests clean
 
 run_tests:
 	@cd tests && python tests.py
 
-revert:
+clean:
 	@cd tests/repositories/bzr && bzr revert --no-backup > /dev/null 2>&1
 	@cd tests/repositories/darcs && darcs revert -a > /dev/null 2>&1
 	@cd tests/repositories/fossil && fossil revert > /dev/null 2>&1
@@ -70,4 +70,4 @@ update-svn:
 
 update-repositories: update-bzr update-darcs update-git update-hg update-svn
 
-.PHONY: help run_tests test $(wildcard fetch-*) $(wildcard update-*)
+.PHONY: clean help run_tests test $(wildcard fetch-*) $(wildcard update-*)
