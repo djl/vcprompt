@@ -3,7 +3,9 @@ help:
 	@echo '  fetch-repositories   - fetch repositories required for testing'
 	@echo '  test                 - run tests'
 
-test:
+test: run_tests revert
+
+run_tests:
 	@cd tests && python tests.py
 
 revert:
@@ -68,4 +70,4 @@ update-svn:
 
 update-repositories: update-bzr update-darcs update-git update-hg update-svn
 
-.PHONY: help test $(wildcard fetch-*) $(wildcard update-*)
+.PHONY: help run_tests test $(wildcard fetch-*) $(wildcard update-*)
