@@ -24,6 +24,10 @@ fetch-darcs:
 	@if [ -d tests/repositories/darcs ]; then rm -rf tests/repositories/darcs; fi
 	@darcs get http://patch-tag.com/r/davidlogie/quotes tests/repositories/darcs > /dev/null 2>&1
 
+fetch-fossil:
+	@echo "Fetching Fossil repository..."
+	@cd tests/repositories/fossil && fossil open fossil
+
 fetch-git:
 	@echo "Fetching Git repository..."
 	@git submodule update --init > /dev/null 2>&1
@@ -39,7 +43,7 @@ fetch-svn:
 	@if [ -d tests/repositories/svn ]; then rm -rf tests/repositories/svn; fi
 	@svn checkout http://svn.github.com/xvzf/quotes.git tests/repositories/svn > /dev/null 2>&1
 
-fetch-repositories: fetch-bzr fetch-darcs fetch-git fetch-hg fetch-svn
+fetch-repositories: fetch-bzr fetch-darcs fetch-fossil fetch-git fetch-hg fetch-svn
 
 update-bzr:
 	@echo "Updating Bazaar repository..."
