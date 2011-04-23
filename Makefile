@@ -1,3 +1,6 @@
+SHELL  := bash
+stdout := /dev/null #/dev/stdout
+
 help:
 	@echo 'Commonly used make targets:'
 	@echo '  fetch-repositories   - fetch repositories required for testing'
@@ -9,56 +12,56 @@ run_tests:
 	@cd tests && python tests.py
 
 clean:
-	@cd tests/repositories/bzr && bzr revert --no-backup > /dev/null 2>&1
-	@cd tests/repositories/darcs && darcs revert -a > /dev/null 2>&1
-	@cd tests/repositories/fossil && fossil revert > /dev/null 2>&1
-	@cd tests/repositories/git && git reset -q --hard HEAD > /dev/null 2>&1
-	@cd tests/repositories/hg && hg revert -a --no-backup > /dev/null 2>&1
-	@cd tests/repositories/svn && svn revert -R . > /dev/null 2>&1
-	@find . -name untracked_file | xargs rm
+	-@cd tests/repositories/bzr && bzr revert --no-backup &>$(stdout)
+	-@cd tests/repositories/darcs && darcs revert -a &>$(stdout)
+	-@cd tests/repositories/fossil && fossil revert &>$(stdout)
+	-@cd tests/repositories/git && [[ -d .git ]] && git reset -q --hard HEAD &>$(stdout)
+	-@cd tests/repositories/hg && hg revert -a --no-backup &>$(stdout)
+	-@cd tests/repositories/svn && svn revert -R . &>$(stdout)
+	-@find . -name untracked_file | xargs rm
 
 fetch-bzr:
 	@echo "Fetching Bazaar repository..."
 	@if [ -d tests/repositories/bzr ]; then rm -rf tests/repositories/bzr; fi
-	@bzr branch lp:~davidlogie/vcprompt-quotes/trunk tests/repositories/bzr > /dev/null 2>&1
+	@bzr branch lp:~davidlogie/vcprompt-quotes/trunk tests/repositories/bzr &>$(stdout)
 
 fetch-darcs:
 	@echo "Fetching Darcs repository..."
 	@if [ -d tests/repositories/darcs ]; then rm -rf tests/repositories/darcs; fi
-	@darcs get http://patch-tag.com/r/davidlogie/quotes tests/repositories/darcs > /dev/null 2>&1
+	@darcs get http://patch-tag.com/r/davidlogie/quotes tests/repositories/darcs &>$(stdout)
 
 fetch-fossil:
 	@echo "Fetching Fossil repository..."
-	@cd tests/repositories/fossil && fossil open fossil > /dev/null 2>&1
+	@cd tests/repositories/fossil && fossil open fossil &>$(stdout)
 
 fetch-git:
 	@echo "Fetching Git repository..."
-	@git submodule update --init > /dev/null 2>&1
+	@git submodule update --init &>$(stdout)
 	@cd tests/repositories/git && git checkout master
 
 fetch-hg:
 	@echo "Fetching Mercurial repository..."
 	@if [ -d tests/repositories/hg ]; then rm -rf tests/repositories/hg; fi
-	@hg clone https://bitbucket.org/xvzf/quotes tests/repositories/hg > /dev/null 2>&1
+	@hg clone https://bitbucket.org/xvzf/quotes tests/repositories/hg &>$(stdout)
 
 fetch-svn:
 	@echo "Fetching out SVN repository..."
 	@if [ -d tests/repositories/svn ]; then rm -rf tests/repositories/svn; fi
-	@svn checkout http://svn.github.com/xvzf/quotes.git tests/repositories/svn > /dev/null 2>&1
+	@svn checkout http://svn.github.com/xvzf/quotes.git tests/repositories/svn &>$(stdout)
 
 fetch-repositories: fetch-bzr fetch-darcs fetch-fossil fetch-git fetch-hg fetch-svn
 
 update-bzr:
 	@echo "Updating Bazaar repository..."
-	@cd tests/repositories/bzr && bzr pull > /dev/null 2>&1
+	@cd tests/repositories/bzr && bzr pull &>$(stdout)
 
 update-darcs:
 	@echo "Updating Darcs repository..."
-	@cd tests/repositories/darcs && darcs pull -a > /dev/null 2>&1
+	@cd tests/repositories/darcs && darcs pull -a &>$(stdout)
 
 update-git:
 	@echo "Updating Git repository..."
-	@git submodule update > /dev/null 2>&1
+	@git submodule update &>$(stdout)
 
 update-hg:
 	@echo "Updating Mercurial repository..."
