@@ -1,5 +1,5 @@
 SHELL  := bash
-stdout := /dev/null #/dev/stdout
+stdout := /dev/null
 
 help:
 	@echo 'Commonly used make targets:'
