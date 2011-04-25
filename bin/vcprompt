@@ -734,4 +734,6 @@ def svn(options):
 
 
 if __name__ == '__main__':
-    print main()
+    prompt = main()
+    if prompt: print prompt
+    else: sys.exit(1)
