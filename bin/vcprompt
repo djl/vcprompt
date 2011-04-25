@@ -228,7 +228,6 @@ def main():
         flag = '--%s' % dest
         parser.add_option(flag, dest=dest, default=default)
 
-
     options, args = parser.parse_args()
     output = vcprompt(options)
 
@@ -251,23 +250,18 @@ def bzr(options):
     # local revision or global sha
     if re.search('%(r|h)', options.format):
         try:
-            f = None
-            try:
-                f = open(file, 'r')
-                for line in f:
-                    line = line.strip()
-                    revision, sha = line.split(' ', 1)
-                    # compensate for empty Bazaar repositories
-                    if sha == 'null:':
-                        sha = unknown
-                    else:
-                        sha = sha.rsplit('-', 1)[-1][:7]
-                        break
-            except IOError:
-                pass
-        finally:
-            if f:
-                f.close()
+            fh = open(file, 'r')
+            for line in fh:
+                line = line.strip()
+                revision, sha = line.split(' ', 1)
+                # compensate for empty Bazaar repositories
+                if sha == 'null:':
+                    sha = unknown
+                else:
+                    sha = sha.rsplit('-', 1)[-1][:7]
+                    break
+        except IOError:
+            pass
 
     # status (modified/untracked)
     if re.search('%[mu]', options.format):
@@ -286,7 +280,6 @@ def bzr(options):
                         modified = MODIFIED
                     elif line.startswith('?'):
                         untracked = UNTRACKED
-
 
     # formatting
     output = options.format
@@ -310,7 +303,6 @@ def cvs(options):
     file = os.path.join(options.path, 'CVS/')
     if not os.path.exists(file):
         return None
-
 
     output = options.format
     output = output.replace('%b', options.unknown)
@@ -370,7 +362,6 @@ def darcs(options):
                     modified = MODIFIED
                 elif line.startswith('a'):
                     untracked = UNTRACKED
-
 
     # formatting
     output = options.format
@@ -499,40 +490,36 @@ def git(options):
 
     staged = branch = sha = modified = untracked = options.unknown
 
+    def revstring(ref, chars=7):
+        sha_file = os.path.join(file, ref)
+        if not os.path.exists(sha_file):
+            return ''
+
+        try:
+            fh = open(sha_file, 'r')
+            for line in fh:
+                return line.strip()[0:chars]
+        except IOError:
+            pass
+        return ''
+
     # the current branch is required to get the sha
     if re.search('%(b|r|h)', options.format):
         branch_file = os.path.join(file, 'HEAD')
         try:
-            f = None
-            try:
-                f = open(branch_file, 'r')
-                for line in f:
-                    line = line.strip()
-                    if re.match('^ref: refs/heads/', line):
-                        branch = (line.split('/')[-1] or options.unknown)
-                        break
-            except IOError:
-                pass
-        finally:
-            if f:
-                f.close()
+            fh = open(branch_file, 'r')
+            for line in fh:
+                line = line.strip()
+                if line.startswith('ref: refs/heads/'):
+                    branch = (line.split('/')[-1] or options.unknown)
+                    break
+        except IOError:
+            pass
 
         # sha/revision
         if re.search('%(r|h)', options.format) and branch != options.unknown:
             sha_file = os.path.join(file, 'refs/heads/%s' % branch)
-            if os.path.exists(sha_file):
-                try:
-                    f = None
-                    try:
-                        f = open(sha_file, 'r')
-                        for line in f:
-                            sha = line.strip()[0:7]
-                            break
-                    except IOError:
-                        pass
-                finally:
-                    if f:
-                        f.close()
+            sha = revstring(sha_file)
 
     # modified
     if '%m' in options.format:
@@ -599,34 +586,22 @@ def hg(options):
     # changeset ID or global sha
     if re.search('%(r|h)', options.format):
         try:
-            f = None
-            try:
-                f = open(os.path.join(file, 'tags.cache'), 'r')
-                for line in f:
-                    revision, sha = line.strip().split()
-                    sha = sha[:7]
-                    break
-            except IOError:
-                pass
-        finally:
-            if f:
-                f.close()
+            fh = open(os.path.join(file, 'tags.cache'), 'r')
+            line = fh.readline()
+            revision, sha = line.strip().split()
+            sha = sha[:7]
+        except IOError:
+            pass
 
     # branch
     if '%b' in options.format:
         file = os.path.join(options.path, '.hg/undo.branch')
         try:
-            f = None
-            try:
-                f = open(file, 'r')
-                for line in f:
-                    branch = line.strip()
-                    break
-            except IOError:
-                pass
-        finally:
-            if f:
-                f.close()
+            fh = open(file, 'r')
+            line = fh.readline()
+            branch = line.strip()
+        except IOError:
+            pass
 
     # modified
     if '%m' in options.format:
