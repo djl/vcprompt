@@ -523,7 +523,7 @@ def git(options):
 
     # modified
     if '%m' in options.format:
-        command = 'git diff --diff-filter=M --exit-code'
+        command = 'git diff --name-status --exit-code'
         returncode = call(command, stdout=PIPE, stderr=PIPE, shell=True)
 
         if returncode == 1:
