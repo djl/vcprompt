@@ -19,7 +19,7 @@ Installing
 ::
 
     # assuming ~/bin is on your $PATH
-    $ curl -s https://github.com/xvzf/vcprompt/raw/master/bin/vcprompt > ~/bin/vcprompt
+    $ curl -sL https://github.com/xvzf/vcprompt/raw/master/bin/vcprompt > ~/bin/vcprompt
     $ chmod 755 ~/bin/vcprompt
 
 
