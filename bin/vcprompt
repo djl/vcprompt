@@ -586,9 +586,9 @@ def hg(options):
     # changeset ID or global sha
     if re.search('%(r|h)', options.format):
         try:
-            fh = open(os.path.join(file, 'tags.cache'), 'r')
+            fh = open(os.path.join(file, 'cache/branchheads'), 'r')
             line = fh.readline()
-            revision, sha = line.strip().split()
+            sha, revision = line.strip().split()
             sha = sha[:7]
         except IOError:
             pass
