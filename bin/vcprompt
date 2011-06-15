@@ -95,20 +95,6 @@ def systems(*args, **kwargs):
     sys.exit(0)
 
 
-def values(option, opt, value, parser, *args, **kwargs):
-    """
-    Prints the given values to stdout.
-
-    This function is *private* and should not be relied on.
-    """
-    for option in parser.rargs:
-        if option == 'SYSTEMS':
-            systems()
-        if option in globals().keys():
-            print globals()[option]
-    sys.exit(0)
-
-
 def vcs(file):
     """
     A convenience decorator.
@@ -209,10 +195,6 @@ def main():
 
     # version
     parser.add_option('-v', '--version', action='callback', callback=version)
-
-    # values
-    parser.add_option('--values', dest='values', action='callback',
-                      callback=values)
 
     # vcs-specific formatting
     for system in SYSTEMS:
