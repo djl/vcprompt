@@ -112,24 +112,18 @@ def values(option, opt, value, parser, *args, **kwargs):
     sys.exit(0)
 
 
-def vcs(function):
+def vcs(file):
     """
-    Adds the given ``name`` and ``description`` as attributes on the
-    wrapped function.
+    A convenience decorator.
 
-    Arguments:
-
-        ``name``
-            The display name for the system. E.g. "Mercurial" or
-            "Subversion".
-
-         ``description``
-             The description for the system. E.g.:
-             "The fast version continue system".
-
+    Wraps a VCS function, appending it to ``SYSTEMS`` and sets the ``file``
+    attribute.
     """
-    SYSTEMS.append(function)
-    return function
+    def wrapper(function):
+        SYSTEMS.append(function)
+        function.file = file
+        return function
+    return wrapper
 
 
 def version(*args):
@@ -170,10 +164,16 @@ def vcprompt(options):
             if not options.systems or options.systems and \
                    vcs.__name__ in options.systems:
 
+                if not os.path.exists(vcs.file):
+                    continue
+
                 # set up custom formatting
                 vcs_format = getattr(options, 'format-' + vcs.__name__, None)
                 if vcs_format:
                     options.format = vcs_format
+
+                # the "vcs" file
+                options.file = vcs.file
 
                 prompt = vcs(options)
                 if prompt is not None:
@@ -234,23 +234,19 @@ def main():
     return output
 
 
-@vcs
+@vcs(file=".bzr/branch/last-revision")
 def bzr(options):
     """
     Bazaar
 
     The Bazaar version control system
     """
-    file = os.path.join(options.path, '.bzr/branch/last-revision')
-    if not os.path.exists(file):
-        return None
-
     branch = revision = sha = modified = untracked = options.unknown
 
     # local revision or global sha
     if re.search('%(r|h)', options.format):
         try:
-            fh = open(file, 'r')
+            fh = open(options.file, 'r')
             for line in fh:
                 line = line.strip()
                 revision, sha = line.split(' ', 1)
@@ -294,16 +290,12 @@ def bzr(options):
 
 
 @vcs
-def cvs(options):
+def cvs(file="CVS"):
     """
     CVS
 
     Concurrent Versions System.
     """
-    file = os.path.join(options.path, 'CVS/')
-    if not os.path.exists(file):
-        return None
-
     output = options.format
     output = output.replace('%b', options.unknown)
     output = output.replace('%h', options.unknown)
@@ -314,17 +306,13 @@ def cvs(options):
     return output
 
 
-@vcs
+@vcs(file="_darcs/hashed_inventory")
 def darcs(options):
     """
     Darcs
 
     Distributed. Interactive. Smart.
     """
-    file = os.path.join(options.path, '_darcs/hashed_inventory')
-    if not os.path.exists(file):
-        return None
-
     branch = sha = modified = untracked = options.unknown
 
     # sha
@@ -375,17 +363,13 @@ def darcs(options):
     return output
 
 
-@vcs
+@vcs(file="_FOSSIL_")
 def fossil(options):
     """
     Fossil
 
     The Fossil version control system.
     """
-    file = os.path.join(options.path, '_FOSSIL_')
-    if not os.path.exists(file):
-        return None
-
     branch = sha = modified = untracked = options.unknown
 
     # all this just to get the repository file :(
@@ -395,7 +379,7 @@ def fossil(options):
             conn = None
             try:
                 query = "SELECT value FROM vvar where name = 'repository'"
-                conn = sqlite3.connect(file)
+                conn = sqlite3.connect(options.file)
                 c = conn.cursor()
                 c.execute(query)
                 repository = c.fetchone()[0]
@@ -477,26 +461,21 @@ def fossil(options):
     return output
 
 
-@vcs
+@vcs(file=".git")
 def git(options):
     """
     Git
 
     The fast version control system.
     """
-    file = os.path.join(options.path, '.git/')
-    if not os.path.exists(file):
-        return None
-
     staged = branch = sha = modified = untracked = options.unknown
 
     def revstring(ref, chars=7):
-        sha_file = os.path.join(file, ref)
-        if not os.path.exists(sha_file):
+        if not os.path.exists(ref):
             return ''
 
         try:
-            fh = open(sha_file, 'r')
+            fh = open(ref, 'r')
             for line in fh:
                 return line.strip()[0:chars]
         except IOError:
@@ -505,7 +484,7 @@ def git(options):
 
     # the current branch is required to get the sha
     if re.search('%(b|r|h)', options.format):
-        branch_file = os.path.join(file, 'HEAD')
+        branch_file = os.path.join(options.file, 'HEAD')
         try:
             fh = open(branch_file, 'r')
             for line in fh:
@@ -518,7 +497,7 @@ def git(options):
 
         # sha/revision
         if re.search('%(r|h)', options.format) and branch != options.unknown:
-            sha_file = os.path.join(file, 'refs/heads/%s' % branch)
+            sha_file = os.path.join(options.file, 'refs/heads/%s' % branch)
             sha = revstring(sha_file)
 
     # modified
@@ -570,23 +549,19 @@ def git(options):
     return output
 
 
-@vcs
+@vcs(file=".hg")
 def hg(options):
     """
     Mercurial
 
     The Mercurial version control system.
     """
-    file = os.path.join(options.path, '.hg')
-    if not os.path.isdir(file):
-        return None
-
     branch = revision = sha = modified = untracked = options.unknown
 
     # changeset ID or global sha
     if re.search('%(r|h)', options.format):
         try:
-            fh = open(os.path.join(file, 'cache/branchheads'), 'r')
+            fh = open(os.path.join(options.file, 'cache/branchheads'), 'r')
             line = fh.readline()
             sha, revision = line.strip().split()
             sha = sha[:7]
@@ -595,7 +570,7 @@ def hg(options):
 
     # branch
     if '%b' in options.format:
-        file = os.path.join(file, 'undo.branch')
+        file = os.path.join(options.file, 'undo.branch')
         try:
             fh = open(file, 'r')
             line = fh.readline()
@@ -639,17 +614,13 @@ def hg(options):
     return output
 
 
-@vcs
+@vcs(file=".svn/entries")
 def svn(options):
     """
     Subversion
 
     The Subversion version control system.
     """
-    file = os.path.join(options.path, '.svn/entries')
-    if not os.path.exists(file):
-        return None
-
     branch = revision = modified = untracked = options.unknown
 
     # branch
