@@ -8,8 +8,8 @@ Options:
   -f, --format FORMAT        The format string to use.
   -p, --path PATH            The path to run vcprompt on.
   -d, --max-depth DEPTH      The maximum number of directories to traverse.
-  -s, --systems SYSTEMS      The version control systems to use.
   -u, --unknown UNKNOWN      The "unknown" value.
+  -s, --systems              Print all known VCSs and exit
   -v, --version              Show program's version number and exit
   -h, --help                 Show this help message and exit
 
@@ -88,13 +88,10 @@ def helper(*args, **kwargs):
     sys.exit(0)
 
 
-def systems():
+def systems(*args, **kwargs):
     """Prints all available systems to stdout."""
     for system in SYSTEMS:
-        doc = system.__doc__.split('\n')
-        name, desc = filter(bool, map(lambda x: x.strip(), doc))
-        output = '%s: %s' % (name, desc)
-        print output
+        print system.func_name
     sys.exit(0)
 
 
@@ -161,23 +158,20 @@ def vcprompt(options):
             os.chdir(options.path)
 
         for vcs in SYSTEMS:
-            if not options.systems or options.systems and \
-                   vcs.__name__ in options.systems:
+            if not os.path.exists(vcs.file):
+                continue
 
-                if not os.path.exists(vcs.file):
-                    continue
+            # set up custom formatting
+            vcs_format = getattr(options, 'format-' + vcs.__name__, None)
+            if vcs_format:
+                options.format = vcs_format
 
-                # set up custom formatting
-                vcs_format = getattr(options, 'format-' + vcs.__name__, None)
-                if vcs_format:
-                    options.format = vcs_format
+            # the "vcs" file
+            options.file = vcs.file
 
-                # the "vcs" file
-                options.file = vcs.file
-
-                prompt = vcs(options)
-                if prompt is not None:
-                    return prompt
+            prompt = vcs(options)
+            if prompt is not None:
+                return prompt
 
         if options.depth:
             if count == options.depth:
@@ -208,7 +202,7 @@ def main():
     parser.add_option('-d', '--max-depth', dest='depth', type='int',
                       default=DEPTH)
     # systems
-    parser.add_option('-s', '--systems', dest='systems', action='append')
+    parser.add_option('-s', '--systems', action='callback', callback=systems)
 
     # unknown
     parser.add_option('-u', '--unknown', dest='unknown', default=UNKNOWN)
