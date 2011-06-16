@@ -12,12 +12,16 @@ Download vcprompt, make it executable and add it to your prompt:
 
     $ curl -sL https://github.com/xvzf/vcprompt/raw/master/bin/vcprompt > ~/bin/vcprompt
     $ chmod 755 ~/bin/vcprompt
-    $ export PS1="$(vcprompt) $PS1"
+
+For bash, you'll want to do something like this:
+
+    $ export PS1='\u@\h:\w $(vcprompt)\$'
 
 ZSH users should be aware that they will have to set the
 `PROMPT_SUBST` option first:
 
-    $ setopt PROMPT_SUBST
+    $ setopt prompt_subst
+    $ export PS1='%n@%m:%~ $(vcprompt)$ '
 
 
 
