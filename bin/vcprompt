@@ -265,8 +265,8 @@ def bzr(options):
     return output
 
 
-@vcs
-def cvs(file="CVS"):
+@vcs(file="CVS")
+def cvs(options):
     """
     CVS
 
