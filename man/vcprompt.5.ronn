@@ -3,35 +3,26 @@ vcprompt(5) -- Prompt formatting syntax
 
 ## SYNTAX
 
+* `%s` or `%n`:
+  The "short name" of the version control system currently in use.
+  E.g. git, hg, svn
+
 * `%b`:
-  The current branch of the repository.
+  The current branch. If the branch is not available or not supported
+  it will be the directory where the version control system was first
+  encountered.
 
 * `%h`:
-  The hash of the most recent commit in the repository.
-
-  If the version control system does not provide a hash for each commit
-  or changeset, it will fall back onto the revision number.
-
-* `%m`:
-  Indicates whether the repository contains modified files.
-  
-  The output is a plus symbol ('+').
-
+  The hash of the repository. If no hash is available it will show 
+  the revision number instead.
 
 * `%r`:
-  The current revision number of the repository.
+  The revision number of the repository. If no revision number is 
+  available it will return the hash instead.
 
-  If the version control in use does not have revision numbers,
-  it will fall back to the most recent commit's SHA1 hash
-  (or equivalent).
-
-* `%s`:
-  The version control system in use.
-
-  Uses the 'short' or executable name for each system.
+* `%m`:
+  Displays a plus symbol (+) if the repository has any modified files.
 
 * `%u`:
-  Indicates whether the repository contains untracked files.
-
-  The output is a plus symbol ('?').
-
+  Displays an exclamtion mark (!) if there is any untracked files in
+  the repository.

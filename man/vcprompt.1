@@ -1,10 +1,10 @@
-.\" generated with Ronn/v0.5
-.\" http://github.com/rtomayko/ronn/
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "VCPROMPT" "1" "May 2010" "" ""
+.TH "VCPROMPT" "1" "July 2011" "" ""
 .
 .SH "NAME"
-\fBvcprompt\fR \-\- Version control information in your prompt
+\fBvcprompt\fR \- Version control information in your prompt
 .
 .SH "SYNOPSIS"
 \fBvcprompt\fR [ \fIOPTIONS\fR ]
@@ -28,8 +28,7 @@
 \fBvcprompt\fR \-\-systems \fISYSTEMS\fR
 .
 .SH "DESCRIPTION"
-vcprompt is a small utility for displaying version control information
-in your shell's prompt.
+vcprompt is a small utility for displaying version control information in your shell\'s prompt\.
 .
 .SH "INSTALL"
 \fBvcprompt\fR is best installed a standalone executable:
@@ -39,7 +38,7 @@ in your shell's prompt.
 .nf
 
 # assuming ~/bin is on your $PATH
-$ curl \-s http://github.com/xvzf/vcprompt/raw/master/bin/vcprompt >> ~/bin/vcprompt
+$ curl \-s http://github\.com/xvzf/vcprompt/raw/master/bin/vcprompt >> ~/bin/vcprompt
 $ chmod 755 ~/bin/vcprompt
 .
 .fi
@@ -53,9 +52,9 @@ Or, clone the git repository:
 .
 .nf
 
-$ git clone git://github.com/xvzf/vcprompt.git
+$ git clone git://github\.com/xvzf/vcprompt\.git
 $ cd vcprompt
-$ [sudo] python setup.py install
+$ [sudo] python setup\.py install
 .
 .fi
 .
@@ -79,79 +78,59 @@ $ [sudo] easy_install vcprompt
 .
 .TP
 \fB\-f\fR, \fB\-\-format\fR=FORMAT
-The format string to use when displaying information.
+The format string to use when displaying information\.
 .
 .IP
-If not provided this will fall back onto the \fBVCPROMPT_FORMAT\fR
-environment variable or the hard\-coded string inside of
-the \fBvprompt\fR binary.
+If not provided this will fall back onto the \fBVCPROMPT_FORMAT\fR environment variable or the hard\-coded string inside of the \fBvprompt\fR binary\.
 .
 .TP
 \fB\-\-format\-<SYSTEM>\fR=FORMAT
-The format string to be used for a specific version control system.
-If a system's formatting is not explicitly specified, it will
-automatically fall back onto the value of the \fB\-\-format\fR flag.
+The format string to be used for a specific version control system\. If a system\'s formatting is not explicitly specified, it will automatically fall back onto the value of the \fB\-\-format\fR flag\.
 .
 .TP
 \fB\-p\fR, \fB\-\-path\fR=PATH
-The path to for vcprompt to start looking for a version control
-repository.
+The path to for vcprompt to start looking for a version control repository\.
 .
 .IP
-Defaults to '.'.
+Defaults to \'\.\'\.
 .
 .TP
 \fB\-u\fR, \fB\-\-unknown\fR=UNKNOWN
-The value to use when \fBvcprompt\fR is unable to determine the
-appropriate output for a formatting option.
+The value to use when \fBvcprompt\fR is unable to determine the appropriate output for a formatting option\.
 .
 .IP
-If not provided will fall back onto the \fBVCPROMPT_UNKNOWN\fR
-environment variable or the hard\-coded string inside of the \fBvcprompt\fR
-binary.
+If not provided will fall back onto the \fBVCPROMPT_UNKNOWN\fR environment variable or the hard\-coded string inside of the \fBvcprompt\fR binary\.
 .
 .TP
 \fB\-d\fR, \fB\-\-max\-depth\fR=DEPTH
-The maximum number of directories \fBvcprompt\fR will traverse in order to
-find a version control system.
+The maximum number of directories \fBvcprompt\fR will traverse in order to find a version control system\.
 .
 .IP
-A non\-positive number indicates an infinite depth.
+A non\-positive number indicates an infinite depth\.
 .
 .IP
-Defaults to 0 (no limit).
+Defaults to 0 (no limit)\.
 .
 .TP
 \fB\-s\fR, \fB\-\-systems\fR=SYSTEMS
-The systems \fBvcprompt\fR will use when traversing over directories.
-.
-.IP
-Defaults to all available systems.
+Prints all known version control systems\.
 .
 .SH "ENVIRONMENT"
 .
 .IP "\(bu" 4
-\fBVCPROMPT_FORMAT\fR:
-The format string which \fBvcprompt\fR will use when displaying any
-information.
+\fBVCPROMPT_FORMAT\fR: The format string which \fBvcprompt\fR will use when displaying any information\.
 .
 .IP
-See vcprompt(5) for the full formatting syntax.
+See vcprompt(5) for the full formatting syntax\.
 .
 .IP "\(bu" 4
-\fBVCPROMPT_FORMAT_<SYSTEM>\fR
-Each version control system's formatting can be specified via
-it's own environment variable.
+\fBVCPROMPT_FORMAT_<SYSTEM>\fR Each version control system\'s formatting can be specified via it\'s own environment variable\.
 .
 .IP "\(bu" 4
-\fBVCPROMPT_UNKNOWN\fR:
-The value to be used when \fBvcprompt\fR is unable to determine the
-output for a formatting option.
+\fBVCPROMPT_UNKNOWN\fR: The value to be used when \fBvcprompt\fR is unable to determine the output for a formatting option\.
 .
 .IP "\(bu" 4
-\fBVCPROMPT_DEPTH\fR:
-The maximum number of directories \fBvcprompt\fR should traverse when looking
-for a usable version control system.
+\fBVCPROMPT_DEPTH\fR: The maximum number of directories \fBvcprompt\fR should traverse when looking for a usable version control system\.
 .
 .IP "" 0
 .

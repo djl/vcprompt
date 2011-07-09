@@ -78,9 +78,7 @@ Although not really recommended, `vcprompt` can be installed from PyPi:
     Defaults to 0 (no limit).
 
   * `-s`, `--systems`=SYSTEMS:
-    The systems `vcprompt` will use when traversing over directories.
-
-    Defaults to all available systems.
+    Prints all known version control systems.
 
 
 

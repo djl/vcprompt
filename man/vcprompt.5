@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "VCPROMPT" "5" "November 2010" "" ""
+.TH "VCPROMPT" "5" "July 2011" "" ""
 .
 .SH "NAME"
 \fBvcprompt\fR \- Prompt formatting syntax
@@ -9,34 +9,26 @@
 .SH "SYNTAX"
 .
 .TP
+\fB%s\fR or \fB%n\fR
+The "short name" of the version control system currently in use\. E\.g\. git, hg, svn
+.
+.TP
 \fB%b\fR
-The current branch of the repository\.
+The current branch\. If the branch is not available or not supported it will be the directory where the version control system was first encountered\.
 .
 .TP
 \fB%h\fR
-The hash of the most recent commit in the repository\.
-.
-.IP
-If the version control system does not provide a hash for each commit or changeset, it will fall back onto the revision number\.
-.
-.TP
-\fB%m\fR
-Indicates whether the repository contains modified files\.
-.
-.IP
-The output is a plus symbol (\'+\')\.
+The hash of the repository\. If no hash is available it will show the revision number instead\.
 .
 .TP
 \fB%r\fR
-The current revision number of the repository\.
-.
-.IP
-If the version control in use does not have revision numbers, it will fall back to the most recent commit\'s SHA1 hash (or equivalent)\.
+The revision number of the repository\. If no revision number is available it will return the hash instead\.
 .
 .TP
-\fB%s\fR
-The version control system in use\.
+\fB%m\fR
+Displays a plus symbol (+) if the repository has any modified files\.
 .
-.IP
-Uses the \'short\' or executable name for each system\.
+.TP
+\fB%u\fR
+Displays an exclamtion mark (!) if there is any untracked files in the repository\.
 
