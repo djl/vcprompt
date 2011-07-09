@@ -73,4 +73,7 @@ update-svn:
 
 update-repositories: update-bzr update-darcs update-git update-hg update-svn
 
-.PHONY: clean help run_tests test $(wildcard fetch-*) $(wildcard update-*)
+build-docs:
+	@cd man && find . -name \*.ronn | xargs ronn -b --roff
+
+.PHONY: clean help run_tests test $(wildcard fetch-*) $(wildcard update-*) build-docs
