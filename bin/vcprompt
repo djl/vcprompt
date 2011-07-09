@@ -277,6 +277,7 @@ def cvs(options):
     output = output.replace('%h', options.unknown)
     output = output.replace('%r', options.unknown)
     output = output.replace('%m', options.unknown)
+    output = output.replace('%u', options.unknown)
     output = output.replace('%s', 'cvs')
     output = output.replace('%n', 'cvs')
     return output
