@@ -15,7 +15,7 @@ Download vcprompt, make it executable and add it to your prompt:
 
 For bash, you'll want to do something like this:
 
-    $ export PS1='\u@\h:\w $(vcprompt)\$'
+    $ export PS1='\u@\h:\w \$(vcprompt)\$'
 
 ZSH users should be aware that they will have to set the
 `PROMPT_SUBST` option first:
