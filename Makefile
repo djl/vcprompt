@@ -47,7 +47,7 @@ fetch-hg:
 fetch-svn:
 	@echo "Fetching out SVN repository..."
 	@if [ -d tests/repositories/svn ]; then rm -rf tests/repositories/svn; fi
-	@svn checkout http://svn.github.com/xvzf/quotes.git tests/repositories/svn &>$(stdout)
+	@svn checkout http://svn.github.com/djl/quotes.git tests/repositories/svn &>$(stdout)
 
 fetch-repositories: fetch-bzr fetch-darcs fetch-fossil fetch-git fetch-hg fetch-svn
 

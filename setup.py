@@ -27,7 +27,7 @@ setup(
     version=commands.getoutput('./bin/vcprompt --version').split()[-1],
     author='David Logie',
     author_email='d@djl.im',
-    url='http://github.com/xvzf/vcprompt',
+    url='http://github.com/djl/vcprompt',
     scripts=['bin/vcprompt'],
     license='BSD',
     description='Version control information in your prompt (or anywhere!).',
