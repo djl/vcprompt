@@ -469,6 +469,15 @@ def git(options):
                 if line.startswith('ref: refs/heads/'):
                     branch = (line.split('/')[-1] or options.unknown)
                     break
+            if branch == options.unknown:
+                command = 'git describe --tags'
+                process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
+                output = process.communicate()[0]
+                returncode = process.returncode
+                if returncode == 0:
+                    branch = "(%s)" % (output.strip())
+                else:
+                    branch = options.unknown
         except IOError:
             pass
 
