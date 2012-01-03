@@ -84,7 +84,7 @@ def helper(*args, **kwargs):
     help flag.
 
     """
-    print __doc__.strip()
+    print >> sys.stderr, __doc__.strip()
     sys.exit(0)
 
 
