@@ -442,6 +442,9 @@ def git(options):
     """
     staged = branch = sha = modified = untracked = options.unknown
 
+    if os.path.isfile(options.file):
+        options.file = open(options.file, "r").read().rstrip('\n').split(" ")[1]
+
     def revstring(ref, chars=7):
         if not os.path.exists(ref):
             return ''
