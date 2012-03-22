@@ -465,9 +465,7 @@ def git(options):
             for line in fh:
                 line = line.strip()
                 if line.startswith('ref: refs/heads/'):
-                    parts = line.split('/')
-                    if len(parts) > 2:
-                        branch = '/'.join(parts[2:])
+                    branch = (line.split('/', 2)[-1] or options.unknown)
                     break
             if branch == options.unknown:
                 command = 'git describe --always'
