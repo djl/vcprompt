@@ -23,7 +23,7 @@ clean:
 fetch-bzr:
 	@echo "Fetching Bazaar repository..."
 	@if [ -d tests/repositories/bzr ]; then rm -rf tests/repositories/bzr; fi
-	@bzr branch lp:~davidlogie/vcprompt-quotes/trunk tests/repositories/bzr &>$(stdout)
+	@bzr branch lp:vcprompt-quotes tests/repositories/bzr &>$(stdout)
 
 fetch-darcs:
 	@echo "Fetching Darcs repository..."
