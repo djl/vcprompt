@@ -28,7 +28,7 @@ fetch-bzr:
 fetch-darcs:
 	@echo "Fetching Darcs repository..."
 	@if [ -d tests/repositories/darcs ]; then rm -rf tests/repositories/darcs; fi
-	@darcs get http://patch-tag.com/r/davidlogie/quotes tests/repositories/darcs &>$(stdout)
+	@darcs get http://darcs.djl.im/quotes tests/repositories/darcs &>$(stdout)
 
 fetch-fossil:
 	@echo "Fetching Fossil repository..."
