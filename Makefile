@@ -37,7 +37,7 @@ fetch-fossil:
 fetch-git:
 	@echo "Fetching Git repository..."
 	@git submodule update --init &>$(stdout)
-	@cd tests/repositories/git && git checkout master
+	@cd tests/repositories/git && git checkout master &>$(stdout)
 
 fetch-hg:
 	@echo "Fetching Mercurial repository..."
