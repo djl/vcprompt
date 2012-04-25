@@ -621,7 +621,7 @@ def svn(options):
         for line in output.split('\n'):
             # branch
             if '%b' in options.format:
-                if re.match('URL:', line):
+                if re.match('URL', line):
                     matches = re.search(branch_regex, line)
                     if matches:
                         branch = matches.groups(0)[0]
