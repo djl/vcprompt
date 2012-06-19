@@ -15,10 +15,10 @@ clean:
 	-@cd tests/repositories/bzr && bzr revert --no-backup &>$(stdout)
 	-@cd tests/repositories/darcs && darcs revert -a &>$(stdout)
 	-@cd tests/repositories/fossil && fossil revert &>$(stdout)
-	-@cd tests/repositories/git && [[ -d .git ]] && git reset -q --hard HEAD &>$(stdout)
+	-@cd tests/repositories/git && git reset -q --hard HEAD &>$(stdout)
 	-@cd tests/repositories/hg && hg revert -a --no-backup &>$(stdout)
 	-@cd tests/repositories/svn && svn revert -R . &>$(stdout)
-	-@find . -name untracked_file | xargs rm
+	-@find . -name untracked_file -type f -exec rm {} \;
 
 fetch-bzr:
 	@echo "Fetching Bazaar repository..."
