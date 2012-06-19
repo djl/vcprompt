@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 from subprocess import Popen, PIPE
-import ConfigParser
 import os
 import re
 import sys
 import unittest
 
-config = ConfigParser.ConfigParser()
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
+
+config = configparser.ConfigParser()
 config.read('tests.cfg')
 
 
@@ -36,13 +40,16 @@ class BaseTest(unittest.TestCase):
         """
         command = 'cd %s && %s' % (self.get_repository(),
                                    self.revert_command)
-        Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
+        proc = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
+        proc.communicate()
 
-    def touch(self, file):
+    def touch(self, fn):
         """
         Creates a new file.
         """
-        f = open(file, 'w')
+        f = open(fn, 'w')
+        f.write('foo')
+        f.close()
 
     def unknown(self):
         """
@@ -50,8 +57,8 @@ class BaseTest(unittest.TestCase):
         """
         commands = self.commands + ['--values', 'UNKNOWN']
         process = Popen(commands, stdout=PIPE)
-        output = process.communicate()[0].strip()
-        return output
+        output = process.communicate()[0]
+        return output.decode('utf-8').strip()
 
     def vcprompt(self, environment=False, *args, **kwargs):
         """
@@ -68,7 +75,8 @@ class BaseTest(unittest.TestCase):
             commands.append("--%s" % key)
             commands.append(value)
         process = Popen(commands, stdout=PIPE)
-        return process.communicate()[0].strip()
+        output = process.communicate()[0]
+        return output.decode("utf-8").strip()
 
 
 class Base(object):
@@ -79,7 +87,7 @@ class Base(object):
         """
         path = os.path.join(self.get_repository(), path)
         output = self.vcprompt(path=path, max_depth=depth, format=format)
-        self.assertEquals(output, self.get_repository().rsplit('/')[-1])
+        self.assertEqual(output, self.get_repository().rsplit('/')[-1])
 
     def test_depth_limited(self, path='foo/bar/baz', depth='2'):
         """
@@ -87,7 +95,7 @@ class Base(object):
         """
         path = os.path.join(self.get_repository(), path)
         output = self.vcprompt(path=path, max_depth=depth)
-        self.assertEquals(output, '')
+        self.assertEqual(output, '')
 
     def test_format_all(self, string='%s:%n:%r:%h:%b'):
         """
@@ -99,27 +107,27 @@ class Base(object):
                              self.config('revision'),
                              self.config('hash'),
                              self.config('branch')])
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_format_branch(self, string='%b'):
         """
         Tests that the correct branch name is returned.
         """
         output = self.vcprompt(format=string)
-        self.assertEquals(output, self.config('branch'))
+        self.assertEqual(output, self.config('branch'))
 
     def test_format_revision(self, string='%r'):
         """
         Tests that the correct revision ID or hash is returned.
         """
         output = self.vcprompt(format=string)
-        self.assertEquals(output, self.config('revision'))
+        self.assertEqual(output, self.config('revision'))
 
     def test_format_hash(self, string='%h'):
         """
         Tests that the correct hash or revision ID is returned.
         """
-        self.assertEquals(self.vcprompt(format=string),
+        self.assertEqual(self.vcprompt(format=string),
                           self.config('hash'))
 
     def test_format_modified(self, string='%m'):
@@ -127,25 +135,26 @@ class Base(object):
         Tests for modified files in the repository.
         """
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '')
+        self.assertEqual(output, '')
 
         f = open(os.path.join(self.get_repository(), 'quotes.txt'), 'w')
         f.write('foo')
+        f.close()
 
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '+')
+        self.assertEqual(output, '+')
 
         self.revert()
 
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '')
+        self.assertEqual(output, '')
 
     def test_format_system(self, string='%s'):
         """
         Tests that the '%s' argument correctly returns the system name.
         """
         output = self.vcprompt(format=string)
-        self.assertEquals(output, self.config('system'))
+        self.assertEqual(output, self.config('system'))
 
     def test_format_system_alt(self, string='%n'):
         """
@@ -158,18 +167,18 @@ class Base(object):
         Tests for any untracked files in the repository.
         """
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '')
+        self.assertEqual(output, '')
 
         file = os.path.join(self.get_repository(), 'untracked_file')
         self.touch(file)
 
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '?')
+        self.assertEqual(output, '?')
 
         os.remove(file)
 
         output = self.vcprompt(format=string)
-        self.assertEquals(output, '')
+        self.assertEqual(output, '')
 
 
 class Bazaar(Base, BaseTest):
