@@ -1,2 +1,0 @@
-include HISTORY LICENSE README
-recursive-include man/ *.[0-9]
