@@ -23,6 +23,14 @@ VCS-specific formatting:
   --format-git FORMAT        Git
   --format-hg FORMAT         Mercurial
   --format-svn FORMAT        Subversion
+
+Format tokens:
+  %s, %n                     The VCS "short name" (e.g. git, hg)
+  %h                         The hash (or revision number)
+  %r                         The revision number (or hash)
+  %b                         The currently checked out branch
+  %m                         Prints plus symbol if the repo is modified
+  %u                         Prints exclamation mark if repo has new files
 """
 
 from subprocess import call, Popen, PIPE
