@@ -73,8 +73,8 @@ The available options are currently:
 FORMATS
 -------
 
-`vcprompt` comes with a number of formatting tokens. What follows is a list
-of all the available tokens:
+`vcprompt` comes with a number of formatting tokens. What follows is a
+list of all the available tokens:
 
 * `%s` or `%n`
 
@@ -111,33 +111,11 @@ of all the available tokens:
 REQUIREMENTS
 ------------
 
-* Python 2.4 or later. Python >= 2.5 recommended.
+* Python 2.4 or later (including Python 3).
 
-  Python 2.4 is experimental at best but should work for the most
-  part.  Expect it to break or change in the future.
+* Support for Subversion >= 1.7 and Fossil requires the SQLite3 Python
+  module to be installed (built in on Python 2.5+).
 
-  Use of Python 2.5 or later is recommended.
-
-* Python 3 isn't supported yet but 2to3 produces a tiny diff which
-  seems to work.
-
-* Fossil support requires the SQLite3 module to be installed (built in
-  on Python 2.5+).
-
-
-
-TESTING
--------
-
-To run the tests, use the provided Makefile:
-
-    make test
-
-
-A few notes on testing:
-
-* Tests have to fetch remote repositories, so network access is required
-* Fetching remote repositories requires each VCS to be installed
 
 
 NOTES
