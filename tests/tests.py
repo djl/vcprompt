@@ -81,22 +81,6 @@ class BaseTest(unittest.TestCase):
 
 class Base(object):
 
-    def test_depth(self, path='foo/bar/baz', depth='0', format='%s'):
-        """
-        Tests that vcprompt still works multiple directories deep.
-        """
-        path = os.path.join(self.get_repository(), path)
-        output = self.vcprompt(path=path, max_depth=depth, format=format)
-        self.assertEqual(output, self.get_repository().rsplit('/')[-1])
-
-    def test_depth_limited(self, path='foo/bar/baz', depth='2'):
-        """
-        Tests that the 'depth' argument is followed correctly.
-        """
-        path = os.path.join(self.get_repository(), path)
-        output = self.vcprompt(path=path, max_depth=depth)
-        self.assertEqual(output, '')
-
     def test_format_all(self, string='%s:%n:%r:%h:%b'):
         """
         Tests that all formatting arguments are working correctly.
@@ -216,12 +200,6 @@ class Subversion(Base, BaseTest):
     revert_command = 'svn revert -R .'
     repository = 'svn'
 
-    def test_depth_limited(self):
-        """
-        SVN puts '.svn' directories everywhere, so the limited depth test
-        doesn't apply here.
-        """
-        return self.test_depth()
 
 if __name__ == '__main__':
     unittest.main()

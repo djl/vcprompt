@@ -72,7 +72,6 @@ if len(sys.argv) > 1 and sys.argv[1] == '--without-environment':
 
 
 # user editable options
-DEPTH = os.environ.get('VCPROMPT_DEPTH', 0)
 FORMAT = os.environ.get('VCPROMPT_FORMAT', '%s:%b')
 UNKNOWN = os.environ.get('VCPROMPT_UNKNOWN', '(unknown)')
 SYSTEMS = []
@@ -162,11 +161,6 @@ def vcprompt(options):
             if prompt is not None:
                 return prompt
 
-        if options.depth:
-            if count == options.depth:
-                break
-            count += 1
-
         options.path = options.path.rsplit('/', 1)[0]
     return ''
 
@@ -187,9 +181,6 @@ def main():
     # path
     parser.add_option('-p', '--path', dest='path', default='.')
 
-    # max depth
-    parser.add_option('-d', '--max-depth', dest='depth', type='int',
-                      default=DEPTH)
     # systems
     parser.add_option('-s', '--systems', action='callback', callback=systems)
 
