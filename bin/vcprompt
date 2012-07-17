@@ -33,6 +33,8 @@ Format tokens:
   %u                         Prints question mark if repo has new files
 """
 
+__version__ = '1.0.0-dev'
+
 from subprocess import call, Popen, PIPE
 from xml.dom.minidom import parseString
 import optparse
@@ -48,8 +50,6 @@ except ImportError:
         from pysqlite2 import dbapi2 as sqlite3
     except ImportError:
         has_sqlite3 = False
-
-__version__ = (0, 1, 5)
 
 
 # check to make sure the '--without-environment' flag is called first
@@ -115,7 +115,7 @@ def version(*args):
     """
     Convenience function for printing a version number.
     """
-    sys.stdout.write('vcprompt %s\n' % '.'.join(map(str, __version__)))
+    sys.stdout.write('vcprompt %s\n' % __version__)
     sys.exit(0)
 
 
