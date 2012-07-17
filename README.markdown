@@ -119,6 +119,14 @@ list of all the available tokens:
 
   Displays a question mark (`?`) if there are any untracked files.
 
+* `%P`
+
+  The name of the repository root directory (typically a project name).
+
+* `%p`
+
+  The relative path from the repository root directory to the current
+  directory (or the directory specified by `--path`).
 
 
 REQUIREMENTS
