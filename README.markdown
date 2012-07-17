@@ -98,13 +98,17 @@ list of all the available tokens:
 
 * `%m`
 
-  Displays a plus symbol (`+`) if the repository has any modified
-  files.
+  Displays a plus symbol (`+`) if there are any changes (which are not
+  staged for commit, in systems that make such a distinction, i.e. git).
+
+* `%a`
+
+  Displays an asterisk (`*`) if there are any changes staged for commit
+  (in systems that make such a distinction, i.e. git).
 
 * `%u`
 
-  Displays an exclamtion mark (`!`) if there is any untracked files in
-  the repository.
+  Displays a question mark (`?`) if there are any untracked files.
 
 
 
