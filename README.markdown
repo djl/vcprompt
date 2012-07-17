@@ -108,8 +108,7 @@ of all the available tokens:
 
 * `%u`
 
-  Displays an exclamtion mark (`!`) if there is any untracked files in
-  the repository.
+  Displays a question mark (`?`) if there are any untracked files.
 
 
 
