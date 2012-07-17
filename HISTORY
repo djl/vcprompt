@@ -1,19 +1,18 @@
-0.1.5 (2010-??-??)
+1.0.0 (2012-??-??)
 ------------------
 
-* Added: New '--without-environment' option for ignoring environment variables.
-* Added: Experimental support for Python 2.4
-* Changed: The '%i' format argument has been replaced with '%m' and '%u'
-  arguments.
-* Changed: Test repositories are stored externally now to prevent possible
-  corruption (current exceptions are Darcs and Fossil).
+* Added: Python 2.4 support
+* Added: Python 3 support
+* Added: '--without-environment' option for ignoring environment variables.
+* Changed: '--values SYSTEMS' is now just '--systems'
+* Changed: Test repositories are stored externally (except Fossil).
+* Changed: The '%i' format token has been replaced with '%m' and '%u' tokens.
 * Fixed: CVS is now aware of all formatting arguments.
-* Fixed: Setup.py now uses the correct version number.
-* Fixed: '--values SYSTEMS' now works correctly.
-* Fixed: Newly initialised repositories now work correctly with '%h' and '%r'
-  format arguments.
-* Fixed: Fixed a bug with Bazaar hashes not being calculated correctly.
 * Fixed: Errors are now written to stderr.
+* Fixed: Fixed a bug with Bazaar hashes not being calculated correctly.
+* Fixed: Handling of new/empty repositories.
+* Removed: The '-d/--max-depth' option.
+* Removed: Useless Python packaging.
 
 
 0.1.4 (2010-05-25)
