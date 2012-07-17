@@ -30,7 +30,7 @@ Format tokens:
   %r                         The revision number (or hash)
   %b                         The currently checked out branch
   %m                         Prints plus symbol if the repo is modified
-  %u                         Prints exclamation mark if repo has new files
+  %u                         Prints question mark if repo has new files
 """
 
 from subprocess import call, Popen, PIPE
