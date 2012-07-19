@@ -636,10 +636,9 @@ def svn(options):
         returncode = process.returncode
 
         if returncode == 0:
-            if not output:
-                modified = ''
-                untracked = ''
-            else:
+            modified = ''
+            untracked = ''
+            if output:
                 codes = [line[0] for line in output.split('\n') if line]
                 if 'M' in codes:
                     modified = MODIFIED
