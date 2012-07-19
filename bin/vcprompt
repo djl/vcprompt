@@ -85,7 +85,7 @@ def helper(*args, **kwargs):
     """
     Prints the help message to stderr.
     """
-    sys.stderr.write(__doc__.strip())
+    sys.stderr.write(__doc__.lstrip())
     sys.exit(0)
 
 
