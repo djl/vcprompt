@@ -484,7 +484,7 @@ def git(options):
 
     # modified
     if '%m' in options.format:
-        command = 'git diff --name-status --exit-code'
+        command = 'git diff --quiet --exit-code'
         returncode = call(command, stdout=PIPE, stderr=PIPE, shell=True)
 
         if returncode == 1:
@@ -507,16 +507,13 @@ def git(options):
 
     # staged files
     if '%a' in options.format:
-        command = 'git diff --name-only --cached'
-        process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
-        output = process.communicate()[0]
-        returncode = process.returncode
+        command = 'git diff --quiet --cached --exit-code'
+        returncode = call(command, stdout=PIPE, stderr=PIPE, shell=True)
 
-        if returncode == 0:
-            if output == '':
-                staged = ''
-            else:
-                staged = STAGED
+        if returncode == 1:
+            staged = STAGED
+        else:
+            staged = ''
 
     # formatting
     output = options.format
