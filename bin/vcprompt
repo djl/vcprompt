@@ -7,7 +7,6 @@ Version control information in your prompt.
 Options:
   -f, --format FORMAT        The format string to use.
   -p, --path PATH            The path to run vcprompt on.
-  -d, --max-depth DEPTH      The maximum number of directories to traverse.
   -u, --unknown UNKNOWN      The "unknown" value.
   -s, --systems              Print all known VCSs and exit
   -v, --version              Show program's version number and exit
