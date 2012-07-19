@@ -43,6 +43,17 @@ class BaseTest(unittest.TestCase):
         proc = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
         proc.communicate()
 
+    def stage(self, file):
+        """
+        Stages a file
+        """
+
+        if self.stage_command:
+            command = 'cd %s && %s' % (self.get_repository(),
+                (self.stage_command % file.name))
+            proc = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
+            proc.communicate()
+
     def touch(self, fn):
         """
         Creates a new file.
@@ -164,6 +175,44 @@ class Base(object):
         output = self.vcprompt(format=string)
         self.assertEqual(output, '')
 
+    def test_modified_format_chars(self, string='%a%m%u'):
+        """
+        Tests for changing the characters used in stages/modified/untracked
+        output
+        """
+
+        # This is not applicable to all repositories
+        if not hasattr(self, 'stage_command'):
+            return
+
+        chars = {
+            'staged': 'a',
+            'modified': 'm',
+            'untracked': 'u',
+        }
+        output = self.vcprompt(format=string, **chars)
+        self.assertEquals(output, '')
+
+        untracked = os.path.join(self.get_repository(), 'untracked_file')
+        self.touch(untracked)
+
+        witticism = open(os.path.join(self.get_repository(), 'witticism.txt'), 'w')
+        witticism.write('The 100/50 rule: We are 100% responsible and at least'
+            '50% to blame\n')
+        self.stage(witticism)
+
+        quotes = open(os.path.join(self.get_repository(), 'quotes.txt'), 'w')
+        quotes.write('foo bar baz\n')
+
+        output = self.vcprompt(format=string, **chars)
+        self.assertEquals(output, 'amu')
+
+        os.remove(untracked)
+        self.revert()
+
+        output = self.vcprompt(format=string, **chars)
+        self.assertEquals(output, '')
+
 
 class Bazaar(Base, BaseTest):
 
@@ -185,7 +234,8 @@ class Fossil(Base, BaseTest):
 
 class Git(Base, BaseTest):
 
-    revert_command = 'git reset -q --hard HEAD'
+    revert_command = 'git reset -q --hard HEAD && git clean -f'
+    stage_command = 'git add %s'
     repository = 'git'
 
 

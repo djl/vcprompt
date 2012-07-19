@@ -76,9 +76,9 @@ UNKNOWN = os.environ.get('VCPROMPT_UNKNOWN', '(unknown)')
 SYSTEMS = []
 
 # status indicators
-STAGED = '*'
-MODIFIED = '+'
-UNTRACKED = '?'
+STAGED = os.environ.get('VCPROMPT_STAGED', '*')
+MODIFIED = os.environ.get('VCPROMPT_MODIFIED', '+')
+UNTRACKED = os.environ.get('VCPROMPT_UNTRACKED', '?')
 
 
 def helper(*args, **kwargs):
@@ -183,6 +183,15 @@ def main():
     # systems
     parser.add_option('-s', '--systems', action='callback', callback=systems)
 
+    # staged
+    parser.add_option('-A', '--staged', dest='staged', default=STAGED)
+
+    # modified
+    parser.add_option('-M', '--modified', dest='modified', default=MODIFIED)
+
+    # untracked
+    parser.add_option('-U', '--untracked', dest='untracked', default=UNTRACKED)
+
     # unknown
     parser.add_option('-u', '--unknown', dest='unknown', default=UNKNOWN)
 
@@ -242,9 +251,9 @@ def bzr(options):
             else:
                 for line in output.split('\n'):
                     if line.startswith('M'):
-                        modified = MODIFIED
+                        modified = options.modified
                     elif line.startswith('?'):
-                        untracked = UNTRACKED
+                        untracked = options.untracked
 
     # formatting
     output = options.format
@@ -317,9 +326,9 @@ def darcs(options):
             for line in output:
                 line = line.strip()
                 if line.startswith('M'):
-                    modified = MODIFIED
+                    modified = options.modified
                 elif line.startswith('a'):
-                    untracked = UNTRACKED
+                    untracked = options.untracked
 
     # formatting
     output = options.format
@@ -402,7 +411,7 @@ def fossil(options):
 
         if returncode == 0:
             if output:
-                modified = MODIFIED
+                modified = options.modified
             else:
                 modified = ''
 
@@ -415,7 +424,7 @@ def fossil(options):
 
         if returncode == 0:
             if output:
-                untracked = UNTRACKED
+                untracked = options.untracked
             else:
                 untracked = ''
 
@@ -488,7 +497,7 @@ def git(options):
         returncode = call(command, stdout=PIPE, stderr=PIPE, shell=True)
 
         if returncode == 1:
-            modified = MODIFIED
+            modified = options.modified
         else:
             modified = ''
 
@@ -503,17 +512,20 @@ def git(options):
             if output == '':
                 untracked = ''
             else:
-                untracked = UNTRACKED
+                untracked = options.untracked
 
     # staged files
     if '%a' in options.format:
         command = 'git diff --quiet --cached --exit-code'
-        returncode = call(command, stdout=PIPE, stderr=PIPE, shell=True)
+        process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
+        output = process.communicate()[0]
+        returncode = process.returncode
 
-        if returncode == 1:
-            staged = STAGED
-        else:
-            staged = ''
+        if returncode == 0:
+            if output == '':
+                staged = ''
+            else:
+                staged = options.staged
 
     # formatting
     output = options.format
@@ -568,7 +580,7 @@ def hg(options):
             if output == '':
                 modified = ''
             else:
-                modified = MODIFIED
+                modified = options.modified
 
     # untracked
     if '%u' in options.format:
@@ -580,7 +592,7 @@ def hg(options):
         if output == '':
             untracked = ''
         else:
-            untracked = UNTRACKED
+            untracked = options.untracked
 
     output = options.format
     output = output.replace('%b', branch)
@@ -641,9 +653,9 @@ def svn(options):
             if output:
                 codes = [line[0] for line in output.split('\n') if line]
                 if 'M' in codes:
-                    modified = MODIFIED
+                    modified = options.modified
                 if '?' in codes:
-                    untracked = UNTRACKED
+                    untracked = options.untracked
 
     # formatting
     output = options.format
