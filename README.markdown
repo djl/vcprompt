@@ -38,11 +38,6 @@ OPTIONS
   The path on which to run `vcprompt`. Defaults to the current
   directory.
 
-* `-d, --max-depth`
-
-  The maximum number of directories `vcprompt` should traverse while
-  looking for version control systems.
-
 * `-s, --systems`
 
   Prints all available version control systems to standard out.
