@@ -63,6 +63,20 @@ The available options are currently:
 * `--format-hg`
 * `--format-svn`
 
+You can customise the status symbols used with the following options:
+
+* `-A, --staged`
+
+  The symbol to print when changes have been staged. Defaults to `*`
+
+* `-a, --modified`
+
+  The symbol to print when files have been modified. Defaults to `+`
+
+* `-A, --untracked`
+
+  The symbol to print when there are untracked files. Defaults to `?`
+
 
 
 FORMATS

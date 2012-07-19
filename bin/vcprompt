@@ -7,10 +7,15 @@ Version control information in your prompt.
 Options:
   -f, --format FORMAT        The format string to use.
   -p, --path PATH            The path to run vcprompt on.
-  -u, --unknown UNKNOWN      The "unknown" value.
   -s, --systems              Print all known VCSs and exit
   -v, --version              Show program's version number and exit
   -h, --help                 Show this help message and exit
+
+Formatting options:
+  -u, --unknown UNKNOWN      The "unknown" value. Default is "(unknown)"
+  -A, --staged UNKNOWN       The "staged" symbol. Default is '*'
+  -M, --modified UNKNOWN     The "modified" symbol. Default is '+'
+  -U, --untracked UNKNOWN    The "untracked" symbol. Default is '?'
 
 VCS-specific formatting:
   These options can be used for VCS-specific prompt formatting.
@@ -28,6 +33,7 @@ Format tokens:
   %h                         The hash (or revision number)
   %r                         The revision number (or hash)
   %b                         The currently checked out branch
+  %a                         Prints an asterisk if the repo has staged changes
   %m                         Prints plus symbol if the repo is modified
   %u                         Prints question mark if repo has new files
 """
