@@ -69,11 +69,11 @@ You can customise the status symbols used with the following options:
 
   The symbol to print when changes have been staged. Defaults to `*`
 
-* `-a, --modified`
+* `-M, --modified`
 
   The symbol to print when files have been modified. Defaults to `+`
 
-* `-A, --untracked`
+* `-U, --untracked`
 
   The symbol to print when there are untracked files. Defaults to `?`
 
