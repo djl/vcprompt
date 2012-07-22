@@ -205,7 +205,7 @@ class Base(object):
         quotes.write('foo bar baz\n')
 
         output = self.vcprompt(format=string, **chars)
-        self.assertEquals(output, 'amu')
+        self.assertEqual(output, 'amu')
 
         os.remove(untracked)
         self.revert()

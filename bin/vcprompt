@@ -523,15 +523,12 @@ def git(options):
     # staged files
     if '%a' in options.format:
         command = 'git diff --quiet --cached --exit-code'
-        process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
-        output = process.communicate()[0]
-        returncode = process.returncode
+        returncode = call(command, stdout=PIPE, stderr=PIPE, shell=True)
 
-        if returncode == 0:
-            if output == '':
-                staged = ''
-            else:
-                staged = options.staged
+        if returncode == 1:
+            staged = options.staged
+        else:
+            staged = ''
 
     # formatting
     output = options.format
