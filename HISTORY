@@ -5,6 +5,7 @@
 * Added: Python 3 support
 * Added: '--without-environment' option for ignoring environment variables.
 * Added: Options to change status characters (modified/untracked files, etc.)
+* Added: '%p' and '%P' format tokens.
 * Changed: '--values SYSTEMS' is now just '--systems'
 * Changed: Test repositories are stored externally (except Fossil).
 * Changed: The '%i' format token has been replaced with '%m' and '%u' tokens.
