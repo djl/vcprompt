@@ -66,7 +66,7 @@ class BaseTest(unittest.TestCase):
         """
         Returns the default 'unknown' value from vcprompt.
         """
-        commands = self.commands + ['--values', 'UNKNOWN']
+        commands = list(self.commands) + ['--values', 'UNKNOWN']
         process = Popen(commands, stdout=PIPE)
         output = process.communicate()[0]
         return output.decode('utf-8').strip()
@@ -80,7 +80,9 @@ class BaseTest(unittest.TestCase):
 
         Returns the output from the call to vcprompt.
         """
-        commands = self.commands + ['--path', self.get_repository()]
+        commands = list(self.commands)
+        if 'path' not in kwargs.keys():
+            commands += ['--path', self.get_repository()]
         for key, value in kwargs.items():
             key = key.replace('_', '-')
             commands.append("--%s" % key)
@@ -174,6 +176,20 @@ class Base(object):
 
         output = self.vcprompt(format=string)
         self.assertEqual(output, '')
+
+    def test_format_relative_root(self, string='%P'):
+        """
+        Tests the '%p' format token (relative root of the repository).
+        """
+        self.assertEquals(self.vcprompt(format=string), self.repository)
+
+    def test_format_root_directory(self, string='%p'):
+        """
+        Tests the '%P' format token (root of the repository)
+        """
+        self.assertEquals(self.vcprompt(format=string), '.')
+        path = os.path.join(self.get_repository(), 'foo', 'bar')
+        self.assertEquals(self.vcprompt(format=string, path=path), 'foo/bar')
 
     def test_modified_format_chars(self, string='%a%m%u'):
         """
