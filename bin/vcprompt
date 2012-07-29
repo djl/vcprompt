@@ -138,7 +138,6 @@ def vcprompt(options):
     options.path = os.path.abspath(os.path.expanduser(options.path))
     original_path = options.path
     prompt = None
-    count = 0
 
     while options.path:
         # bail out on non-existant paths
