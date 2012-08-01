@@ -36,6 +36,8 @@ Format tokens:
   %a                         Prints an asterisk if the repo has staged changes
   %m                         Prints plus symbol if the repo is modified
   %u                         Prints question mark if repo has new files
+  %P                         The name of the repository root directory
+  %p                         The relative path to the repository from cwd
 """
 
 __version__ = '1.0.0-dev'
