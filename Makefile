@@ -45,7 +45,7 @@ fetch-hg:
 	@hg clone http://hg.djl.im/quotes tests/repositories/hg &>$(stdout)
 
 fetch-svn:
-	@echo "Fetching out SVN repository..."
+	@echo "Fetching SVN repository..."
 	@if [ -d tests/repositories/svn ]; then rm -rf tests/repositories/svn; fi
 	@svn checkout http://svn.github.com/djl/quotes.git tests/repositories/svn &>$(stdout)
 
