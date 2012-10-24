@@ -465,8 +465,18 @@ def git(options):
 
     def revstring(ref, chars=7):
         if not os.path.exists(ref):
-            return ''
-
+            # look for packed-refs file in case garbage collection just run
+            try:
+                pr = os.path.join(options.file, 'packed-refs')
+                ref = ref.split('/', 1)[1]
+                fh = open(pr, 'r')
+                for line in fh:
+                    line = line.strip()
+                    if line.endswith(ref):
+                        return line.split(" ")[0][0:chars]
+                return ''
+            except IOError:
+                return ''
         try:
             fh = open(ref, 'r')
             for line in fh:
