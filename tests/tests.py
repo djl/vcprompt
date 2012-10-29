@@ -181,15 +181,15 @@ class Base(object):
         """
         Tests the '%p' format token (relative root of the repository).
         """
-        self.assertEquals(self.vcprompt(format=string), self.repository)
+        self.assertEqual(self.vcprompt(format=string), self.repository)
 
     def test_format_root_directory(self, string='%p'):
         """
         Tests the '%P' format token (root of the repository)
         """
-        self.assertEquals(self.vcprompt(format=string), '.')
+        self.assertEqual(self.vcprompt(format=string), '.')
         path = os.path.join(self.get_repository(), 'foo', 'bar')
-        self.assertEquals(self.vcprompt(format=string, path=path), 'foo/bar')
+        self.assertEqual(self.vcprompt(format=string, path=path), 'foo/bar')
 
     def test_modified_format_chars(self, string='%a%m%u'):
         """
@@ -207,7 +207,7 @@ class Base(object):
             'untracked': 'u',
         }
         output = self.vcprompt(format=string, **chars)
-        self.assertEquals(output, '')
+        self.assertEqual(output, '')
 
         untracked = os.path.join(self.get_repository(), 'untracked_file')
         self.touch(untracked)
@@ -215,10 +215,12 @@ class Base(object):
         witticism = open(os.path.join(self.get_repository(), 'witticism.txt'), 'w')
         witticism.write('The 100/50 rule: We are 100% responsible and at least'
             '50% to blame\n')
+        witticism.close()
         self.stage(witticism)
 
         quotes = open(os.path.join(self.get_repository(), 'quotes.txt'), 'w')
         quotes.write('foo bar baz\n')
+        quotes.close()
 
         output = self.vcprompt(format=string, **chars)
         self.assertEqual(output, 'amu')
@@ -227,7 +229,7 @@ class Base(object):
         self.revert()
 
         output = self.vcprompt(format=string, **chars)
-        self.assertEquals(output, '')
+        self.assertEqual(output, '')
 
 
 class Bazaar(Base, BaseTest):
@@ -270,7 +272,7 @@ class Subversion(Base, BaseTest):
         """
         Tests the '%P' format token (root of the repository)
         """
-        self.assertEquals(self.vcprompt(format=string), '.')
+        self.assertEqual(self.vcprompt(format=string), '.')
         # subversion < 1.7 litters every directory with ".svn"
         # directories so either '.' or 'foo/bar' could be correct
         # depending on which version is available.
