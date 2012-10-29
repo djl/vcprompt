@@ -6,7 +6,7 @@ help:
 	@echo '  fetch-repositories   - fetch repositories required for testing'
 	@echo '  test                 - run tests'
 
-test: run_tests clean
+test: clean run_tests clean
 
 run_tests:
 	@cd tests && python tests.py
