@@ -353,7 +353,7 @@ def darcs(options):
     return output
 
 
-@vcs(file="_FOSSIL_")
+@vcs(file=".fslckout")
 def fossil(options):
     """
     Fossil
