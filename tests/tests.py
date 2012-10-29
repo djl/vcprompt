@@ -266,6 +266,20 @@ class Subversion(Base, BaseTest):
     revert_command = 'svn revert -R .'
     repository = 'svn'
 
+    def test_format_root_directory(self, string='%p'):
+        """
+        Tests the '%P' format token (root of the repository)
+        """
+        self.assertEquals(self.vcprompt(format=string), '.')
+        # subversion < 1.7 litters every directory with ".svn"
+        # directories so either '.' or 'foo/bar' could be correct
+        # depending on which version is available.
+        # Rather than try to determine which version is installed, we
+        # just treat both results as correct
+        path = os.path.join(self.get_repository(), 'foo', 'bar')
+        self.assertTrue(self.vcprompt(format=string, path=path) in ['.', 'foo/bar'])
+
+
 
 if __name__ == '__main__':
     unittest.main()
