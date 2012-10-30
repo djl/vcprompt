@@ -89,6 +89,25 @@ MODIFIED = os.environ.get('VCPROMPT_MODIFIED', '+')
 UNTRACKED = os.environ.get('VCPROMPT_UNTRACKED', '?')
 
 
+# Taken almost wholesale from Python 2.7's posixpath module
+def relpath(path, start=os.path.curdir):
+    """Return a relative version of a path"""
+
+    if not path:
+        raise ValueError("no path specified")
+
+    start_list = [x for x in os.path.abspath(start).split(os.path.sep) if x]
+    path_list = [x for x in os.path.abspath(path).split(os.path.sep) if x]
+
+    # Work out how much of the filepath is shared by start and path.
+    i = len(os.path.commonprefix([start_list, path_list]))
+
+    rel_list = [os.path.pardir] * (len(start_list) - i) + path_list[i:]
+    if not rel_list:
+        return os.path.curdir
+    return os.path.join(*rel_list)
+
+
 def helper(*args, **kwargs):
     """
     Prints the help message to stderr.
@@ -168,8 +187,8 @@ def vcprompt(options):
                 prompt = vcs(options)
                 if prompt is not None:
                     prompt = prompt.replace("%P", os.path.basename(options.path))
-                    prompt = prompt.replace("%p", os.path.relpath(original_path,
-                                                                  options.path))
+                    prompt = prompt.replace("%p", relpath(original_path,
+                                                          options.path))
                     return prompt
 
         options.path = options.path.rsplit('/', 1)[0]
