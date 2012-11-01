@@ -1,12 +1,4 @@
 .DS_Store
 *.pyc
-*~
-build/
-dist/
-MANIFEST
-tests/repositories/bzr
-tests/repositories/darcs
-tests/repositories/fossil/*
+tests/repositories/*
 !tests/repositories/fossil/fossil
-tests/repositories/hg
-tests/repositories/svn
