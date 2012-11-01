@@ -119,7 +119,7 @@ def helper(*args, **kwargs):
 def systems(*args, **kwargs):
     """Prints all available systems to stdout."""
     for system in SYSTEMS:
-        sys.stdout.write(system.func_name + '\n')
+        sys.stdout.write(system.__name__ + '\n')
     sys.exit(0)
 
 
@@ -184,12 +184,26 @@ def vcprompt(options):
                 # the "vcs" file
                 options.file = vfile
 
-                prompt = vcs(options)
-                if prompt is not None:
-                    prompt = prompt.replace("%P", os.path.basename(options.path))
-                    prompt = prompt.replace("%p", relpath(original_path,
-                                                          options.path))
-                    return prompt
+                conf = vcs(options)
+                prompt = options.format
+
+                # Get hash and revision, with fallback to each other
+                hash = conf.get('hash', conf.get('revision', options.unknown))
+                revision = conf.get('revision', conf.get('hash', options.unknown))
+
+                # Substitute stuff
+                prompt = prompt.replace("%b", conf.get('branch', options.unknown))
+                prompt = prompt.replace("%r", revision)
+                prompt = prompt.replace("%h", hash)
+                prompt = prompt.replace("%m", conf.get('modified', ''))
+                prompt = prompt.replace("%u", conf.get('untracked', ''))
+                prompt = prompt.replace("%a", conf.get('staged', ''))
+                prompt = prompt.replace("%s", vcs.__name__)
+                prompt = prompt.replace("%n", vcs.__name__)
+                prompt = prompt.replace("%P", os.path.basename(options.path))
+                prompt = prompt.replace("%p", relpath(original_path,
+                                                      options.path))
+                return prompt
 
         options.path = options.path.rsplit('/', 1)[0]
     return ''
@@ -287,15 +301,13 @@ def bzr(options):
                         untracked = options.untracked
 
     # formatting
-    output = options.format
-    output = output.replace('%b', os.path.basename(options.path))
-    output = output.replace('%h', sha)
-    output = output.replace('%r', revision)
-    output = output.replace('%m', modified)
-    output = output.replace('%u', untracked)
-    output = output.replace('%s', 'bzr')
-    output = output.replace('%n', 'bzr')
-    return output
+    return {
+        'branch': os.path.basename(options.path),
+        'hash': sha,
+        'revision': revision,
+        'modified': modified,
+        'untracked': untracked,
+        }
 
 
 @vcs(["CVS"])
@@ -305,15 +317,7 @@ def cvs(options):
 
     Concurrent Versions System.
     """
-    output = options.format
-    output = output.replace('%b', options.unknown)
-    output = output.replace('%h', options.unknown)
-    output = output.replace('%r', options.unknown)
-    output = output.replace('%m', options.unknown)
-    output = output.replace('%u', options.unknown)
-    output = output.replace('%s', 'cvs')
-    output = output.replace('%n', 'cvs')
-    return output
+    return { }
 
 
 @vcs(["_darcs/hashed_inventory"])
@@ -362,15 +366,12 @@ def darcs(options):
                     untracked = options.untracked
 
     # formatting
-    output = options.format
-    output = output.replace('%b', branch)
-    output = output.replace('%h', sha)
-    output = output.replace('%r', sha)
-    output = output.replace('%m', modified)
-    output = output.replace('%u', untracked)
-    output = output.replace('%s', 'darcs')
-    output = output.replace('%n', 'darcs')
-    return output
+    return {
+        'branch': branch,
+        'hash': sha,
+        'modified': modified,
+        'untracked': untracked,
+        }
 
 
 @vcs([".fslckout", "_FOSSIL_"])
@@ -460,15 +461,12 @@ def fossil(options):
                 untracked = ''
 
     # parse out formatting string
-    output = options.format
-    output = output.replace('%b', branch)
-    output = output.replace('%h', sha)
-    output = output.replace('%r', sha)
-    output = output.replace('%m', modified)
-    output = output.replace('%u', untracked)
-    output = output.replace('%s', 'fossil')
-    output = output.replace('%n', 'fossil')
-    return output
+    return {
+        'branch': branch,
+        'hash': sha,
+        'modified': modified,
+        'untracked': untracked,
+        }
 
 
 @vcs([".git"])
@@ -566,16 +564,13 @@ def git(options):
             staged = ''
 
     # formatting
-    output = options.format
-    output = output.replace('%b', branch)
-    output = output.replace('%h', sha)
-    output = output.replace('%r', sha)
-    output = output.replace('%m', modified)
-    output = output.replace('%u', untracked)
-    output = output.replace('%a', staged)
-    output = output.replace('%s', 'git')
-    output = output.replace('%n', 'git')
-    return output
+    return {
+        'branch': branch,
+        'hash': sha,
+        'modified': modified,
+        'untracked': untracked,
+        'staged': staged,
+        }
 
 
 @vcs([".hg"])
@@ -632,15 +627,13 @@ def hg(options):
         else:
             untracked = options.untracked
 
-    output = options.format
-    output = output.replace('%b', branch)
-    output = output.replace('%h', sha)
-    output = output.replace('%r', revision)
-    output = output.replace('%m', modified)
-    output = output.replace('%u', untracked)
-    output = output.replace('%s', 'hg')
-    output = output.replace('%n', 'hg')
-    return output
+    return {
+        'branch': branch,
+        'hash': sha,
+        'revision': revision,
+        'modified': modified,
+        'untracked': untracked,
+        }
 
 
 @vcs([".svn/entries"])
@@ -696,15 +689,12 @@ def svn(options):
                     untracked = options.untracked
 
     # formatting
-    output = options.format
-    output = output.replace('%r', revision)
-    output = output.replace('%h', revision)
-    output = output.replace('%b', branch)
-    output = output.replace('%m', modified)
-    output = output.replace('%u', untracked)
-    output = output.replace('%s', 'svn')
-    output = output.replace('%n', 'svn')
-    return output
+    return {
+        'revision': revision,
+        'branch': branch,
+        'modified': modified,
+        'untracked': untracked,
+        }
 
 
 if __name__ == '__main__':
