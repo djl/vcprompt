@@ -125,10 +125,8 @@ def systems(*args, **kwargs):
 
 def vcs(files):
     """
-    A convenience decorator.
-
-    Wraps a VCS function, appending it to ``SYSTEMS`` and sets the ``file``
-    attribute.
+    Wraps a VCS function, appending it to ``SYSTEMS`` and sets the
+    ``file`` attribute.
     """
     def wrapper(function):
         SYSTEMS.append(function)
@@ -147,14 +145,8 @@ def version(*args):
 
 def vcprompt(options):
     """
-    Returns a formatted version control string for use in a shell prompt
-    or elsewhere.
-
-    Arguments:
-
-        ``options``
-            An optparse.Values instance.
-
+    Returns a formatted version control string for use in a shell
+    prompt or elsewhere.
     """
     options.path = os.path.abspath(os.path.expanduser(options.path))
     original_path = options.path
@@ -210,37 +202,16 @@ def vcprompt(options):
 
 
 def main():
-    # parser
     parser = optparse.OptionParser()
-
-    # dump the provided --help option
     parser.remove_option('--help')
-
-    # our own --help flag
     parser.add_option('-h', '--help', action='callback', callback=helper)
-
-    # format
     parser.add_option('-f', '--format', dest='format', default=FORMAT)
-
-    # path
     parser.add_option('-p', '--path', dest='path', default='.')
-
-    # systems
     parser.add_option('-s', '--systems', action='callback', callback=systems)
-
-    # staged
     parser.add_option('-A', '--staged', dest='staged', default=STAGED)
-
-    # modified
     parser.add_option('-M', '--modified', dest='modified', default=MODIFIED)
-
-    # untracked
     parser.add_option('-U', '--untracked', dest='untracked', default=UNTRACKED)
-
-    # unknown
     parser.add_option('-u', '--unknown', dest='unknown', default=UNKNOWN)
-
-    # version
     parser.add_option('-v', '--version', action='callback', callback=version)
 
     # vcs-specific formatting
