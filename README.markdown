@@ -85,7 +85,7 @@ FORMATS
 `vcprompt` comes with a number of formatting tokens. What follows is a
 list of all the available tokens:
 
-* `%s` or `%n`
+* `%s`, `%n`
 
   The "short name" of the version control system currently in
   use. E.g. `git`, `hg`, `svn`
@@ -102,8 +102,8 @@ list of all the available tokens:
 
 * `%b`
 
-  The current branch. If branch is available it will be the directory
-  where the version control system was first encountered.
+  The current branch (or basename of the repository if the branch name
+  is unavailable).
 
 * `%m`
 
