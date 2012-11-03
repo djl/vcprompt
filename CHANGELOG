@@ -2,6 +2,7 @@
 ------------------
 
 * Fixed: '%P' token works in Python < 2.6 again.
+* Changed: Renamed HISTORY to CHANGELOG (oh my, how meta! again!)
 
 
 1.0.0 (2012-10-16)
