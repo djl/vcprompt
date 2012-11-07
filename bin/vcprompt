@@ -40,7 +40,7 @@ Format tokens:
   %p                         The relative path to the repository from cwd
 """
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 from subprocess import call, Popen, PIPE
 from xml.dom.minidom import parseString
