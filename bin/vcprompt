@@ -273,7 +273,8 @@ def bzr(options):
                 modified = ''
                 untracked = ''
             else:
-                for line in output.strip().split('\n'):
+                for line in output.splitlines():
+                    line = line.strip()
                     if line.startswith('M'):
                         modified = options.modified
                     elif line.startswith('?'):

@@ -3,6 +3,7 @@
 
 * Fixed: '%P' token works in Python < 2.6 again.
 * Fixed: vcprompt will not implode when executables cannot be found
+* Fixed: '%m' token in Bazaar when working dir has modified and untracked files
 * Changed: Renamed HISTORY to CHANGELOG (oh my, how meta! again!)
 
 
