@@ -596,7 +596,7 @@ def svn(options):
 
     The Subversion version control system.
     """
-    branch = revision = modified = untracked = options.unknown
+    branch = revision = modified = untracked = staged = options.unknown
 
     # branch
     output, returncode = popen('svn info %s' % options.path)
@@ -621,19 +621,22 @@ def svn(options):
                     if 'revision' in matches.groupdict():
                         revision = matches.group('revision')
 
-    # modified
-    if re.search('%[mu]', options.format):
+    # modified/staged/untracked
+    if re.search('%[amu]', options.format):
         output, returncode = popen('svn status %s' % options.path)
 
         if returncode == 0:
             modified = ''
             untracked = ''
+            staged = ''
             if output:
-                codes = [line[0] for line in output.split('\n') if line]
-                if 'M' in codes:
+                codes = [line.strip()[0:1] for line in output.split('\n')]
+                if re.search('[CDMR!]', ''.join(codes)):
                     modified = options.modified
                 if '?' in codes:
                     untracked = options.untracked
+                if 'A' in codes:
+                    staged = options.staged
 
     # formatting
     return {
@@ -641,6 +644,7 @@ def svn(options):
         'branch': branch,
         'modified': modified,
         'untracked': untracked,
+        'staged': staged,
         }
 
 

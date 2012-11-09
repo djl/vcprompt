@@ -1,9 +1,15 @@
+1.0.2 (????-??-??)
+------------------
+
+* Fixed: '%m' token in Bazaar when working dir has modified and untracked files
+* Changed: Better handling of '%a' and '%m' token in Subversion
+
+
 1.0.1 (2012-11-07)
 ------------------
 
 * Fixed: '%P' token works in Python < 2.6 again.
 * Fixed: vcprompt will not implode when executables cannot be found
-* Fixed: '%m' token in Bazaar when working dir has modified and untracked files
 * Changed: Renamed HISTORY to CHANGELOG (oh my, how meta! again!)
 
 
