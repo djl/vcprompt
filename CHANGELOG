@@ -2,6 +2,7 @@
 ------------------
 
 * Fixed: '%m' token in Bazaar when working dir has modified and untracked files
+* Fixed: '%u' token always being shown in Python 3.
 * Changed: Better handling of '%a' and '%m' token in Subversion
 
 

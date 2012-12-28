@@ -269,16 +269,16 @@ def bzr(options):
         output, returncode = popen('bzr status --short')
 
         if returncode == 0:
-            if output == '':
-                modified = ''
-                untracked = ''
-            else:
+            if output:
                 for line in output.splitlines():
                     line = line.strip()
                     if line.startswith('M'):
                         modified = options.modified
                     elif line.startswith('?'):
                         untracked = options.untracked
+            else:
+                modified = ''
+                untracked = ''
 
     # formatting
     return {
@@ -509,10 +509,10 @@ def git(options):
         output, returncode = popen('git ls-files --other --exclude-standard')
 
         if returncode == 0:
-            if output == '':
-                untracked = ''
-            else:
+            if output:
                 untracked = options.untracked
+            else:
+                untracked = ''
 
     # staged files
     if '%a' in options.format:
@@ -567,10 +567,10 @@ def hg(options):
         output, returncode = popen('hg status --modified')
 
         if returncode == 0:
-            if output == '':
-                modified = ''
-            else:
+            if output:
                 modified = options.modified
+            else:
+                modified = ''
 
     # untracked
     if '%u' in options.format:
