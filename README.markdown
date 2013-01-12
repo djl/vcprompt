@@ -129,6 +129,25 @@ list of all the available tokens:
   directory (or the directory specified by `--path`).
 
 
+
+HACKING
+-------
+
+Before adding new functionality, think about whether this really needs
+to be part of vcprompt. A good rule of thumb would be if the new
+functionality is specific to a single VCS or is otherwise complex then
+it probably doesn't belong in vcprompt.
+
+If you still think your new feature is a good fit then try to follow
+these guidelines:
+
+* Confirm *all* existing tests pass
+* Add tests for any new functionality
+* If you've added a new feature document it in the README and docstring
+* Do not update the version number
+
+
+
 REQUIREMENTS
 ------------
 
