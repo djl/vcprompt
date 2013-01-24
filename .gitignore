@@ -1,4 +1,2 @@
-.DS_Store
-*.pyc
-tests/repositories/*
-!tests/repositories/fossil/fossil
+tests/data/
+tests/repositories/

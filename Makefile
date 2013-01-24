@@ -6,71 +6,117 @@ help:
 	@echo '  fetch-repositories   - fetch repositories required for testing'
 	@echo '  test                 - run tests'
 
-test: clean run_tests clean
+test: fetch-repositories run_tests clean
+
+quicktest: run_tests clean
 
 run_tests:
 	@cd tests && python tests.py
 
 clean:
-	-@cd tests/repositories/bzr && bzr revert --no-backup &>$(stdout)
-	-@cd tests/repositories/darcs && darcs revert -a &>$(stdout)
-	-@cd tests/repositories/fossil && fossil revert &>$(stdout)
-	-@cd tests/repositories/git && git reset -q --hard HEAD &>$(stdout)
-	-@cd tests/repositories/hg && hg revert -a --no-backup &>$(stdout)
-	-@cd tests/repositories/svn && svn revert -R . &>$(stdout)
-	-@find . -name untracked_file -type f -exec rm {} \;
+	-@rm -rf tests/repositories/
+	-@rm -rf tests/data/
 
 fetch-bzr:
-	@echo "Fetching Bazaar repository..."
-	@if [ -d tests/repositories/bzr ]; then rm -rf tests/repositories/bzr; fi
-	@bzr branch lp:vcprompt-quotes tests/repositories/bzr &>$(stdout)
+	@echo "Creating Bazaar repository..."
+	@rm -rf tests/repositories/bzr
+	@rm -rf tests/data/bzr
+	@mkdir -p tests/repositories/bzr/foo/bar
+	@mkdir -p tests/data/bzr
+	@bzr init tests/repositories/bzr > /dev/null 2>&1
+	@cd tests/repositories/bzr && echo "This is a test" > quotes.txt
+	@cd tests/repositories/bzr && echo "This is a test" > foo/bar/test.txt
+	@cd tests/repositories/bzr && bzr add . > /dev/null 2>&1
+	@cd tests/repositories/bzr && bzr commit -m "First commit." > /dev/null 2>&1
+	@cd tests/data/bzr && echo 'bzr' > branch
+	@cd tests/data/bzr && ln -sf branch system
+	@cd tests/data/bzr && head -n1 ../../repositories/bzr/.bzr/branch/last-revision | awk '{print $$1}' > revision
+	@cd tests/data/bzr && head -n1 ../../repositories/bzr/.bzr/branch/last-revision | awk -F '-' '{print $$NF}' | cut -c-7 > hash
 
 fetch-darcs:
-	@echo "Fetching Darcs repository..."
-	@if [ -d tests/repositories/darcs ]; then rm -rf tests/repositories/darcs; fi
-	@darcs get http://patch-tag.com/r/djl/quotes tests/repositories/darcs &>$(stdout)
+	@echo "Creating Darcs repository..."
+	@rm -rf tests/repositories/darcs/
+	@rm -rf tests/data/darcs/
+	@mkdir -p tests/repositories/darcs/foo/bar
+	@mkdir -p tests/data/darcs
+	@cd tests/repositories/darcs && darcs initialize
+	@cd tests/repositories/darcs && echo "This is a test" > quotes.txt
+	@cd tests/repositories/darcs && echo "This is a test" > foo/bar/test.txt
+	@cd tests/repositories/darcs && darcs add -r . > /dev/null
+	@cd tests/repositories/darcs && darcs record -a -m "First commit." > /dev/null 2>&1
+	@cd tests/data/darcs && echo 'darcs' > branch
+	@cd tests/data/darcs && ln -sf branch system
+	@cd tests/repositories/darcs && darcs changes --last 1 --xml | grep hash | awk -F "hash='" '{print $$NF}' | cut -d '-' -f3 | cut -c-7 > ../../data/darcs/hash
+	@cd tests/data/darcs && ln -sf hash revision
 
 fetch-fossil:
-	@echo "Fetching Fossil repository..."
-	@cd tests/repositories/fossil && fossil open fossil &>$(stdout)
+	@echo "Creating Fossil repository..."
+	@rm -rf tests/repositories/fossil
+	@rm -rf tests/data/fossil
+	@mkdir -p tests/repositories/fossil/foo/bar
+	@mkdir -p tests/data/fossil
+	@fossil init tests/repositories/fossil/fossil > /dev/null 2>&1
+	@cd tests/repositories/fossil && fossil open fossil 2> /dev/null
+	@cd tests/repositories/fossil && echo "This is a test" > quotes.txt
+	@cd tests/repositories/fossil && echo "This is a test" > foo/bar/test.txt
+	@cd tests/repositories/fossil && fossil add . > /dev/null 2>&1
+	@cd tests/repositories/fossil && fossil commit -m "First commit." > /dev/null 2>&1
+	@cd tests/data/fossil && echo "fossil" > system
+	@cd tests/data/fossil && sqlite3 ../../repositories/fossil/fossil "SELECT uuid from blob ORDER BY rid DESC LIMIT 1;" | cut -c-7 > hash
+	@cd tests/data/fossil && ln -sf hash revision
+	@cd tests/data/fossil && sqlite3 ../../repositories/fossil/fossil "SELECT value FROM tagxref WHERE value IS NOT NULL LIMIT 1" > branch
 
 fetch-git:
-	@echo "Fetching Git repository..."
-	@git submodule update --init &>$(stdout)
-	@cd tests/repositories/git && git checkout master &>$(stdout)
+	@echo "Creating Git repository..."
+	@rm -rf tests/repositories/git
+	@rm -rf tests/data/git
+	@mkdir -p tests/repositories/git/foo/bar
+	@mkdir -p tests/data/git
+	@git init tests/repositories/git > /dev/null 2>&1
+	@cd tests/repositories/git && echo "This is a test" > quotes.txt
+	@cd tests/repositories/git && echo "This is a test" > foo/bar/test.txt
+	@cd tests/repositories/git && git add . > /dev/null 2>&1
+	@cd tests/repositories/git && git commit -m "First commit." > /dev/null 2>&1
+	@cd tests/data/git && echo "git" > system
+	@cd tests/repositories/git && git log -n1 --oneline | awk '{print $$1}' > ../../data/git/hash
+	@cd tests/data/git && ln -sf hash revision
+	@cd tests/repositories/git && git rev-parse --abbrev-ref HEAD > ../../data/git/branch
 
 fetch-hg:
-	@echo "Fetching Mercurial repository..."
-	@if [ -d tests/repositories/hg ]; then rm -rf tests/repositories/hg; fi
-	@hg clone https://bitbucket.org/xvzf/quotes tests/repositories/hg &>$(stdout)
+	@echo "Creating Mercurial repository..."
+	@rm -rf tests/repositories/hg
+	@rm -rf tests/data/hg
+	@mkdir -p tests/repositories/hg/foo/bar
+	@mkdir -p tests/data/hg
+	@hg init tests/repositories/hg
+	@cd tests/repositories/hg && echo "This is a test" > quotes.txt
+	@cd tests/repositories/hg && echo "This is a test" > foo/bar/test.txt
+	@cd tests/repositories/hg && hg add . > /dev/null 2>&1
+	@cd tests/repositories/hg && hg commit -m "First commit." --user `whoami`
+	@cd tests/data/hg && echo "hg" > system
+	@cd tests/repositories/hg && hg id -i | cut -c-7 > ../../data/hg/hash
+	@cd tests/repositories/hg && hg id -n > ../../data/hg/revision
+	@cd tests/repositories/hg && hg branch > ../../data/hg/branch
 
 fetch-svn:
-	@echo "Fetching SVN repository..."
-	@if [ -d tests/repositories/svn ]; then rm -rf tests/repositories/svn; fi
-	@svn checkout http://svn.github.com/djl/quotes.git tests/repositories/svn &>$(stdout)
+	@echo "Creating Subversion repository..."
+	@rm -rf tests/repositories/svn
+	@rm -rf tests/data/svn
+	@mkdir -p tests/repositories/svn/src
+	@mkdir -p tests/repositories/svn/dst
+	@mkdir -p tests/data/svn/dst
+	@svnadmin create tests/repositories/svn/src
+	@svn checkout file://`pwd`/tests/repositories/svn/src tests/repositories/svn/dst > /dev/null
+	@mkdir -p tests/repositories/svn/dst/foo/bar
+	@cd tests/repositories/svn/dst && echo "This is a test" > quotes.txt
+	@cd tests/repositories/svn/dst && echo "This is a test" > foo/bar/test.txt
+	@cd tests/repositories/svn/dst && svn add quotes.txt foo > /dev/null
+	@cd tests/repositories/svn/dst && svn commit -m "First commit." > /dev/null
+	@cd tests/data/svn/dst && echo "svn" > system
+	@cd tests/data/svn/dst && echo "(unknown)" > branch
+	@cd tests/data/svn/dst && svn info ../../../repositories/svn/dst | grep Revision | awk '{print $$2}' > revision
+	@cd tests/data/svn/dst && ln -sf revision hash
 
-fetch-repositories: fetch-bzr fetch-darcs fetch-fossil fetch-git fetch-hg fetch-svn
+fetch-repositories: clean fetch-bzr fetch-darcs fetch-fossil fetch-git fetch-hg fetch-svn
 
-update-bzr:
-	@echo "Updating Bazaar repository..."
-	@cd tests/repositories/bzr && bzr pull &>$(stdout)
-
-update-darcs:
-	@echo "Updating Darcs repository..."
-	@cd tests/repositories/darcs && darcs pull -a &>$(stdout)
-
-update-git:
-	@echo "Updating Git repository..."
-	@git submodule update &>$(stdout)
-
-update-hg:
-	@echo "Updating Mercurial repository..."
-	@cd tests/repositories/hg && hg pull -u
-
-update-svn:
-	@echo "Updating SVN repository..."
-	@cd tests/repositories/svn && svn up
-
-update-repositories: update-bzr update-darcs update-git update-hg update-svn
-
-.PHONY: clean help run_tests test $(wildcard fetch-*) $(wildcard update-*)
+.PHONY: clean help run_tests test $(wildcard fetch-*)

@@ -5,14 +5,6 @@ import re
 import sys
 import unittest
 
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
-
-config = configparser.ConfigParser()
-config.read('tests.cfg')
-
 
 class BaseTest(unittest.TestCase):
 
@@ -23,7 +15,9 @@ class BaseTest(unittest.TestCase):
         Returns the value for the given ``field`` from the
         configuration file.
         """
-        return config.get(self.__class__.__name__.lower(), field)
+        location = os.path.abspath(__file__).rsplit('/', 1)[0]
+        location = os.path.join(location, 'data', self.repository, field)
+        return open(location).read().strip()
 
     def get_repository(self):
         """
@@ -187,7 +181,8 @@ class Base(object):
         """
         Tests the '%p' format token (relative root of the repository).
         """
-        self.assertEqual(self.vcprompt(format=string), self.repository)
+        repo = self.repository.split('/')[-1]
+        self.assertEqual(self.vcprompt(format=string), repo)
 
     def test_format_root_directory(self, string='%p'):
         """
@@ -272,7 +267,7 @@ class Mercurial(Base, BaseTest):
 class Subversion(Base, BaseTest):
 
     revert_command = 'svn revert -R .'
-    repository = 'svn'
+    repository = 'svn/dst'
 
     def test_format_root_directory(self, string='%p'):
         """

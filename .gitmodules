@@ -1,3 +1,0 @@
-[submodule "tests/repositories/git"]
-	path = tests/repositories/git
-	url = git://github.com/djl/quotes.git
