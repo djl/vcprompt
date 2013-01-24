@@ -16,7 +16,7 @@ config.read('tests.cfg')
 
 class BaseTest(unittest.TestCase):
 
-    commands = ['../bin/vcprompt', '--without-environment']
+    commands = ['../bin/vcprompt']
 
     def config(self, field):
         """
@@ -80,6 +80,12 @@ class BaseTest(unittest.TestCase):
 
         Returns the output from the call to vcprompt.
         """
+        # unset any environment variables
+        if not environment:
+            for k in os.environ.keys():
+                if k.startswith('VCPROMPT'):
+                    del os.environ[k]
+
         commands = list(self.commands)
         if 'path' not in kwargs.keys():
             commands += ['--path', self.get_repository()]
