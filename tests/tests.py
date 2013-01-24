@@ -191,39 +191,39 @@ class Base(object):
         path = os.path.join(self.get_repository(), 'foo', 'bar')
         self.assertEqual(self.vcprompt(format=string, path=path), 'foo/bar')
 
-    def test_modified_format_chars(self, string='%a%m%u'):
+    def test_modified_format_chars(self, string='%m%u'):
         """
-        Tests for changing the characters used in stages/modified/untracked
-        output
+        Tests for changing the characters used in
+        staged/modified/untracked output.
         """
-
-        # This is not applicable to all repositories
-        if not hasattr(self, 'stage_command'):
-            return
-
         chars = {
-            'staged': 'a',
             'modified': 'm',
             'untracked': 'u',
         }
+
+        if hasattr(self, 'stage_command'):
+            string = '%a' + string
+            chars['staged'] = 'a'
+
         output = self.vcprompt(format=string, **chars)
         self.assertEqual(output, '')
 
         untracked = os.path.join(self.get_repository(), 'untracked_file')
         self.touch(untracked)
 
-        witticism = open(os.path.join(self.get_repository(), 'witticism.txt'), 'w')
-        witticism.write('The 100/50 rule: We are 100% responsible and at least'
-            '50% to blame\n')
-        witticism.close()
-        self.stage(witticism)
+        if hasattr(self, 'stage_command'):
+            witticism = open(os.path.join(self.get_repository(), 'witticism.txt'), 'w')
+            witticism.write('The 100/50 rule: We are 100% responsible and at least'
+                '50% to blame\n')
+            witticism.close()
+            self.stage(witticism)
 
         quotes = open(os.path.join(self.get_repository(), 'quotes.txt'), 'w')
         quotes.write('foo bar baz\n')
         quotes.close()
 
         output = self.vcprompt(format=string, **chars)
-        self.assertEqual(output, 'amu')
+        self.assertEqual(output, string.replace('%', ''))
 
         os.remove(untracked)
         self.revert()
