@@ -1,12 +1,9 @@
-SHELL  := bash
-stdout := /dev/null
-
 help:
 	@echo 'Commonly used make targets:'
-	@echo '  fetch-repositories   - fetch repositories required for testing'
-	@echo '  test                 - run tests'
+	@echo '  init-repos          - Create test repos'
+	@echo '  test                - Run tests'
 
-test: fetch-repositories run_tests clean
+test: init-repos run_tests clean
 
 quicktest: run_tests clean
 
@@ -14,10 +11,10 @@ run_tests:
 	@cd tests && python tests.py
 
 clean:
-	-@rm -rf tests/repositories/
-	-@rm -rf tests/data/
+	@rm -rf tests/repositories/
+	@rm -rf tests/data/
 
-fetch-bzr:
+init-bzr:
 	@echo "Creating Bazaar repository..."
 	@rm -rf tests/repositories/bzr
 	@rm -rf tests/data/bzr
@@ -33,7 +30,7 @@ fetch-bzr:
 	@cd tests/data/bzr && head -n1 ../../repositories/bzr/.bzr/branch/last-revision | awk '{print $$1}' > revision
 	@cd tests/data/bzr && head -n1 ../../repositories/bzr/.bzr/branch/last-revision | awk -F '-' '{print $$NF}' | cut -c-7 > hash
 
-fetch-darcs:
+init-darcs:
 	@echo "Creating Darcs repository..."
 	@rm -rf tests/repositories/darcs/
 	@rm -rf tests/data/darcs/
@@ -46,10 +43,10 @@ fetch-darcs:
 	@cd tests/repositories/darcs && darcs record -a -m "First commit." > /dev/null 2>&1
 	@cd tests/data/darcs && echo 'darcs' > branch
 	@cd tests/data/darcs && ln -sf branch system
-	@cd tests/repositories/darcs && darcs changes --last 1 --xml | grep hash | awk -F "hash='" '{print $$NF}' | cut -d '-' -f3 | cut -c-7 > ../../data/darcs/hash
+	@cd tests/repositories/darcs && darcs changes --last 1 --xml | grep hash | awk -F "hash='" '{print $$NF}' | awk -F '-' '{print $$3}' | cut -c-7 > ../../data/darcs/hash
 	@cd tests/data/darcs && ln -sf hash revision
 
-fetch-fossil:
+init-fossil:
 	@echo "Creating Fossil repository..."
 	@rm -rf tests/repositories/fossil
 	@rm -rf tests/data/fossil
@@ -66,7 +63,7 @@ fetch-fossil:
 	@cd tests/data/fossil && ln -sf hash revision
 	@cd tests/data/fossil && sqlite3 ../../repositories/fossil/fossil "SELECT value FROM tagxref WHERE value IS NOT NULL LIMIT 1" > branch
 
-fetch-git:
+init-git:
 	@echo "Creating Git repository..."
 	@rm -rf tests/repositories/git
 	@rm -rf tests/data/git
@@ -82,7 +79,7 @@ fetch-git:
 	@cd tests/data/git && ln -sf hash revision
 	@cd tests/repositories/git && git rev-parse --abbrev-ref HEAD > ../../data/git/branch
 
-fetch-hg:
+init-hg:
 	@echo "Creating Mercurial repository..."
 	@rm -rf tests/repositories/hg
 	@rm -rf tests/data/hg
@@ -98,7 +95,7 @@ fetch-hg:
 	@cd tests/repositories/hg && hg id -n > ../../data/hg/revision
 	@cd tests/repositories/hg && hg branch > ../../data/hg/branch
 
-fetch-svn:
+init-svn:
 	@echo "Creating Subversion repository..."
 	@rm -rf tests/repositories/svn
 	@rm -rf tests/data/svn
@@ -117,6 +114,6 @@ fetch-svn:
 	@cd tests/data/svn/dst && svn info ../../../repositories/svn/dst | grep Revision | awk '{print $$2}' > revision
 	@cd tests/data/svn/dst && ln -sf revision hash
 
-fetch-repositories: clean fetch-bzr fetch-darcs fetch-fossil fetch-git fetch-hg fetch-svn
+init-repos: clean init-bzr init-darcs init-fossil init-git init-hg init-svn
 
-.PHONY: clean help run_tests test $(wildcard fetch-*)
+.PHONY: clean help run_tests test $(wildcard init-*)
