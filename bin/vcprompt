@@ -435,9 +435,7 @@ def git(options):
             except IOError:
                 return ''
         try:
-            fh = open(ref, 'r')
-            for line in fh:
-                return line.strip()[0:chars]
+            return open(ref, 'r').readline()[0:chars]
         except IOError:
             pass
         return ''
