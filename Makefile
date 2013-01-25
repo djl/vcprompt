@@ -28,7 +28,7 @@ init-bzr:
 	@cd tests/data/bzr && echo 'bzr' > branch
 	@cd tests/data/bzr && ln -sf branch system
 	@cd tests/data/bzr && head -n1 ../../repositories/bzr/.bzr/branch/last-revision | awk '{print $$1}' > revision
-	@cd tests/data/bzr && head -n1 ../../repositories/bzr/.bzr/branch/last-revision | awk -F '-' '{print $$NF}' | cut -c-7 > hash
+	@cd tests/data/bzr && ln -s revision hash
 
 init-darcs:
 	@echo "Creating Darcs repository..."

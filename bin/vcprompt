@@ -227,21 +227,12 @@ def bzr(options):
 
     The Bazaar version control system
     """
-    branch = revision = sha = modified = untracked = options.unknown
+    branch = revision = modified = untracked = options.unknown
 
     # local revision or global sha
     if re.search('%(r|h)', options.format):
         try:
-            fh = open(options.file, 'r')
-            for line in fh:
-                line = line.strip()
-                revision, sha = line.split(' ', 1)
-                # compensate for empty Bazaar repositories
-                if sha == 'null:':
-                    sha = unknown
-                else:
-                    sha = sha.rsplit('-', 1)[-1][:7]
-                    break
+            revision = open(options.file, 'r').readline().split()[0]
         except IOError:
             pass
 
@@ -264,7 +255,6 @@ def bzr(options):
     # formatting
     return {
         'branch': os.path.basename(options.path),
-        'hash': sha,
         'revision': revision,
         'modified': modified,
         'untracked': untracked,
