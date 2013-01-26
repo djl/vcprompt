@@ -6,7 +6,7 @@ import sys
 import unittest
 
 
-class BaseTest(unittest.TestCase):
+class Base(unittest.TestCase):
 
     commands = ['../bin/vcprompt']
 
@@ -41,12 +41,9 @@ class BaseTest(unittest.TestCase):
         """
         Stages a file
         """
-
-        if self.stage_command:
-            command = 'cd %s && %s' % (self.get_repository(),
-                (self.stage_command % file.name))
-            proc = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
-            proc.communicate()
+        command = 'cd %s && %s %s' % (self.get_repository(), self.stage_command, file.name)
+        proc = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
+        proc.communicate()
 
     def touch(self, fn):
         """
@@ -55,15 +52,6 @@ class BaseTest(unittest.TestCase):
         f = open(fn, 'w')
         f.write('foo')
         f.close()
-
-    def unknown(self):
-        """
-        Returns the default 'unknown' value from vcprompt.
-        """
-        commands = list(self.commands) + ['--values', 'UNKNOWN']
-        process = Popen(commands, stdout=PIPE)
-        output = process.communicate()[0]
-        return output.decode('utf-8').strip()
 
     def vcprompt(self, environment=False, *args, **kwargs):
         """
@@ -75,10 +63,9 @@ class BaseTest(unittest.TestCase):
         Returns the output from the call to vcprompt.
         """
         # unset any environment variables
-        if not environment:
-            for k in os.environ.keys():
-                if k.startswith('VCPROMPT'):
-                    del os.environ[k]
+        for k in os.environ.keys():
+            if k.startswith('VCPROMPT'):
+                del os.environ[k]
 
         commands = list(self.commands)
         if 'path' not in kwargs.keys():
@@ -92,7 +79,7 @@ class BaseTest(unittest.TestCase):
         return output.decode("utf-8").strip()
 
 
-class Base(object):
+class BaseTest(object):
 
     def test_format_all(self, string='%s:%n:%r:%h:%b'):
         """
@@ -254,7 +241,7 @@ class Fossil(Base, BaseTest):
 class Git(Base, BaseTest):
 
     revert_command = 'git reset -q --hard HEAD && git clean -f'
-    stage_command = 'git add %s'
+    stage_command = 'git add'
     repository = 'git'
 
 
