@@ -168,8 +168,7 @@ class BaseTest(object):
         """
         Tests the '%p' format token (relative root of the repository).
         """
-        repo = self.repository.split('/')[-1]
-        self.assertEqual(self.vcprompt(format=string), repo)
+        self.assertEqual(self.vcprompt(format=string), self.repository)
 
     def test_format_root_directory(self, string='%p'):
         """
@@ -254,7 +253,7 @@ class Mercurial(Base, BaseTest):
 class Subversion(Base, BaseTest):
 
     revert_command = 'svn revert -R .'
-    repository = 'svn/dst'
+    repository = 'svn'
 
     def test_format_root_directory(self, string='%p'):
         """

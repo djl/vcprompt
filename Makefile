@@ -100,19 +100,19 @@ init-svn:
 	@rm -rf tests/repositories/svn
 	@rm -rf tests/data/svn
 	@mkdir -p tests/repositories/svn/src
-	@mkdir -p tests/repositories/svn/dst
-	@mkdir -p tests/data/svn/dst
+	@mkdir -p tests/data/svn
 	@svnadmin create tests/repositories/svn/src
-	@svn checkout file://`pwd`/tests/repositories/svn/src tests/repositories/svn/dst > /dev/null
-	@mkdir -p tests/repositories/svn/dst/foo/bar
-	@cd tests/repositories/svn/dst && echo "This is a test" > quotes.txt
-	@cd tests/repositories/svn/dst && echo "This is a test" > foo/bar/test.txt
-	@cd tests/repositories/svn/dst && svn add quotes.txt foo > /dev/null
-	@cd tests/repositories/svn/dst && svn commit -m "First commit." > /dev/null
-	@cd tests/data/svn/dst && echo "svn" > system
-	@cd tests/data/svn/dst && echo "(unknown)" > branch
-	@cd tests/data/svn/dst && svn info ../../../repositories/svn/dst | grep Revision | awk '{print $$2}' > revision
-	@cd tests/data/svn/dst && ln -sf revision hash
+	@svn checkout file://`pwd`/tests/repositories/svn/src tests/repositories/svn/ > /dev/null
+	@cd tests/repositories/svn && svn propset svn:ignore src . > /dev/null
+	@mkdir -p tests/repositories/svn/foo/bar
+	@cd tests/repositories/svn && echo "This is a test" > quotes.txt
+	@cd tests/repositories/svn && echo "This is a test" > foo/bar/test.txt
+	@cd tests/repositories/svn && svn add quotes.txt foo > /dev/null
+	@cd tests/repositories/svn && svn commit -m "First commit." > /dev/null
+	@cd tests/data/svn && echo "svn" > system
+	@cd tests/data/svn && echo "(unknown)" > branch
+	@cd tests/data/svn && svn info ../../repositories/svn | grep Revision | awk '{print $$2}' > revision
+	@cd tests/data/svn && ln -sf revision hash
 
 init-repos: clean init-bzr init-darcs init-fossil init-git init-hg init-svn
 
