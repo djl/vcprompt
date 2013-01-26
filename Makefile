@@ -116,4 +116,4 @@ init-svn:
 
 init-repos: clean init-bzr init-darcs init-fossil init-git init-hg init-svn
 
-.PHONY: clean help run_tests test $(wildcard init-*)
+.PHONY: clean help run_tests test quicktest $(wildcard init-*)
