@@ -1,7 +1,27 @@
+define create-new-repo
+	@rm -rf tests/repositories/$1
+	@rm -rf tests/data/$1
+	@mkdir -p tests/repositories/$1/foo/bar
+	@mkdir -p tests/data/$1
+	@cd tests/repositories/$1 && echo "This is a test" > quotes.txt
+	@cd tests/repositories/$1 && echo "This is a test" > foo/bar/test.txt
+	@echo $1 > tests/data/$1/system
+	@cd tests/repositories/$1; $2 > /dev/null 2>&1
+endef
+
+define run-data-command
+	@cd tests/data/$1 && $2
+endef
+
+define run-repo-command
+	@cd tests/repositories/$1 && $2
+endef
+
 help:
 	@echo 'Commonly used make targets:'
 	@echo '  init-repos          - Create test repos'
 	@echo '  test                - Run tests'
+	@echo '  quicktest           - Run tests without generating new repos'
 
 test: init-repos run_tests clean
 
@@ -16,103 +36,60 @@ clean:
 
 init-bzr:
 	@echo "Creating Bazaar repository..."
-	@rm -rf tests/repositories/bzr
-	@rm -rf tests/data/bzr
-	@mkdir -p tests/repositories/bzr/foo/bar
-	@mkdir -p tests/data/bzr
-	@bzr init tests/repositories/bzr > /dev/null 2>&1
-	@cd tests/repositories/bzr && echo "This is a test" > quotes.txt
-	@cd tests/repositories/bzr && echo "This is a test" > foo/bar/test.txt
-	@cd tests/repositories/bzr && bzr add . > /dev/null 2>&1
-	@cd tests/repositories/bzr && bzr commit -m "First commit." > /dev/null 2>&1
-	@cd tests/data/bzr && echo 'bzr' > branch
-	@cd tests/data/bzr && ln -sf branch system
-	@cd tests/data/bzr && head -n1 ../../repositories/bzr/.bzr/branch/last-revision | awk '{print $$1}' > revision
-	@cd tests/data/bzr && ln -s revision hash
+	@$(call create-new-repo,'bzr',bzr init)
+	@$(call run-repo-command,'bzr',bzr add -q .)
+	@$(call run-repo-command,'bzr',bzr commit -q -m "First commit.")
+	@$(call run-data-command,'bzr',echo 'bzr' > branch)
+	@$(call run-data-command,'bzr',head -n1 ../../repositories/bzr/.bzr/branch/last-revision | awk '{print $$1}' > revision)
+	@$(call run-data-command,'bzr',ln -s revision hash)
 
 init-darcs:
 	@echo "Creating Darcs repository..."
-	@rm -rf tests/repositories/darcs/
-	@rm -rf tests/data/darcs/
-	@mkdir -p tests/repositories/darcs/foo/bar
-	@mkdir -p tests/data/darcs
-	@cd tests/repositories/darcs && darcs initialize
-	@cd tests/repositories/darcs && echo "This is a test" > quotes.txt
-	@cd tests/repositories/darcs && echo "This is a test" > foo/bar/test.txt
-	@cd tests/repositories/darcs && darcs add -r . > /dev/null
-	@cd tests/repositories/darcs && darcs record -a -m "First commit." > /dev/null 2>&1
-	@cd tests/data/darcs && echo 'darcs' > branch
-	@cd tests/data/darcs && ln -sf branch system
-	@cd tests/repositories/darcs && darcs changes --last 1 --xml | grep hash | awk -F "hash='" '{print $$NF}' | awk -F '-' '{print $$3}' | cut -c-7 > ../../data/darcs/hash
-	@cd tests/data/darcs && ln -sf hash revision
+	@$(call create-new-repo,'darcs',darcs initialize)
+	@$(call run-repo-command,'darcs',darcs add -q -r .)
+	@$(call run-repo-command,'darcs',darcs record -q -a -m "First commit.")
+	@$(call run-data-command,'darcs',echo 'darcs' > branch)
+	@$(call run-repo-command,'darcs',darcs changes --last 1 --xml | grep hash | awk -F "hash='" '{print $$NF}' | awk -F '-' '{print $$3}' | cut -c-7 > ../../data/darcs/hash)
+	@$(call run-data-command,darcs,ln -sf hash revision)
 
 init-fossil:
 	@echo "Creating Fossil repository..."
-	@rm -rf tests/repositories/fossil
-	@rm -rf tests/data/fossil
-	@mkdir -p tests/repositories/fossil/foo/bar
-	@mkdir -p tests/data/fossil
-	@fossil init tests/repositories/fossil/fossil > /dev/null 2>&1
-	@cd tests/repositories/fossil && fossil open fossil 2> /dev/null
-	@cd tests/repositories/fossil && echo "This is a test" > quotes.txt
-	@cd tests/repositories/fossil && echo "This is a test" > foo/bar/test.txt
-	@cd tests/repositories/fossil && fossil add . > /dev/null 2>&1
-	@cd tests/repositories/fossil && fossil commit -m "First commit." > /dev/null 2>&1
-	@cd tests/data/fossil && echo "fossil" > system
-	@cd tests/data/fossil && sqlite3 ../../repositories/fossil/fossil "SELECT uuid from blob ORDER BY rid DESC LIMIT 1;" | cut -c-7 > hash
-	@cd tests/data/fossil && ln -sf hash revision
-	@cd tests/data/fossil && sqlite3 ../../repositories/fossil/fossil "SELECT value FROM tagxref WHERE value IS NOT NULL LIMIT 1" > branch
+	@$(call create-new-repo,'fossil',fossil init fossil)
+	@$(call run-repo-command,'fossil',fossil open fossil > /dev/null)
+	@$(call run-repo-command,'fossil',fossil add . > /dev/null)
+	@$(call run-repo-command,'fossil',fossil commit -m "First commit." > /dev/null)
+	@$(call run-repo-command,'fossil',sqlite3 fossil "SELECT uuid from blob ORDER BY rid DESC LIMIT 1;" | cut -c-7 > ../../data/fossil/hash)
+	@$(call run-data-command,'fossil',ln -sf hash revision)
+	@$(call run-repo-command,'fossil',sqlite3 fossil "SELECT value FROM tagxref WHERE value IS NOT NULL LIMIT 1" > ../../data/fossil/branch)
 
 init-git:
 	@echo "Creating Git repository..."
-	@rm -rf tests/repositories/git
-	@rm -rf tests/data/git
-	@mkdir -p tests/repositories/git/foo/bar
-	@mkdir -p tests/data/git
-	@git init tests/repositories/git > /dev/null 2>&1
-	@cd tests/repositories/git && echo "This is a test" > quotes.txt
-	@cd tests/repositories/git && echo "This is a test" > foo/bar/test.txt
-	@cd tests/repositories/git && git add . > /dev/null 2>&1
-	@cd tests/repositories/git && git commit -m "First commit." > /dev/null 2>&1
-	@cd tests/data/git && echo "git" > system
-	@cd tests/repositories/git && git log -n1 --oneline | awk '{print $$1}' > ../../data/git/hash
-	@cd tests/data/git && ln -sf hash revision
-	@cd tests/repositories/git && git rev-parse --abbrev-ref HEAD > ../../data/git/branch
+	@$(call create-new-repo,'git',git init)
+	@$(call run-repo-command,'git',git add .)
+	@$(call run-repo-command,'git',git commit -m "First commit." > /dev/null)
+	@$(call run-repo-command,'git',git log -n1 --oneline | awk '{print $$1}' > ../../data/git/hash)
+	@$(call run-data-command,'git',ln -sf hash revision)
+	@$(call run-repo-command,'git',git rev-parse --abbrev-ref HEAD > ../../data/git/branch)
 
 init-hg:
 	@echo "Creating Mercurial repository..."
-	@rm -rf tests/repositories/hg
-	@rm -rf tests/data/hg
-	@mkdir -p tests/repositories/hg/foo/bar
-	@mkdir -p tests/data/hg
-	@hg init tests/repositories/hg
-	@cd tests/repositories/hg && echo "This is a test" > quotes.txt
-	@cd tests/repositories/hg && echo "This is a test" > foo/bar/test.txt
-	@cd tests/repositories/hg && hg add . > /dev/null 2>&1
-	@cd tests/repositories/hg && hg commit -m "First commit." --user `whoami`
-	@cd tests/data/hg && echo "hg" > system
-	@cd tests/repositories/hg && hg id -i | cut -c-7 > ../../data/hg/hash
-	@cd tests/repositories/hg && hg id -n > ../../data/hg/revision
-	@cd tests/repositories/hg && hg branch > ../../data/hg/branch
+	@$(call create-new-repo,'hg',hg init -q)
+	@$(call run-repo-command,'hg',hg add -q .)
+	@$(call run-repo-command,'hg',hg commit -q -m "First commit" --user `whoami`)
+	@$(call run-repo-command,'hg',hg id -i | cut -c-7 > ../../data/hg/hash)
+	@$(call run-repo-command,'hg',hg id -n > ../../data/hg/revision)
+	@$(call run-repo-command,'hg',hg branch > ../../data/hg/branch)
 
 init-svn:
 	@echo "Creating Subversion repository..."
-	@rm -rf tests/repositories/svn
-	@rm -rf tests/data/svn
-	@mkdir -p tests/repositories/svn/src
-	@mkdir -p tests/data/svn
-	@svnadmin create tests/repositories/svn/src
+	@$(call create-new-repo,'svn',svnadmin create src)
 	@svn checkout file://`pwd`/tests/repositories/svn/src tests/repositories/svn/ > /dev/null
-	@cd tests/repositories/svn && svn propset svn:ignore src . > /dev/null
-	@mkdir -p tests/repositories/svn/foo/bar
-	@cd tests/repositories/svn && echo "This is a test" > quotes.txt
-	@cd tests/repositories/svn && echo "This is a test" > foo/bar/test.txt
-	@cd tests/repositories/svn && svn add quotes.txt foo > /dev/null
-	@cd tests/repositories/svn && svn commit -m "First commit." > /dev/null
-	@cd tests/data/svn && echo "svn" > system
-	@cd tests/data/svn && echo "(unknown)" > branch
-	@cd tests/data/svn && svn info ../../repositories/svn | grep Revision | awk '{print $$2}' > revision
-	@cd tests/data/svn && ln -sf revision hash
+	@$(call run-repo-command,"svn",svn propset -q svn:ignore src .)
+	@$(call run-repo-command,"svn",svn add -q quotes.txt foo)
+	@$(call run-repo-command,"svn",svn commit -q -m "First commit." > /dev/null)
+	@$(call run-data-command,"svn",echo "(unknown)" > branch)
+	@$(call run-data-command,'svn',svn info ../../repositories/svn | grep Revision | awk '{print $$2}' > revision)
+	@$(call run-data-command,"svn",ln -sf revision hash)
 
 init-repos: clean init-bzr init-darcs init-fossil init-git init-hg init-svn
 
