@@ -47,7 +47,7 @@ init-darcs:
 	@echo "Creating Darcs repository..."
 	@$(call create-new-repo,'darcs',darcs initialize)
 	@$(call run-repo-command,'darcs',darcs add -q -r .)
-	@$(call run-repo-command,'darcs',darcs record -q -a -m "First commit.")
+	@$(call run-repo-command,'darcs',darcs record -q -a -m "First commit." > /dev/null)
 	@$(call run-data-command,'darcs',echo 'darcs' > branch)
 	@$(call run-repo-command,'darcs',darcs changes --last 1 --xml | grep hash | awk -F "hash='" '{print $$NF}' | awk -F '-' '{print $$3}' | cut -c-7 > ../../data/darcs/hash)
 	@$(call run-data-command,darcs,ln -sf hash revision)
