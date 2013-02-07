@@ -513,13 +513,15 @@ def hg(options):
 
     # changeset ID or global sha
     if re.search('%(r|h)', options.format):
-        try:
-            fh = open(os.path.join(options.file, 'cache/branchheads'), 'r')
-            line = fh.readline()
-            sha, revision = line.strip().split()
-            sha = sha[:7]
-        except IOError:
-            pass
+        fns = ['cache/branchheads', 'cache/branchheads-served']
+        for fn in fns:
+            try:
+                fh = open(os.path.join(options.file, fn), 'r')
+                line = fh.readline()
+                sha, revision = line.strip().split()
+                sha = sha[:7]
+            except IOError:
+                continue
 
     # branch
     if '%b' in options.format:
