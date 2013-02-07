@@ -10,10 +10,10 @@ class Base(unittest.TestCase):
 
     commands = ['../bin/vcprompt']
 
-    def config(self, field):
+    def data(self, field):
         """
         Returns the value for the given ``field`` from the
-        configuration file.
+        'tests/data' directory for each repository.
         """
         location = os.path.abspath(__file__).rsplit('/', 1)[0]
         location = os.path.join(location, 'data', self.repository, field)
@@ -86,11 +86,11 @@ class BaseTest(object):
         Tests that all formatting arguments are working correctly.
         """
         output = self.vcprompt(format=string)
-        expected = ':'.join([self.config('system'),
-                             self.config('system'),
-                             self.config('revision'),
-                             self.config('hash'),
-                             self.config('branch')])
+        expected = ':'.join([self.data('system'),
+                             self.data('system'),
+                             self.data('revision'),
+                             self.data('hash'),
+                             self.data('branch')])
         self.assertEqual(output, expected)
 
     def test_format_branch(self, string='%b'):
@@ -98,21 +98,21 @@ class BaseTest(object):
         Tests that the correct branch name is returned.
         """
         output = self.vcprompt(format=string)
-        self.assertEqual(output, self.config('branch'))
+        self.assertEqual(output, self.data('branch'))
 
     def test_format_revision(self, string='%r'):
         """
         Tests that the correct revision ID or hash is returned.
         """
         output = self.vcprompt(format=string)
-        self.assertEqual(output, self.config('revision'))
+        self.assertEqual(output, self.data('revision'))
 
     def test_format_hash(self, string='%h'):
         """
         Tests that the correct hash or revision ID is returned.
         """
         self.assertEqual(self.vcprompt(format=string),
-                          self.config('hash'))
+                          self.data('hash'))
 
     def test_format_modified(self, string='%m'):
         """
@@ -138,7 +138,7 @@ class BaseTest(object):
         Tests that the '%s' argument correctly returns the system name.
         """
         output = self.vcprompt(format=string)
-        self.assertEqual(output, self.config('system'))
+        self.assertEqual(output, self.data('system'))
 
     def test_format_system_alt(self, string='%n'):
         """
