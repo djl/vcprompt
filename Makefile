@@ -37,6 +37,7 @@ clean:
 init-bzr:
 	@echo "Creating Bazaar repository..."
 	@$(call create-new-repo,'bzr',bzr init)
+	@$(call run-repo-command,'bzr',bzr whoami --branch "`whoami` <`whoami`@`hostname`>")
 	@$(call run-repo-command,'bzr',bzr add -q .)
 	@$(call run-repo-command,'bzr',bzr commit -q -m "First commit.")
 	@$(call run-data-command,'bzr',echo 'bzr' > branch)
