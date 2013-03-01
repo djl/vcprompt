@@ -8,6 +8,7 @@ Options:
   -f, --format FORMAT        The format string to use.
   -p, --path PATH            The path to run vcprompt on.
   -s, --systems              Print all known VCSs and exit
+  -t, --timeout              The max execution time in seconds
   -v, --version              Show program's version number and exit
   -h, --help                 Show this help message and exit
 
@@ -47,6 +48,7 @@ from xml.dom.minidom import parseString
 import optparse
 import os
 import re
+import signal
 import sys
 
 try:
@@ -62,6 +64,7 @@ except ImportError:
 # user editable options
 FORMAT = os.environ.get('VCPROMPT_FORMAT', '%s:%b')
 UNKNOWN = os.environ.get('VCPROMPT_UNKNOWN', '(unknown)')
+TIMEOUT = os.environ.get('VCPROMPT_TIMEOUT', 0)
 SYSTEMS = []
 
 # status indicators
@@ -200,6 +203,7 @@ def main():
     parser.add_option('-f', '--format', dest='format', default=FORMAT)
     parser.add_option('-p', '--path', dest='path', default='.')
     parser.add_option('-s', '--systems', action='callback', callback=systems)
+    parser.add_option('-t', '--timeout', dest='timeout', default=TIMEOUT, type="int")
     parser.add_option('-A', '--staged', dest='staged', default=STAGED)
     parser.add_option('-M', '--modified', dest='modified', default=MODIFIED)
     parser.add_option('-U', '--untracked', dest='untracked', default=UNTRACKED)
@@ -215,8 +219,13 @@ def main():
         parser.add_option(flag, dest=dest, default=default)
 
     options, args = parser.parse_args()
-    output = vcprompt(options)
 
+    # set max execution time
+    # exit with status 126 if timeout is reached
+    signal.signal(signal.SIGALRM, lambda x, y: sys.exit(126))
+    signal.alarm(options.timeout)
+
+    output = vcprompt(options)
     return output
 
 

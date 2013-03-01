@@ -1,6 +1,7 @@
 1.0.2 (????-??-??)
 ------------------
 
+* Added: -t/--timeout option for limiting max execution time
 * Fixed: '%m' token in Bazaar when working dir has modified and untracked files
 * Fixed: '%u' token always being shown in Python 3.
 * Fixed '%r' and '%h' tokens in Mercurual 1.5

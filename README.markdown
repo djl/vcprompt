@@ -42,6 +42,10 @@ OPTIONS
 
   Prints all available version control systems to standard out.
 
+* `-t, --timeout`
+
+  The maximum execution time in seconds.
+
 * `-h, --help`
 
   Prints the help message and exists.
