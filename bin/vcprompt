@@ -43,7 +43,7 @@ Format tokens:
 
 __version__ = '1.0.1'
 
-from subprocess import call, Popen, PIPE
+from subprocess import Popen, PIPE
 from xml.dom.minidom import parseString
 import optparse
 import os
