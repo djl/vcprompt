@@ -579,27 +579,23 @@ def svn(options):
     branch = revision = modified = untracked = staged = options.unknown
 
     # branch
-    output, returncode = popen('svn info %s' % options.path)
+    output, returncode = popen('svn info --xml %s' % options.path)
 
     if returncode == 0:
-        # compile some regexes
-        branch_regex = re.compile('((tags|branches)/([^/]*)|trunk)')
-        revision_regex = re.compile('^Revision: (?P<revision>\d+)')
+        dom = parseString(output)
 
-        for line in output.split('\n'):
-            # branch
-            if '%b' in options.format:
-                if re.match('URL', line):
-                    matches = re.search(branch_regex, line)
-                    if matches:
-                        branch = matches.groups(0)[0]
+        # branch
+        if '%b' in options.format:
+            regex = re.compile('((tags|branches)/([^/]*)|trunk)')
+            tag = dom.getElementsByTagName('url')[0]
+            matches = re.search(regex, tag.childNodes[0].data)
+            if matches:
+                branch = matches.groups(0)[0]
 
-            # revision/sha
-            if re.search('%(r|h)', options.format):
-                if re.match('Revision:', line):
-                    matches = re.search(revision_regex, line)
-                    if 'revision' in matches.groupdict():
-                        revision = matches.group('revision')
+        # revision/sha
+        if re.search('%(r|h)', options.format):
+            tag = dom.getElementsByTagName('commit')[0]
+            revision = tag.getAttribute('revision')
 
     # modified/staged/untracked
     if re.search('%[amu]', options.format):
