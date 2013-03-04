@@ -8,7 +8,7 @@ Options:
   -f, --format FORMAT        The format string to use.
   -p, --path PATH            The path to run vcprompt on.
   -s, --systems              Print all known VCSs and exit
-  -t, --timeout              The max execution time in seconds
+  -t, --timeout              The max execution time in milliseconds
   -v, --version              Show program's version number and exit
   -h, --help                 Show this help message and exit
 
@@ -45,6 +45,7 @@ __version__ = '1.0.1'
 
 from subprocess import Popen, PIPE
 from xml.dom.minidom import parseString
+import errno
 import optparse
 import os
 import re
@@ -221,9 +222,15 @@ def main():
     options, args = parser.parse_args()
 
     # set max execution time
-    # exit with status 126 if timeout is reached
-    signal.signal(signal.SIGALRM, lambda x, y: sys.exit(126))
-    signal.alarm(options.timeout)
+    # exit with status errno.ETIME if timeout is reached
+    timeout = float(options.timeout) / 1000
+    signal.signal(signal.SIGALRM, lambda x, y: sys.exit(errno.ETIME))
+
+    # Use setitimer on Python 2.6+
+    try:
+        signal.setitimer(signal.ITIMER_REAL, timeout)
+    except AttributeError:
+        signal.alarm(options.timeout)
 
     output = vcprompt(options)
     return output

@@ -44,7 +44,7 @@ OPTIONS
 
 * `-t, --timeout`
 
-  The maximum execution time in seconds.
+  The maximum execution time in milliseconds.
 
 * `-h, --help`
 
