@@ -49,6 +49,7 @@ import errno
 import optparse
 import os
 import re
+import shlex
 import signal
 import sys
 
@@ -76,7 +77,8 @@ UNTRACKED = os.environ.get('VCPROMPT_UNTRACKED', '?')
 
 def popen(command, stdout=PIPE, stderr=PIPE):
     try:
-        process = Popen(command.split(), stdout=stdout, stderr=stderr)
+        commands = shlex.split(command)
+        process = Popen(commands, stdout=stdout, stderr=stderr)
         output = process.communicate()[0]
         returncode = process.returncode
     except OSError:
