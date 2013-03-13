@@ -543,13 +543,13 @@ def hg(options):
 
     # branch
     if '%b' in options.format:
-        file = os.path.join(options.file, 'undo.branch')
         try:
+            file = os.path.join(options.file, 'branch')
             fh = open(file, 'r')
             line = fh.readline()
             branch = line.strip()
         except IOError:
-            pass
+            branch = "default"
 
     # modified
     if '%m' in options.format:
