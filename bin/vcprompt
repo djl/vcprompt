@@ -544,10 +544,8 @@ def hg(options):
     # branch
     if '%b' in options.format:
         try:
-            file = os.path.join(options.file, 'branch')
-            fh = open(file, 'r')
-            line = fh.readline()
-            branch = line.strip()
+            fn = os.path.join(options.file, 'branch')
+            branch = open(fn, 'r').readline().strip()
         except IOError:
             branch = "default"
 
