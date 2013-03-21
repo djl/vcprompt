@@ -148,6 +148,7 @@ def vcprompt(options):
     """
     options.path = os.path.abspath(os.path.expanduser(options.path))
     original_path = options.path
+    unknown = options.unknown
     prompt = None
 
     while options.path:
@@ -178,11 +179,11 @@ def vcprompt(options):
                 prompt = options.format
 
                 # Get hash and revision, with fallback to each other
-                hash = conf.get('hash', conf.get('revision', options.unknown))
-                revision = conf.get('revision', conf.get('hash', options.unknown))
+                hash = conf.get('hash', conf.get('revision', unknown))
+                revision = conf.get('revision', conf.get('hash', unknown))
 
                 # Substitute stuff
-                prompt = prompt.replace("%b", conf.get('branch', options.unknown))
+                prompt = prompt.replace("%b", conf.get('branch', unknown))
                 prompt = prompt.replace("%r", revision)
                 prompt = prompt.replace("%h", hash)
                 prompt = prompt.replace("%m", conf.get('modified', ''))
@@ -206,7 +207,7 @@ def main():
     parser.add_option('-f', '--format', dest='format', default=FORMAT)
     parser.add_option('-p', '--path', dest='path', default='.')
     parser.add_option('-s', '--systems', action='callback', callback=systems)
-    parser.add_option('-t', '--timeout', dest='timeout', default=TIMEOUT, type="int")
+    parser.add_option('-t', '--timeout', dest='timeout', default=TIMEOUT, type='int')
     parser.add_option('-A', '--staged', dest='staged', default=STAGED)
     parser.add_option('-M', '--modified', dest='modified', default=MODIFIED)
     parser.add_option('-U', '--untracked', dest='untracked', default=UNTRACKED)
@@ -276,7 +277,7 @@ def bzr(options):
         'revision': revision,
         'modified': modified,
         'untracked': untracked,
-        }
+    }
 
 
 @vcs(["CVS"])
@@ -286,7 +287,7 @@ def cvs(options):
 
     Concurrent Versions System.
     """
-    return { }
+    return {}
 
 
 @vcs(["_darcs/hashed_inventory"])
@@ -334,7 +335,7 @@ def darcs(options):
         'hash': sha,
         'modified': modified,
         'untracked': untracked,
-        }
+    }
 
 
 @vcs([".fslckout", "_FOSSIL_"])
@@ -423,7 +424,7 @@ def fossil(options):
         'hash': sha,
         'modified': modified,
         'untracked': untracked,
-        }
+    }
 
 
 @vcs([".git"])
@@ -436,7 +437,8 @@ def git(options):
     staged = branch = sha = modified = untracked = options.unknown
 
     if os.path.isfile(options.file):
-        options.file = open(options.file, "r").read().rstrip('\n').split(" ", 1)[1]
+        fn = open(options.file, 'r').read().rstrip('\n').split(' ', 1)[1]
+        options.file = fn
 
     def revstring(ref, chars=7):
         if not os.path.exists(ref):
@@ -517,7 +519,7 @@ def git(options):
         'modified': modified,
         'untracked': untracked,
         'staged': staged,
-        }
+    }
 
 
 @vcs([".hg"])
@@ -573,7 +575,7 @@ def hg(options):
         'revision': revision,
         'modified': modified,
         'untracked': untracked,
-        }
+    }
 
 
 @vcs([".svn/entries"])
@@ -628,7 +630,7 @@ def svn(options):
         'modified': modified,
         'untracked': untracked,
         'staged': staged,
-        }
+    }
 
 
 if __name__ == '__main__':
