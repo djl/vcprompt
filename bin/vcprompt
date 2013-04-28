@@ -259,6 +259,9 @@ def bzr(options):
     if re.search('%[mu]', options.format):
         output, returncode = popen('bzr status --short')
 
+        modified = ''
+        untracked = ''
+
         if returncode == 0:
             if output:
                 for line in output.splitlines():
@@ -267,9 +270,6 @@ def bzr(options):
                         modified = options.modified
                     elif line.startswith('?'):
                         untracked = options.untracked
-            else:
-                modified = ''
-                untracked = ''
 
     # formatting
     return {
