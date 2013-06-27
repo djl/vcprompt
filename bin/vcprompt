@@ -50,8 +50,8 @@ import optparse
 import os
 import re
 import shlex
-import signal
 import sys
+import threading
 
 try:
     import sqlite3
@@ -227,13 +227,8 @@ def main():
     # set max execution time
     # exit with status errno.ETIME if timeout is reached
     timeout = float(options.timeout) / 1000
-    signal.signal(signal.SIGALRM, lambda x, y: sys.exit(errno.ETIME))
-
-    # Use setitimer on Python 2.6+
-    try:
-        signal.setitimer(signal.ITIMER_REAL, timeout)
-    except AttributeError:
-        signal.alarm(int(round(timeout)))
+    timer = threading.Timer(timeout, lambda: sys.exit(errno.ETIME))
+    timer.start()
 
     output = vcprompt(options)
     return output
