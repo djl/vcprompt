@@ -303,12 +303,6 @@ def darcs(options):
             patch = dom.getElementsByTagName("patch")[0].getAttribute("hash")
             sha = patch.rsplit('-', 1)[-1].split('.')[0][:7]
 
-    # branch
-    # darcs doesn't have in-repo local branching (yet), so just use
-    # the directory name for now
-    # see also: http://bugs.darcs.net/issue555
-    branch = os.path.basename(options.path)
-
     # modified
     if re.search('%[mu]', options.format):
         output, returncode = popen('darcs whatsnew -l -s')
@@ -326,7 +320,7 @@ def darcs(options):
 
     # formatting
     return {
-        'branch': branch,
+        'branch': os.path.basename(options.path),
         'hash': sha,
         'modified': modified,
         'untracked': untracked,
