@@ -9,9 +9,9 @@ Options:
   -p, --path PATH            The path to run vcprompt on.
   -s, --systems              Print all known VCSs and exit
   -t, --timeout              The max execution time in milliseconds
+  -n, --no-newline           Do not print a trailing newline character
   -v, --version              Show program's version number and exit
   -h, --help                 Show this help message and exit
-  -n, --no-newline           Do not append a new line char in output
 
 Formatting options:
   -u, --unknown UNKNOWN      The "unknown" value. Default is "(unknown)"
@@ -207,6 +207,7 @@ def main():
     parser.add_option('-h', '--help', action='callback', callback=helper)
     parser.add_option('-f', '--format', dest='format', default=FORMAT)
     parser.add_option('-p', '--path', dest='path', default='.')
+    parser.add_option('-n', '--no-newline', action='store_false', dest='newline', default=True)
     parser.add_option('-s', '--systems', action='callback', callback=systems)
     parser.add_option('-t', '--timeout', dest='timeout', default=TIMEOUT, type='int')
     parser.add_option('-A', '--staged', dest='staged', default=STAGED)
@@ -214,7 +215,6 @@ def main():
     parser.add_option('-U', '--untracked', dest='untracked', default=UNTRACKED)
     parser.add_option('-u', '--unknown', dest='unknown', default=UNKNOWN)
     parser.add_option('-v', '--version', action='callback', callback=version)
-    parser.add_option('-n', '--no-newline', action='store_true', dest='noNewline', default=False)
 
     # vcs-specific formatting
     for system in SYSTEMS:
@@ -233,7 +233,8 @@ def main():
     timer.start()
 
     output = vcprompt(options)
-    output += '\n' if not options.noNewline else ''
+    if options.newline:
+        output += '\n'
     return output
 
 

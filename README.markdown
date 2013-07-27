@@ -38,6 +38,10 @@ OPTIONS
   The path on which to run `vcprompt`. Defaults to the current
   directory.
 
+* `-n, --no-newline`
+
+  Do not print a trailing newline character.
+
 * `-s, --systems`
 
   Prints all available version control systems to standard out.
