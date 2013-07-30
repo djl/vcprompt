@@ -235,6 +235,7 @@ def main():
     output = vcprompt(options)
     if options.newline:
         output += '\n'
+    timer.cancel()
     return output
 
 
